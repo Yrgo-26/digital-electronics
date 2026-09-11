@@ -1,0 +1,61 @@
+# Ignore everything without an extension, then selectively allow files and directories.
+*
+!*.*
+!*/
+
+# Don't ignore makefiles and license files.
+!makefile
+!Makefile
+!LICENSE
+!LICENSE-CODE
+
+# Ignore the simulator harness binary, built by `make -C ci/simcheck`.
+ci/simcheck/simcheck
+
+# Ignore assembler output, wherever an assembler run by hand leaves it.
+*.hex
+*.obj
+*.lst
+*.lss
+*.map
+*.eep
+
+# Ignore Microchip Studio projects and their build output. The course ships .asm files; a Studio
+# project is something each participant creates around one.
+*.atsln
+*.asmproj
+*.componentinfo.xml
+Debug/
+Release/
+.vs/
+
+# Ignore the Python environment and bytecode used to redraw the diagrams.
+.venv/
+__pycache__/
+*.pyc
+
+# Ignore IDE directories.
+.vscode/
+.claude/
+
+# Ignore temp/ directory.
+temp/
+
+# Solutions are published after each lecture, not with it. They sit in the working tree so the
+# course can be checked end to end (ci/simtest.py assembles and simulates the lab solutions), and
+# are force-added once the lecture has been given:
+#   git add -f lectures/L01/appendix/d_solutions.md
+*_solutions.md
+labs/lab3/solutions/
+
+# Figures used only by a solutions appendix are named sol_*.png, and follow their appendix: they
+# are force-added together with it. Otherwise the check that every committed figure is embedded
+# somewhere would fail on a figure whose only reader has not been published yet.
+lectures/*/appendix/images/sol_*.png
+
+# The written exam and its solutions are the teacher's alone and are never published; the
+# solutions are handed out on paper when the marked exam is returned. The practice exam and its
+# solutions are published from the start, since students train on them before L12.
+!exam/practice_exam_solutions.md
+exam/exam.md
+exam/images/exam_*.png
