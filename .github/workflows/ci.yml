@@ -1,0 +1,55 @@
+# Set pipeline name.
+name: CI
+
+# Set pipeline triggers.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Read-only is all any job here needs.
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+# Define pipeline jobs.
+jobs:
+  # Assemble every program with avra, which takes the syntax Microchip Studio takes, and run the
+  # ones that carry @expect lines in the simulator. Solutions are git-ignored until published,
+  # so CI checks whatever has been published so far.
+  test:
+    name: Assemble and simulate the assembly programs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install avra and simavr
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y avra simavr libsimavr-dev libelf-dev
+          avra --version | head -n 1
+
+      - name: Assemble and simulate
+        run: make test
+
+  # Cheap checks that need no toolchain.
+  lint:
+    name: Markdown links and course conventions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check that relative Markdown links resolve
+        run: make links
+
+      - name: Check the course conventions
+        run: make check
