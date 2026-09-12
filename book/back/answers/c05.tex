@@ -1,0 +1,215 @@
+% Solutions to Chapter 5's exercises, from lectures/L05/appendix/c_solutions.md. No exercise in the
+% chapter is a program, so every one is answered, and the source's note on what counts as the
+% answer in a troubleshooting case is kept as the entry's introduction.
+
+\answerchapter{c5:ch}
+
+I felsökningsfallen är det \textbf{resonemanget} som är svaret: vilken mätning som görs härnäst, och
+vad den kan visa. Den som gissade rätt orsak utan att kunna säga var hen skulle mäta har gissat.
+
+\answer{c5:ex:1}{Matningen först}
+\pt{a}Röd mätsladd på \textbf{ben~14} (VCC), svart på \textbf{ben~7} (GND). Du ska se ungefär
+\textbf{5~V}.
+
+\pt{b}Skenan kan ha 5~V medan kretsen inte har det: sladden till ben~14 kan sitta i kolumnen
+bredvid, eller skenan kan vara delad på mitten av kopplingsdäcket. Det som räknas är spänningen
+\textbf{på kretsens ben}, så det är där du mäter.
+
+\pt{c}Varje ingång på en CMOS-krets har skyddsdioder mot VCC. När en ingång får 5~V från en
+strömbrytare leder dioden, och kretsen får en del av sin matning \textbf{genom ingången}. Kretsen
+kan då ge utsignaler som ibland är rätt, men bara när någon ingång råkar vara hög, och med fel
+nivåer. Det är därför ett matningsfel sällan ser ut som \enquote{ingenting fungerar}, och därför
+matningen ska mätas först även när något verkar fungera.
+
+\answer{c5:ex:2}{Vad betyder mätvärdet?}
+\pt{a}4,7~V är över 3,5~V: logisk \textbf{1}, en normal hög utgång.
+
+\pt{b}0,1~V är under 1,5~V: logisk \textbf{0}, en normal låg utgång.
+
+\pt{c}2,3~V ligger i det förbjudna området mellan 1,5 och 3,5~V: \textbf{ingen giltig nivå}.
+Troligen en flytande ingång, som inte är ansluten till något.
+
+\pt{d}2,5~V på en utgång som är kopplad till en annan utgång: \textbf{två utgångar mot varandra}.
+Den ena försöker driva hög, den andra låg, och spänningen hamnar någonstans mitt emellan medan en
+onödigt stor ström går mellan dem. Det är ett fel, och kretsarna blir varma. Två utgångar får
+aldrig kopplas ihop.
+
+\answer{c5:ex:3}{En grind som ljuger}
+\pt{a}En AND-grind med ingångarna 1 och 0 ska ge \textbf{0}, alltså under 0,3~V på ben~3.
+
+\pt{b}Grinden ger 1 för ingångarna 1 och 0: den beter sig som en \textbf{OR-grind}. Den troligaste
+förklaringen är att det sitter en \textbf{74HC32} i stället för en 74HC08. De har samma
+benplacering, så nätet går att koppla upp och fungerar på alla rader där AND och OR råkar ge samma
+svar (00 och 11), vilket gör felet lätt att missa. Kontrollera texten på kretsen. Ett alternativ är
+att ben~3 är kortslutet mot 5~V; det skiljer du ut genom att ställa ingångarna på 00: en OR ger då
+0, en kortslutning ger fortfarande 5~V.
+
+\answer{c5:ex:4}{Den varma kretsen}
+\pt{a}\textbf{Bryt matningen direkt.} En varm krets håller på att skadas, och det går fort.
+
+\pt{b}De två vanligaste orsakerna:
+\begin{itemize}
+  \item \textbf{kretsen sitter felvänd}, så att den får plus på ben~7 och jord på ben~14;
+  \item \textbf{en utgång är kortsluten}: mot matningen, mot jord, mot en annan utgång eller mot en
+    strömbrytare som driver den i motsatt riktning.
+\end{itemize}
+
+\pt{c}Kontrollera först riktningen: hacket åt vänster, ben~1 längst ned till vänster, och ben~14 i
+kolumnen med sladden till \code{+}. Om riktningen är rätt, gå igenom kopplingslistan rad för rad
+och leta efter en ledning som går till ett utgångsben (ben 3, 6, 8 och 11 på en 74HC08) från något
+annat än en ingång. Multimeterns resistansläge (Ω), med matningen \textbf{frånslagen}, visar om ett
+utgångsben har direkt förbindelse med en skena.
+
+\answer{c5:ex:5}{Läs felet ur tabellen}
+\pt{a}Förväntat är \code{X = 1} på raderna 001, 011, 101, 110 och 111. Raderna \textbf{001, 011
+och 101} är fel: där blir \code{X = 0}.
+
+\pt{b}Alla tre har \code{C = 1} och \code{AB = 0}. Det är de rader där \code{X} bara kan bli 1
+\textbf{tack vare C}. Raderna där \code{AB = 1} stämmer. Alltså når \code{AB} fram genom
+OR-grinden, men \code{C} gör det inte: den uppmätta tabellen är precis \code{X = AB}.
+
+\pt{c}Ställ in raden \code{ABC = 001} och mät på \textbf{OR-grindens andra ingång}, U2 ben~2.
+Förväntat 1. Om den visar 0 sitter felet i ledningen från strömbrytaren C: fel kolumn, eller
+kanske kopplad till jord tillsammans med de oanvända ingångarna. Om den visar 1 är det OR-grinden
+eller dess utgång som ska undersökas.
+
+\answer{c5:ex:6}{Bromsassistenten som inte bromsar}
+\pt{a}Kravet att \textbf{föraren alltid ska kunna bromsa}, även när assistanssystemet är trasigt.
+Nätet släpper inte igenom förarens pedal när \code{F = 1}, alltså precis när systemet rapporterar
+ett fel. Just då, när föraren inte kan lita på systemet och bromsar själv, bromsar bilen inte. Det
+är den farligaste raden i hela tabellen.
+
+\pt{b}Pedalen är kopplad \textbf{in i OR-grinden tillsammans med detektorerna}, så att den passerar
+AND-grinden med \code{F'}. Nätet de byggt är:
+
+\begin{textdrawing}
+B = (D + S + R) · F'
+\end{textdrawing}
+
+\noindent i stället för det rätta:
+
+\begin{textdrawing}
+B = D + (S + R) · F'
+\end{textdrawing}
+
+\noindent Kontrollera: med \code{D = 1} och \code{F = 1} ger det felaktiga uttrycket
+\code{1 · 0 = 0}, och det rätta \code{1 + ... = 1}. Med \code{F = 0} ger båda samma svar, vilket är
+varför tolv rader stämmer.
+
+\pt{c}Följ ledningen från strömbrytaren \code{D}. Den ska gå till \textbf{den sista OR-grindens}
+ingång, den vars utgång är \code{B}. Ställ in en rad med \code{D = 1, F = 1} och mät på ingångarna
+till grinden som driver \code{B}. I det rätta nätet är det OR-grinden, med \code{D = 1} på ena
+ingången. I det felaktiga nätet är det AND-grinden med \code{F'}, och dess \code{F'}-ingång ligger
+på 0: pedalens etta kommer aldrig förbi den.
+
+\answer{c5:ex:7}{Halvering}
+\pt{a}\textbf{Efter grind~8}, i mitten. Då vet du efter en enda mätning i vilken halva felet
+sitter, och halva nätet är avskrivet.
+
+\pt{b}Sexton grindar halveras till åtta, fyra, två och en: högst \textbf{fyra mätningar}.
+
+\pt{c}Från ingången och grind för grind: i värsta fall \textbf{15 mätningar} (efter grind 1 till
+15; om alla är rätt är det grind~16 som felar).
+
+\answer{c5:ex:8}{Den flimrande lysdioden}
+\pt{a}En \textbf{flytande ingång} någonstans i nätet: en ingång som inte är ansluten till något, och
+som därför påverkas av laddning från omgivningen, till exempel från din hand.
+
+\pt{b}Mät spänningen på varje ingång i nätet, också på oanvända grindar. En ansluten ingång visar
+stadigt nära 0~V eller 5~V; den flytande visar ett värde som vandrar, eller ligger mitt emellan,
+och ändras när du rör handen. Jämför sedan med kopplingslistan: vilken ingång saknar en rad?
+
+\pt{c}En HC-krets är byggd i CMOS, och dess ingångar har extremt hög resistans: nästan ingen ström
+flyter in eller ut, så ingenting bestämmer spänningen. En LS-krets (TTL) har ingångar där en liten
+ström flyter \textbf{ut} ur ingången, och den strömmen drar en okopplad ingång mot hög nivå. En
+flytande LS-ingång läses därför nästan alltid som 1. Det gör felet mindre synligt på LS, men det är
+fel där också.
+
+\needspace{14\baselineskip}
+\answer{c5:ex:9}{Planera fläkten}
+\pt{a}Grindtilldelning för \code{F = TW'B' + CB'}:
+
+\begin{narrowtable}{@{}llclc@{}}
+  \thead{Grind i nätet} & \thead{Krets} & \thead{Grind} & \thead{Ingångar (ben)} &
+    \thead{Utgång (ben)} \\
+  \midrule
+  NOT: \code{W'} & U1 = 74HC04 & 1 & W $\rightarrow$ 1 & 2 \\
+  NOT: \code{B'} & U1 = 74HC04 & 2 & B $\rightarrow$ 3 & 4 \\
+  AND: \code{TW'} & U2 = 74HC08 & 1 & T $\rightarrow$ 1, U1 ben 2 $\rightarrow$ 2 & 3 \\
+  AND: \code{TW'B'} & U2 = 74HC08 & 2 & U2 ben 3 $\rightarrow$ 4, U1 ben 4 $\rightarrow$ 5 & 6 \\
+  AND: \code{CB'} & U2 = 74HC08 & 3 & C $\rightarrow$ 9, U1 ben 4 $\rightarrow$ 10 & 8 \\
+  OR: \code{F} & U3 = 74HC32 & 1 & U2 ben 6 $\rightarrow$ 1, U2 ben 8 $\rightarrow$ 2 & 3 \\
+\end{narrowtable}
+
+\needspace{20\baselineskip}
+\pt{b}Kopplingslista:
+
+\begin{narrowtable}{@{}rll@{}}
+  \thead{Nr} & \thead{Från} & \thead{Till} \\
+  \midrule
+  1 & U1, U2 och U3 ben 14 & +5~V \\
+  2 & U1, U2 och U3 ben 7 & GND \\
+  3 & strömbrytare W & U1 ben 1 \\
+  4 & strömbrytare B & U1 ben 3 \\
+  5 & strömbrytare T & U2 ben 1 \\
+  6 & U1 ben 2 & U2 ben 2 \\
+  7 & U2 ben 3 & U2 ben 4 \\
+  8 & U1 ben 4 & U2 ben 5 \\
+  9 & U1 ben 4 & U2 ben 10 \\
+  10 & strömbrytare C & U2 ben 9 \\
+  11 & U2 ben 6 & U3 ben 1 \\
+  12 & U2 ben 8 & U3 ben 2 \\
+  13 & U3 ben 3 & lysdiod F \\
+  14 & U1 ben 5, 9, 11, 13 & GND \\
+  15 & U2 ben 12, 13 & GND \\
+  16 & U3 ben 4, 5, 9, 10, 12, 13 & GND \\
+\end{narrowtable}
+
+\noindent\code{B'} från U1 ben~4 används av två grindar, så två rader utgår från samma ben. På
+kopplingsdäcket sätter du båda sladdarna i kolumnen för U1 ben~4.
+
+\pt{c}Fläkten ska starta på hög temperatur när \code{T = 1}, \code{W = 0} och \code{B = 0}. Om
+\code{C = 1} samtidigt startar den ändå, tack vare \code{CB'}. Den felaktiga raden är alltså
+\textbf{\code{TWCB = 1000}}, där bara termen \code{TW'B'} kan göra \code{F = 1}. Ställ in den och
+mät längs den termen: U2 ben~3 (\code{TW'}, ska vara 1) och U2 ben~6 (\code{TW'B'}, ska vara 1),
+och sedan U3 ben~1.
+
+\answer{c5:ex:10}{Kontroll: en utgång under last}
+\pt{a}Med 5~V på utgången och 2~V över lysdioden ligger 3~V över motståndet:
+\[
+  I = \frac{5 - 2}{330} \approx 9,1\ \text{mA}
+\]
+
+\pt{b}Typiska mätvärden på en station är ungefär: hög utgång \textbf{4,4--4,7~V}, lysdiod
+\textbf{1,9--2,0~V}, låg utgång \textbf{0,0--0,1~V}. Dina egna värden är svaret; skriv upp dem.
+
+\pt{c}Med till exempel 4,5~V på utgången och 1,95~V över lysdioden:
+\[
+  I = \frac{4,5 - 1,95}{330} \approx 7,7\ \text{mA}
+\]
+
+\pt{d}Antagandet att utgången ger \textbf{exakt 5~V} var fel. En hög utgång har en viss inre
+resistans, och när den levererar ström tappar den en del av spänningen: med siffrorna ovan ungefär
+0,5~V vid 7,7~mA, alltså runt 65~Ω. Lysdiodens spänning kan också skilja sig lite från 2~V,
+beroende på färg och exemplar.
+
+Den uppmätta höga nivån ligger väl över databladets $V_{\text{OH}}$ på 3,84~V vid 4~mA, trots att
+strömmen här är dubbelt så stor. Den låga nivån ligger nästan på 0~V, långt under $V_{\text{OL}}$
+på 0,33~V, eftersom lysdioden är släckt när utgången är låg och ingen ström går genom utgången
+alls. Slutsatsen: skillnaden mellan kalkyl och mätning är några tiondels volt och ett par
+milliampere, och den kommer från utgångens inre resistans. Den spelar ingen roll för lysdioden, men
+den visar varför en utgång inte ska belastas mer än nödvändigt.
+
+\answer{c5:ex:11}{Fel krets i sockeln}
+\pt{a}Ben~1 på en 74HC02 är \textbf{utgången} på grind~1, \code{1Y}.
+
+\pt{b}När NOR-grindens ingångar (ben 2 och 3) båda är 0 försöker grinden ge en etta på ben~1. Om
+strömbrytaren samtidigt håller ben~1 på 0~V kortsluts utgången mot jord genom strömbrytaren.
+Strömmen begränsas bara av utgångstransistorns inre resistans, några tiotal ohm, och blir tiotals
+milliampere: över kretsens gränsvärde på 25~mA. Kretsen blir varm och kan förstöras. Samma sak
+händer åt andra hållet när strömbrytaren ger 5~V och grinden försöker ge 0.
+
+\pt{c}Ben~3 är en \textbf{ingång} på en 74HC02 (\code{1B}). En ingång driver ingenting, så
+lysdioden lyser aldrig, vad strömbrytarna än står på. Lysdioden och motståndet håller dessutom
+ben~3 nära jord, så NOR-grinden ser ingången som 0. Kombinationen, en lysdiod som aldrig lyser och
+en krets som blir varm, är kännetecknet för en krets med fel benplacering.

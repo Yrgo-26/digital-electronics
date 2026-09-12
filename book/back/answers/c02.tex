@@ -1,0 +1,341 @@
+% Solutions to Chapter 2's exercises, from lectures/L02/appendix/d_solutions.md. No exercise in
+% the chapter is a program, so every one is answered, including what the simulation in
+% CircuitVerse should show.
+%
+% Differences in layout only: the derivation in exercise 6 d) is too long for one line of the page,
+% so it is set with one step per line, and the shorter route in 6 b) is a display, not inline.
+
+\answerchapter{c2:ch}
+
+\answer{c2:ex:1}{Grindar med tre ingångar}
+\needspace{5\baselineskip}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}ccc@{\hspace{1.5em}}ccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{AND} & \thead{OR} & \thead{XOR} \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 1 & 1 \\
+  0 & 1 & 0 & 0 & 1 & 1 \\
+  0 & 1 & 1 & 0 & 1 & 0 \\
+  1 & 0 & 0 & 0 & 1 & 1 \\
+  1 & 0 & 1 & 0 & 1 & 0 \\
+  1 & 1 & 0 & 0 & 1 & 0 \\
+  1 & 1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\needspace{5\baselineskip}
+\pt{b}\leavevmode
+\begin{itemize}
+  \item AND är \code{1} när \textbf{alla} tre ingångarna är \code{1}.
+  \item OR är \code{1} när \textbf{minst en} ingång är \code{1}.
+  \item XOR är \code{1} när ett \textbf{udda} antal ingångar är \code{1}, alltså en eller tre.
+\end{itemize}
+Den sista raden är den många får fel: XOR med tre ingångar är \code{1} på raden \code{111},
+eftersom tre är udda. Den som tänker \enquote{XOR är 1 när ingångarna är olika} missar det, för den
+regeln gäller bara med två ingångar.
+
+\pt{c}AND är \code{1} på \textbf{en} rad och OR på \textbf{sju}. AND kräver att alla villkor är
+uppfyllda, och det är de bara i en kombination; OR kräver bara ett, och det är uppfyllt i alla
+kombinationer utom den där alla är \code{0}. AND och OR är varandras spegelbilder, vilket är precis
+vad De Morgan säger.
+
+\answer{c2:ex:2}{Från ord till uttryck}
+\pt{a}Med D = \enquote{dörren är öppen}, A = \enquote{larmet är aktiverat} och L = \enquote{larmet
+ljuder}: \textbf{\mbox{\code{L = DA}}}.
+
+\pt{b}Med N = \enquote{nivån är låg}, M = \enquote{manuellt stopp är intryckt} och P =
+\enquote{pumpen går}: \textbf{\mbox{\code{P = NM'}}}. Ordet \emph{ingen} i beskrivningen är ett NOT.
+
+\pt{c}Med D1, D2 och D3 för de tre dörrarna och H för lampan:
+\textbf{\mbox{\code{H = D1 + D2 + D3}}}.
+
+\pt{d}X är \code{1} om maskinen är påslagen och skyddet inte är på plats, eller om nödlarmet är
+utlöst. Uttrycket beskriver alltså något som bör leda till ett larm, till exempel ett signalhorn.
+
+\pt{e}\code{AB + C = 0 · 0 + 1 = 1}, men \code{A(B + C) = 0 · (0 + 1) = 0}. De två
+uttrycken ger olika svar, så \mbox{\code{AB + C}} får inte läsas som \mbox{\code{A(B + C)}}. AND
+binder hårdare än OR, precis som multiplikation binder hårdare än addition.
+
+\answer{c2:ex:3}{Räknelagarna}
+\pt{a}\code{A + A = A} (idempotens)
+\pt{b}\code{A · A' = 0} (komplement)
+\pt{c}\code{A + 1 = 1} (dominans)
+\pt{d}\code{(A')' = A} (dubbel invertering)
+\pt{e}\code{A + AB = A} (absorption)
+\pt{f}\code{A(A + B) = A} (absorption). Eller: \code{A(A + B) = AA + AB = A + AB = A}.
+\pt{g}\code{A + A'B = A + B} (förenkling)
+\pt{h}\code{AB + A'B = B(A + A') = B · 1 = B} (distributiv, komplement, identitet)
+
+\answer{c2:ex:4}{De Morgan}
+\pt{a}\code{(AB)' = A' + B'}
+\pt{b}\code{(A + B + C)' = A'B'C'}
+\pt{c}\code{(A'B)' = (A')' + B' = A + B'}
+\pt{d}\code{(A + B')' = A' · (B')' = A'B}
+
+\ptnote{Vanligt fel}Att i c) och d) bara byta tecknet men glömma att invertera varje variabel, eller
+att invertera men glömma att en variabel som redan var inverterad blir oinverterad.
+
+\needspace{5\baselineskip}
+\pt{e}\leavevmode
+
+\begin{narrowtable}{@{}cc@{\hspace{1.5em}}ccccc@{}}
+  \thead{A} & \thead{B} & \thead{AB} & \thead{(AB)'} & \thead{A'} & \thead{B'} &
+    \thead{A' + B'} \\
+  \midrule
+  0 & 0 & 0 & 1 & 1 & 1 & 1 \\
+  0 & 1 & 0 & 1 & 1 & 0 & 1 \\
+  1 & 0 & 0 & 1 & 0 & 1 & 1 \\
+  1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+\end{narrowtable}
+
+\noindent Kolumnerna \code{(AB)'} och \mbox{\code{A' + B'}} är lika på varje rad.
+
+\answer{c2:ex:5}{Från sanningstabell till uttryck}
+\pt{a}X är \code{1} på raderna 000, 010, 110 och 111:
+
+\begin{console}
+X = A'B'C' + A'BC' + ABC' + ABC
+\end{console}
+
+\pt{b}Para ihop de två första termerna (de delar \code{A'C'}) och de två sista (de delar
+\code{AB}):
+
+\begin{console}
+X = A'C'(B' + B) + AB(C' + C) = A'C' + AB
+\end{console}
+
+\pt{c}\code{A'C'} är \code{1} när A = 0 och C = 0: raderna 000 och 010. \code{AB} är \code{1} när
+A = 1 och B = 1: raderna 110 och 111. Tillsammans exakt de fyra ettorna i tabellen, och inga andra.
+
+\pt{d}Oförenklat: tre NOT-grindar (för \code{A'}, \code{B'} och \code{C'}), fyra AND-grindar med tre
+ingångar och en OR-grind med fyra, alltså \textbf{8 grindar}. Förenklat: två NOT-grindar
+(\code{A'} och \code{C'}), två AND-grindar med två ingångar och en OR-grind med två, alltså
+\textbf{5 grindar}.
+
+\answer{c2:ex:6}{Algebraisk förenkling}
+\pt{a}Använd termen \code{AB} två gånger (idempotens):
+
+\begin{console}
+AB + AB' + A'B = (AB + AB') + (AB + A'B) = A(B + B') + B(A + A') = A + B
+\end{console}
+
+\needspace{5\baselineskip}
+\pt{b}\leavevmode
+
+\begin{console}
+(A + B)(A + B') = AA + AB' + AB + BB' = A + A(B' + B) + 0 = A + A = A
+\end{console}
+
+\noindent Eller kortare med den andra distributiva lagen baklänges:
+
+\begin{console}
+(A + B)(A + B') = A + BB' = A + 0 = A
+\end{console}
+
+\pt{c}Samma knep som i a), med \code{SR} två gånger:
+
+\begin{console}
+S'R + SR' + SR = (S'R + SR) + (SR' + SR) = R(S' + S) + S(R' + R) = R + S
+\end{console}
+
+\needspace{5\baselineskip}
+\pt{d}\leavevmode
+
+\begin{textdrawing}
+A'B'C + A'BC + ABC = A'C(B' + B) + ABC
+                   = A'C + ABC
+                   = C(A' + AB)
+                   = C(A' + B)
+                   = A'C + BC
+\end{textdrawing}
+
+\noindent Steget \mbox{\code{A' + AB = A' + B}} är förenklingslagen med A och \code{A'} i omvända
+roller. Kontroll: X är \code{1} på raderna 001, 011 och 111, och \mbox{\code{A'C + BC}} är \code{1}
+på exakt de raderna.
+
+\answer{c2:ex:7}{Kontroll: analys av ett grindnät}
+\needspace{5\baselineskip}
+\pt{a}\leavevmode
+
+\begin{console}
+P = (A + B)'
+Q = BC
+X = P + Q = (A + B)' + BC = A'B' + BC
+\end{console}
+
+\needspace{5\baselineskip}
+\pt{b}\leavevmode
+
+\begin{narrowtable}{@{}ccc@{\hspace{1.5em}}ccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{P = (A + B)'} & \thead{Q = BC} & \thead{X} \\
+  \midrule
+  0 & 0 & 0 & 1 & 0 & 1 \\
+  0 & 0 & 1 & 1 & 0 & 1 \\
+  0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 0 & 1 & 1 \\
+  1 & 0 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 & 0 & 0 \\
+  1 & 1 & 0 & 0 & 0 & 0 \\
+  1 & 1 & 1 & 0 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{c}Simuleringen ska ge exakt den här tabellen. De vanligaste orsakerna till en avvikelse är att
+NOR-grinden har byggts som en OR (då blir P fel på varje rad), eller att B inte har kopplats till
+båda grindarna, eftersom den förgrenar sig i ritningen.
+
+\pt{d}En avvikelse på en enstaka rad beror oftast på ett räknefel i tabellen, eftersom ett fel i
+bygget brukar synas på flera rader. Räkna om P och Q för raden, och följ sedan ledningen från varje
+ingång i bygget.
+
+\pt{e}X är \code{1} när \textbf{både A och B är \code{0}}, eller när \textbf{både B och C är
+\code{1}}.
+
+\answer{c2:ex:8}{Från uttryck till grindnät}
+\pt{a}Två NOT-grindar (\code{A'} och \code{C'}), två AND-grindar (\code{A'B} och \code{BC'}) och en
+OR-grind: \textbf{5 grindar}.
+
+\needspace{5\baselineskip}
+\pt{b}\leavevmode
+
+\begin{console}
+X = A'B + BC' = B(A' + C') = B(AC)'
+\end{console}
+
+\noindent Det sista steget är De Morgan: \mbox{\code{A' + C' = (AC)'}}. Nätet blir en
+\textbf{NAND-grind} med ingångarna A och C, vars utgång går till en \textbf{AND-grind} tillsammans
+med B. \textbf{2 grindar} i stället för 5.
+
+\pt{c}En OR-grind för \mbox{\code{A + B}}, en NOT-grind för \code{C'} och en AND-grind: \textbf{3
+grindar}.
+
+\pt{d}Båda näten ska vara \code{1} på raderna ABC = 010, 011 och 110, och \code{0} på alla andra.
+
+\answer{c2:ex:9}{Allt av NAND}
+\pt{a}Med båda ingångarna kopplade till A blir utgången \mbox{\code{(A · A)' = (A)' = A'}}, eftersom
+\mbox{\code{AA = A}}. \textbf{En NAND-grind med ihopkopplade ingångar är en NOT.}
+
+\pt{b}En NAND ger \code{(AB)'}. Inverteras det en gång till blir det \code{AB}. \textbf{Två
+NAND-grindar}: en som NAND och en, med ihopkopplade ingångar, som NOT.
+
+\needspace{5\baselineskip}
+\pt{c}\leavevmode
+
+\begin{console}
+A + B = ((A + B)')' = (A'B')'
+\end{console}
+
+\noindent\code{(A'B')'} är en NAND av \code{A'} och \code{B'}, och \code{A'} och \code{B'} är var
+sin NAND med ihopkopplade ingångar. Alltså \textbf{tre NAND-grindar}: två som inverterar A och B,
+och en tredje som tar emot deras utgångar.
+
+\pt{d}NOT ska ge 1, 0 för A = 0, 1. AND ska bara ge \code{1} för AB = 11. OR ska ge \code{1} för
+allt utom AB = 00.
+
+\answer{c2:ex:10}{Från uttryck till kontaktnät}
+\pt{a}En strömväg: S1 \textbf{slutande} i serie med S2 \textbf{brytande}, i serie med H1. Lampan
+lyser när S1 är nedtryckt och S2 inte är det.
+
+\pt{b}Två parallella grenar mellan +24~V och lampan: den ena med S1 \textbf{slutande}, den andra
+med S2 \textbf{slutande} och S3 \textbf{slutande} i serie. Därefter H1.
+
+\pt{c}S1 och S2 \textbf{slutande} parallellt, och den parallellkopplingen i serie med S3
+\textbf{brytande} och H1. Samma form som bromsassistentens högra gren i \secref{c2:b6}.
+
+\pt{d}I a)--c) behöver varje knapp \textbf{ett} kontaktelement, eftersom varje variabel förekommer
+en gång. I XOR-kopplingen förekommer varje variabel två gånger, en gång rak och en gång inverterad,
+så varje knapp behöver \textbf{två}: ett slutande och ett brytande.
+
+\answer{c2:ex:11}{Analys av kontaktnät}
+\pt{a}Nät a) är en parallellkoppling av S1 (slutande) och S2 (brytande), i serie med S3:
+
+\begin{console}
+H1 = (S1 + S2') · S3
+\end{console}
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{S1} & \thead{S2} & \thead{S3} & \thead{H1} \\
+  \midrule
+  0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 1 \\
+  0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 0 \\
+  1 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 1 \\
+  1 & 1 & 0 & 0 \\
+  1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{b}Nät b) är en seriekoppling av S1 och S2, parallellt med S3 (brytande):
+
+\begin{console}
+H2 = S1 · S2 + S3'
+\end{console}
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{S1} & \thead{S2} & \thead{S3} & \thead{H2} \\
+  \midrule
+  0 & 0 & 0 & 1 \\
+  0 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 1 \\
+  0 & 1 & 1 & 0 \\
+  1 & 0 & 0 & 1 \\
+  1 & 0 & 1 & 0 \\
+  1 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{c}H2 lyser utan S1 och S2 när \textbf{S3 är släppt}: raden 000. S3 är brytande och sitter i en
+egen parallell gren, så när S3 inte påverkas finns alltid en sluten väg genom den grenen, vad S1 och
+S2 än gör. Faktum är att H2 lyser i alla fyra kombinationer där S3 är släppt.
+
+\answer{c2:ex:12}{Självhållning}
+\pt{a}När S1 trycks sluts strömväg 1 genom S2 och S1, och \textbf{spolen K1 drar}. Båda
+K1-kontakterna sluts: \textbf{H1 tänds}, och kontakten K1 parallellt med S1 sluts. När S1 släpps går
+strömmen genom K1:s egen kontakt i stället, så spolen \textbf{förblir strömsatt} och H1 fortsätter
+lysa.
+
+\pt{b}När S2 trycks bryts strömväg 1, \textbf{spolen släpper}, och båda K1-kontakterna öppnar.
+\textbf{H1 släcks.} När S2 släpps sluts S2 igen, men S1 och K1 är nu öppna, så spolen förblir
+strömlös.
+
+\pt{c}Med S2 nedtryckt är strömväg 1 bruten, vad S1 än gör. \textbf{Stopp vinner.} Kopplingen
+kallas därför stoppdominant, och det är så en maskins start- och stoppkrets ska vara.
+
+\pt{d}Med S2 slutande är strömväg 1 bara sluten medan S2 \textbf{hålls nedtryckt}. Att trycka på
+start gör ingenting. Trycker man på båda knapparna startar maskinen, och den fortsätter så länge S2
+hålls in, men den stannar när man \textbf{släpper} stoppknappen. Stoppknappen fungerar alltså som
+en startknapp som måste hållas in, och ingen går att använda för att stoppa maskinen på det sätt en
+operatör förväntar sig. Felet är farligt även om det i det här fallet råkar leda till att maskinen
+stannar, eftersom ingen kommer att förstå vad som händer.
+
+\pt{e}Med båda knapparna släppta kan H1 vara både tänd och släckt, beroende på om start eller stopp
+trycktes senast. Utgången beror alltså inte bara på ingångarna nu, utan på vad som har hänt
+tidigare. Kretsen har \textbf{minne}, genom att K1:s kontakt återkopplar spolens läge till dess egen
+strömväg, och ett nät med minne är ett sekvensnät, inte ett kombinatoriskt nät.
+
+\answer{c2:ex:13}{Bromsassistenten, felkopplad}
+\pt{a}\code{B = (D + S + R)F'} är \code{1} när F = 0 och minst en av D, S och R är \code{1}.
+Jämfört med \secref{c2:a10} skiljer sig tabellerna på fyra rader:
+
+\begin{narrowtable}{@{}cccc@{\hspace{1.5em}}cc@{}}
+  \thead{D} & \thead{S} & \thead{R} & \thead{F} & \thead{B enligt \secref{c2:a10}} &
+    \thead{B felkopplad} \\
+  \midrule
+  1 & 0 & 0 & 1 & 1 & 0 \\
+  1 & 0 & 1 & 1 & 1 & 0 \\
+  1 & 1 & 0 & 1 & 1 & 0 \\
+  1 & 1 & 1 & 1 & 1 & 0 \\
+\end{narrowtable}
+
+\pt{b}På alla fyra raderna är \textbf{D = 1 och F = 1}: föraren trampar på bromspedalen samtidigt
+som assistanssystemet rapporterar ett fel. Den felkopplade kretsen \textbf{bromsar inte}. Föraren
+ser ett hinder, trampar på bromsen, och ingenting händer, precis i den situation där
+assistanssystemet redan har visat att det inte går att lita på.
+
+\pt{c}Sanningstabellen i \secref{c2:a10} skrevs ur kravet, där säkerhetskravet \enquote{föraren kan
+alltid bromsa} blev hela den nedre halvan med ettor. En tabell som läses av ur en krets man redan
+har byggt visar bara vad kretsen gör, inte vad den borde göra, och skulle ha visat nollor på de fyra
+raderna utan att någon reagerade. \textbf{En tabell härledd ur kravet är ett oberoende facit; en
+tabell avläst ur kretsen är bara en beskrivning av den.} Det är skälet till att man alltid
+förutsäger först och kontrollerar sedan.

@@ -1,0 +1,412 @@
+% Appendix: Microchip Studio, from info/microchip_studio.md. Its sections "N. Title" are sections
+% labelled studio:N, its "N.M Title" subsections labelled studio:N-M, and its screenshots, from
+% info/images, are figures.
+%
+% Deliberate differences: the lecture links are chapter and section references, and the links to
+% Microchip's and Arduino's web sites are written out.
+%
+% The avrdude command in 5.2 is a console listing that may break its lines anywhere, not only at
+% a space: its path to avrdude.conf is one word wider than the page. dtbook.sty has no
+% environment for that, so it is the console box, codeblock, with that one listing option, and
+% unbreakable, so its four lines stay on one page.
+
+\chapter{Microchip Studio}
+\label{app:studio}
+
+Microchip Studio är den utvecklingsmiljö där programmen i Labb~3 (bilaga~\ref{app:lab3}) skrivs,
+assembleras och körs. Den här bilagan är referensen för allt verktygsarbete i boken:
+\begin{itemize}
+  \item avsnitt~\ref{studio:1}--\ref{studio:4} behövs från kapitel~\ref{c7:ch}: installation,
+    projekt, assemblering och simulering;
+  \item \secref{studio:5} behövs först i kapitel~\ref{c11:ch}, när programmet ska köras på ett
+    riktigt Arduino Uno-kort.
+\end{itemize}
+
+Microchip Studio finns bara för Windows. Menyernas namn nedan är de engelska, eftersom programmet
+bara finns på engelska.
+
+\section{Installera Microchip Studio}
+\label{studio:1}
+\begin{enumerate}
+  \item Ladda ned installationsprogrammet från Microchips webbplats,
+    \url{https://www.microchip.com/en-us/tools-resources/develop/microchip-studio}. Välj
+    webbinstallationen (\emph{web installer}) om du inte vet vilken du ska ta.
+  \item Kör installationen. När du får välja arkitekturer räcker \textbf{AVR}; SAM och UC3 behövs
+    inte.
+  \item Godkänn installationen av drivrutiner om du tillfrågas, och starta om datorn när
+    installationen är klar.
+\end{enumerate}
+
+Installationen tar en stund och kräver flera gigabyte. Gör den hemma före det första
+mikrodatorpasset, inte i början av passet.
+
+\begin{aside}
+\textbf{Om installationsfilen inte går att öppna.} Windows 11 kan blockera okända
+installationsprogram med funktionen \emph{Smart App Control}. Sök efter Smart App Control i Windows
+sökruta, stäng av den, och starta om datorn.
+\end{aside}
+
+\section{Skapa ett assemblerprojekt}
+\label{studio:2}
+Varje program i Labb~3 är ett eget projekt. Ett projekt är en katalog med en projektfil och en
+källfil, \code{main.asm}.
+\begin{enumerate}
+  \item Välj \textbf{File $\rightarrow$ New $\rightarrow$ Project...}
+  \item Välj \textbf{Assembler} i listan till vänster, och sedan \textbf{AVR Assembler Project}.
+  \item Ge projektet ett namn som säger vilken del av labben det hör till, till exempel
+    \code{lab3_06}, och välj var det ska sparas. Klicka \textbf{OK}.
+  \item I dialogen \textbf{Device Selection}, sök efter och välj \textbf{ATmega328P}. Klicka
+    \textbf{OK}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/17_device_selection.png}{Dialogen Device Selection med ATmega328P
+markerad.}{studio:fig:device}
+
+Studio skapar projektet och öppnar \code{main.asm} med ett litet exempelprogram. Ersätt det med
+kursens programmall (\secref{lab3:template}), eller med det program uppgiften anger.
+
+Varje program i kursen börjar med raden:
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+\end{asmcode}
+
+\noindent Den läser in definitionsfilen för ATmega328P, som ger namnen \code{PORTB}, \code{DDRB},
+\code{PIND}, \code{RAMEND} och alla andra registernamn. Studio läser ofta in filen automatiskt, men
+raden gör att programmet fungerar oavsett inställningar, och det gör ingen skada att filen läses in
+två gånger.
+
+\section{Assemblera}
+\label{studio:3}
+Välj \textbf{Build $\rightarrow$ Build Solution}, eller tryck \textbf{F7}.
+
+Assemblern översätter programmet till maskinkod. Resultatet visas i fönstret \textbf{Output} längst
+ned:
+
+\begin{console}
+Assembly complete, 0 errors. 0 warnings
+...
+========== Build: 1 succeeded or up-to-date, 0 failed, 0 skipped ==========
+\end{console}
+
+Om något är fel visas felen i fönstret \textbf{Error List} (\textbf{View $\rightarrow$ Error List}
+om det inte syns). Varje fel anger fil och radnummer. Dubbelklicka på felet så hoppar editorn till
+raden.
+
+Tre fel som alla gör i början:
+\begin{itemize}
+  \item \textbf{\code{Invalid register}} på en rad med \code{ldi}: \code{ldi} kan bara ladda
+    \code{r16}--\code{r31} (\secref{c7:app:a}).
+  \item \textbf{\code{Undefined symbol}}: en etikett eller ett registernamn är felstavat, eller
+    raden \code{.include} saknas.
+  \item \textbf{\code{Syntax error}}: ofta ett kommatecken som saknas mellan operanderna,
+    \code{ldi r16 5} i stället för \code{ldi r16, 5}.
+\end{itemize}
+
+Rätta \textbf{det första felet först} och bygg om. Ett fel följs ofta av flera följdfel som
+försvinner av sig själva.
+
+\section{Simulera}
+\label{studio:4}
+Simulatorn kör ditt program i en modell av ATmega328P, instruktion för instruktion, och visar
+register, flaggor och portar medan det går. Nästan hela Labb~3 görs i simulatorn.
+
+\subsection{Välj simulatorn}
+\label{studio:4-1}
+Första gången i varje projekt:
+\begin{enumerate}
+  \item Välj \textbf{Project $\rightarrow$ Properties} (eller \textbf{Alt+F7}).
+  \item Välj fliken \textbf{Tool}.
+  \item Välj \textbf{Simulator} under \emph{Selected debugger/programmer}.
+  \item Spara med \textbf{Ctrl+S} och stäng fliken.
+\end{enumerate}
+
+\subsection{Stega genom programmet}
+\label{studio:4-2}
+Välj \textbf{Debug $\rightarrow$ Start Debugging and Break} (\textbf{Alt+F5}). Programmet
+assembleras, laddas in i simulatorn och stannar på första instruktionen, markerad med en gul pil.
+Den gula pilen pekar på den instruktion som står på tur, \textbf{inte} den som just har körts.
+
+\begin{booktable}{@{}p{7.4em}p{6.6em}L@{}}
+  \thead{Kommando} & \thead{Tangent} & \thead{Gör} \\
+  \midrule
+  Step Into & F11 & Kör en instruktion. Följer med in i en subrutin. \\
+  Step Over & F10 & Kör en instruktion. Kör en hel subrutin som ett steg. \\
+  Run To Cursor & Ctrl+F10 & Kör tills programmet når raden där markören står. \\
+  Continue & F5 & Kör fritt, tills en brytpunkt nås. \\
+  Break All & Ctrl+F5 & Stoppar ett program som kör fritt. \\
+  Stop Debugging & Ctrl+Shift+F5 & Avslutar simuleringen. \\
+\end{booktable}
+
+\subsection{Fönstren du behöver}
+\label{studio:4-3}
+Öppnas under \textbf{Debug $\rightarrow$ Windows} medan simuleringen pågår.
+\begin{itemize}
+  \item \textbf{Processor Status}: de 32 registren \code{R00}--\code{R31}, statusregistret
+    \code{SREG} med en ruta per flagga, programräknaren (\emph{Program Counter}), stackpekaren
+    (\emph{Stack Pointer}), och två räknare som mäter tid: \emph{Cycle Counter} och \emph{Stop
+    Watch}. Värden som ändrades i det senaste steget visas i rött. Medan programmet står still kan
+    du ändra ett registers värde genom att dubbelklicka på det och skriva in ett nytt, vilket är ett
+    snabbt sätt att prova samma program med andra indata.
+  \item \textbf{I/O}: alla I/O-register, grupperade per enhet. Under \textbf{PORTB} finns
+    \code{DDRB}, \code{PORTB} och \code{PINB}, med en ruta per bit. En fylld ruta är en etta.
+  \item \textbf{Memory}: minnet byte för byte. Välj \textbf{data IRAM} för att se SRAM, där
+    stacken ligger, och \textbf{prog FLASH} för att se programmet som maskinkod.
+  \item \textbf{Watch}: värden du själv väljer att bevaka.
+\end{itemize}
+
+Värdena visas som standard hexadecimalt. Högerklicka i fönstret för att växla till decimalt om det
+finns, men vänj dig vid hexadecimal: det är så datablad och instruktionslistor skriver.
+
+\subsection{Brytpunkter och cykelräknaren}
+\label{studio:4-4}
+En \textbf{brytpunkt} stoppar ett program som kör fritt. Klicka i den grå marginalen till vänster
+om en rad, eller ställ markören på raden och tryck \textbf{F9}. En röd prick markerar brytpunkten.
+
+\textbf{Cycle Counter} räknar klockcykler sedan programmet startade, och \textbf{Stop Watch} visar
+samma sak som tid. Stoppuret räknar tiden utifrån fältet \textbf{Frequency}, som ska stå på
+\textbf{16~MHz}, samma klockfrekvens som ett Arduino Uno-kort har. Dubbelklicka på värdet för att
+ändra det.
+
+Så mäter du hur lång tid en del av programmet tar, till exempel en fördröjning i
+kapitel~\ref{c9:ch}:
+\begin{enumerate}
+  \item Sätt en brytpunkt före och en efter den del du vill mäta.
+  \item Kör till den första brytpunkten.
+  \item Högerklicka på \textbf{Stop Watch} och välj \textbf{Reset Stopwatch}, eller skriv upp
+    värdet.
+  \item Kör vidare till den andra brytpunkten, och läs av.
+\end{enumerate}
+
+\subsection{Simulera en ingång}
+\label{studio:4-5}
+I simulatorn finns ingen knapp att trycka på. I stället ändrar du ingångens värde för hand, i
+fönstret \textbf{I/O}:
+\begin{enumerate}
+  \item Stoppa programmet, med en brytpunkt eller \textbf{Break All}.
+  \item Välj \textbf{PORTD} i I/O-fönstret.
+  \item Klicka på den bit i \textbf{PIND} du vill ändra. En fylld ruta är en etta, en tom en nolla.
+  \item Stega eller kör vidare. Programmet läser det nya värdet nästa gång det läser \code{PIND}.
+\end{enumerate}
+
+En knapp kopplad mot jord med pull-up läses som \code{1} när den är släppt och \code{0} när den är
+nedtryckt, se \secref{c10:app:b}. I simulatorn betyder det: töm rutan för att \enquote{trycka ned}
+knappen.
+
+\section{Programmera ett Arduino-kort från Microchip Studio}
+\label{studio:5}
+Hittills har programmet bara körts i simulatorn. I kapitel~\ref{c11:ch} ska det köras på ett
+riktigt Arduino Uno-kort. Det här avsnittet är en engångsinställning som gör det till ett menyval i
+Studio.
+
+\subsection{Varför det här arbetsflödet}
+\label{studio:5-1}
+Arduino Uno-kortet har en \textbf{bootloader}, ett litet program i toppen av flashminnet som tar
+emot ett nytt program över USB-kabeln. Programmet som skickar det heter \code{avrdude}, och det
+följer med Arduino IDE. Arduino IDE vet dessutom exakt vilket kommando som behövs för just ditt
+kort och din COM-port.
+
+Så tricket är att låna det kommandot från Arduino IDE, och peka det på den hexfil Microchip Studio
+skapar i stället för på Arduinos egen. Ingen extra programmerare behövs.
+
+\subsection{Hämta avrdude-kommandot ur Arduino IDE}
+\label{studio:5-2}
+\begin{enumerate}
+  \item Installera Arduino IDE, \url{https://www.arduino.cc/en/software}, och starta den.
+  \item Slå på utförlig utskrift vid uppladdning: \textbf{File $\rightarrow$ Preferences}, och
+    kryssa i \textbf{Show verbose output during: Upload}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/02_file_menu_preferences.png}{Arduino IDE:s meny File med
+Preferences markerat.}{studio:fig:preferences}
+
+\bookimage{0.8}{info/images/03_preferences_verbose_upload.png}{Arduino IDE:s inställningar, med
+rutan för utförlig utskrift vid uppladdning ikryssad.}{studio:fig:verbose}
+
+\begin{enumerate}[start=3]
+  \item Installera stödet för AVR-korten om det inte redan finns: \textbf{Tools $\rightarrow$ Board
+    $\rightarrow$ Boards Manager}, och installera \textbf{Arduino AVR Boards}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/04_tools_board_boards_manager_menu.png}{Arduino IDE:s meny Tools
+$\rightarrow$ Board med Boards Manager markerat.}{studio:fig:boardsmenu}
+
+\bookimage{0.8}{info/images/05_boards_manager_installed.png}{Boards Manager, där Arduino AVR
+Boards redan är installerat.}{studio:fig:boardsmanager}
+
+\begin{enumerate}[start=4]
+  \item Anslut kortet med USB-kabeln. Välj kortet under \textbf{Tools $\rightarrow$ Board
+    $\rightarrow$ Arduino AVR Boards $\rightarrow$ Arduino Uno}, och dess port under
+    \textbf{Tools $\rightarrow$ Port}, till exempel COM4. Numret spelar ingen roll, men skriv upp
+    det.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/06_tools_board_arduino_uno.png}{Arduino IDE:s meny Tools
+$\rightarrow$ Board med Arduino Uno vald.}{studio:fig:uno}
+
+\bookimage{0.8}{info/images/07_tools_port_com4.png}{Arduino IDE:s meny Tools $\rightarrow$ Port
+med COM4 vald.}{studio:fig:port}
+
+\begin{enumerate}[start=5]
+  \item Öppna exemplet \textbf{File $\rightarrow$ Examples $\rightarrow$ 01.Basics $\rightarrow$
+    Blink} och klicka på \textbf{Upload}, pilen uppe till vänster. Lysdioden på kortet börjar
+    blinka.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/08_upload_button.png}{Arduino IDE:s knapp Upload, en pil högerut uppe
+till vänster.}{studio:fig:upload}
+
+\begin{enumerate}[start=6]
+  \item Leta upp raden som startar \code{avrdude} i utskriften längst ned, och kopiera den. Den ser
+    ut ungefär så här (med ditt användarnamn och din COM-port):
+\end{enumerate}
+
+\begin{tcblisting}{codeblock=muted!60, unbreakable,
+  listing options={style=output, breakatwhitespace=false}}
+"C:\Users\...\Arduino15\packages\arduino\tools\avrdude\6.3.0-arduino17/bin/avrdude"
+"-CC:\Users\...\Arduino15\packages\arduino\tools\avrdude\6.3.0-arduino17/etc/avrdude.conf"
+-v -V -patmega328p -carduino "-PCOM4" -b115200 -D
+"-Uflash:w:C:\Users\...\Temp\arduino-sketch-.../Blink.ino.hex:i"
+\end{tcblisting}
+
+\bookimage{0.8}{info/images/09_output_window_avrdude_command.png}{Arduino IDE:s utskrift efter
+uppladdningen, med avrdude-kommandot.}{studio:fig:avrdude}
+
+\subsection{Gör om kommandot till ett återanvändbart verktyg}
+\label{studio:5-3}
+Kommandot ska delas upp i två delar: själva programmet (\textbf{Command}) och allt det får med sig
+(\textbf{Arguments}). Gör det i Anteckningar (Notepad):
+\begin{enumerate}
+  \item Klistra in raden och ta bort alla citattecken.
+  \item Sätt en radbrytning direkt efter \code{bin/avrdude}, och lägg till \code{.exe}, så att
+    första raden slutar på \code{bin/avrdude.exe}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/10_notepad_path_pasted.png}{Anteckningar med avrdude-kommandot
+inklistrat utan citattecken.}{studio:fig:pasted}
+
+\bookimage{0.8}{info/images/11_notepad_exe_appended.png}{Anteckningar där första raden nu slutar
+på avrdude.exe.}{studio:fig:exe}
+
+\begin{enumerate}[start=3]
+  \item Sätt en radbrytning till före \code{-Uflash}, så att resten hamnar på en tredje rad.
+  \item Sätt tillbaka citattecken runt de två filsökvägarna: sökvägen till \code{avrdude.conf} på
+    andra raden, och sökvägen till hexfilen på tredje.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/13_notepad_quotes_added.png}{Kommandot på tre rader, med citattecken
+runt de två filsökvägarna och Arduinos hexfil kvar på tredje raden.}{studio:fig:quotes}
+
+\begin{enumerate}[start=5]
+  \item Ersätt sökvägen till Arduinos hexfil, allt mellan citattecknen på tredje raden, med
+    \code{$(ProjectDir)Debug\\$(TargetName).hex}. Microchip Studio byter ut de två variablerna mot
+    det aktuella projektets katalog och namn, så samma kommando fungerar för alla dina projekt.
+  \item Slå ihop de två sista raderna till en, så att det bara finns två rader kvar. Spara filen.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/14_notepad_state_before_hex_replace.png}{Efter bytet i steg~5, med
+sökvägen till projektets hexfil i Debug-katalogen på tredje raden.}{studio:fig:hexpath}
+
+\bookimage{0.8}{info/images/12_notepad_arguments_split.png}{Samma tre rader utan den tomma raden,
+och med citattecken också runt -PCOM4, vilket fungerar lika bra.}{studio:fig:variant}
+
+\bookimage{0.8}{info/images/15_notepad_hex_path_replaced.png}{Efter steg~6, med två rader kvar och
+filen sparad.}{studio:fig:saved}
+
+Första raden är nu kommandot, andra raden argumenten.
+
+\subsection{Lägg till verktyget i Microchip Studio}
+\label{studio:5-4}
+\begin{enumerate}
+  \item Externa verktyg kräver den avancerade profilen: \textbf{Tools $\rightarrow$ Select
+    Profile}, välj \textbf{Advanced} och klicka \textbf{Apply}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/19_select_profile_menu.png}{Microchip Studios meny Tools med Select
+Profile markerat.}{studio:fig:profilemenu}
+
+\bookimage{0.8}{info/images/20_advanced_profile_dialog.png}{Dialogen Select Profile med profilen
+Advanced vald.}{studio:fig:advanced}
+
+\begin{enumerate}[start=2]
+  \item Välj \textbf{Tools $\rightarrow$ External Tools} och klicka \textbf{Add}.
+  \item Döp verktyget till \code{Arduino} följt av COM-porten, till exempel \code{Arduino - COM4}.
+  \item Klistra in första raden från Anteckningar i \textbf{Command} och andra raden i
+    \textbf{Arguments}.
+  \item Kryssa i \textbf{Use Output window} och klicka \textbf{OK}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/21_external_tools_menu.png}{Microchip Studios meny Tools med External
+Tools markerat.}{studio:fig:externalmenu}
+
+\bookimage{0.8}{info/images/22_external_tools_arduino_com4.png}{Dialogen External Tools, ifylld
+med titel, kommando och argument för Arduino på COM4.}{studio:fig:com4}
+
+Skärmbilderna är tagna i ett C-projekt. För ett assemblerprojekt är varje steg detsamma.
+
+\subsection{Programmera och kontrollera}
+\label{studio:5-5}
+\begin{enumerate}
+  \item Bygg projektet med \textbf{F7}. Hexfilen skapas i projektets katalog \code{Debug};
+    kontrollera i Output-fönstret var den hamnade om programmeringen inte hittar den.
+  \item Välj \textbf{Tools $\rightarrow$ Arduino - COM4}.
+\end{enumerate}
+
+\bookimage{0.8}{info/images/23_tools_menu_arduino_com4_selected.png}{Microchip Studios meny Tools
+med det nya verktyget Arduino - COM4.}{studio:fig:toolcom4}
+
+Om allt fungerar slutar utskriften med antalet byte som skrevs:
+
+\begin{console}
+Writing | ################################################## | 100% 0.05s
+
+avrdude.exe: 194 bytes of flash written
+...
+avrdude.exe done. Thank you.
+\end{console}
+
+\bookimage{0.8}{info/images/24_output_window_flash_success.png}{Microchip Studios utskrift efter
+en lyckad programmering av kortet.}{studio:fig:success}
+
+\subsection{Om COM-porten ändras}
+\label{studio:5-6}
+Om kortet ansluts till en annan USB-port kan det få en annan COM-port, och programmeringen
+misslyckas med ett fel i stil med:
+
+\begin{textdrawing}
+avrdude.exe: ser_open(): can't open device "\\.\COM4": Det går inte att hitta filen.
+\end{textdrawing}
+
+Kontrollera kortets aktuella port i Arduino IDE (\textbf{Tools $\rightarrow$ Port}). Lägg sedan
+till ett andra verktyg i \textbf{Tools $\rightarrow$ External Tools}, likadant som det första men
+med den nya porten i \textbf{Arguments}, till exempel \code{-PCOM3} i stället för \code{-PCOM4}.
+
+\bookimage{0.8}{info/images/25_external_tools_menu_for_com3.png}{Microchip Studios meny Tools med
+verktyget Arduino - COM4 och External Tools markerat.}{studio:fig:externalmenu2}
+
+\bookimage{0.8}{info/images/26_external_tools_arduino_com3.png}{Dialogen External Tools, ifylld
+för Arduino på COM3.}{studio:fig:com3}
+
+\bookimage{0.8}{info/images/27_tools_menu_arduino_com3_selected.png}{Microchip Studios meny Tools
+med verktygen för både COM3 och COM4.}{studio:fig:toolcom3}
+
+\section{Vanliga fel}
+\label{studio:6}
+
+\begin{booktable}{@{}LL@{}}
+  \thead{Symptom} & \thead{Trolig orsak} \\
+  \midrule
+  \textbf{Start Debugging} frågar efter ett verktyg & Simulatorn är inte vald, se
+    \secref{studio:4-1}. \\
+  Den gula pilen står kvar på samma rad & Programmet väntar i en loop, till exempel på en ingång
+    som aldrig ändras. \\
+  Ett register ändras inte som väntat & Den gula pilen visar nästa instruktion, inte den som just
+    kördes. \\
+  Stoppuret visar orimliga tider & \textbf{Frequency} står inte på 16~MHz. \\
+  En port ändras inte i I/O-fönstret & Fel register (\code{PINB} i stället för \code{PORTB}),
+    eller \code{DDRB} är inte satt. \\
+  \code{avrdude} hittar inte hexfilen & Projektet är inte byggt, eller hexfilen ligger i en annan
+    katalog än \code{Debug}. \\
+  \code{ser_open(): can't open device} & Fel COM-port, eller kortet är inte anslutet, se
+    \secref{studio:5-6}. \\
+\end{booktable}

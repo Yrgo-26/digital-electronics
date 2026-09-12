@@ -1,0 +1,51 @@
+% Section 1.3, from lectures/L01/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\section{Sammanfattning}
+\label{c1:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Förklara skillnaden mellan en digital och en analog signal, och varför digitala signaler
+    tål brus.
+  \item Beskriva det decimala, det binära och det hexadecimala talsystemet: talbas, siffror och
+    positionernas vikter.
+  \item Omvandla tal mellan decimalt, binärt och hexadecimalt för hand, i alla riktningar.
+  \item Ange hur många olika värden ett tal med $n$ bitar kan anta, och vilket det största är.
+  \item Addera två binära tal, och avgöra om summan ryms i åtta bitar.
+  \item Beskriva BCD, Graykod, ASCII och 7-segmentkod, och koda och avkoda tal och tecken i dem.
+  \item Beräkna en jämn paritetsbit, och förklara vilka fel den upptäcker.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför har den minst signifikanta positionen vikten 1 i \emph{alla} talsystem?
+  \item Hur ser du direkt på ett binärt tal om det är jämnt eller udda?
+  \item Varför används hexadecimala tal till att skriva binära tal, och inte decimala?
+  \item Talet \code{0x100} är ett större tal än \code{0xFF}, men bara med ett. Hur många bitar
+    behövs för var och ett av dem?
+  \item Vad händer med ett binärt tal när du lägger till en nolla längst till höger? Jämför med
+    vad som händer med ett decimalt tal.
+  \item Tecknet \code{'7'} och talet 7 är olika saker i en dator. Vad skiljer dem åt, och hur gör
+    du om det ena till det andra?
+  \item I vilken kod ändras exakt en bit mellan två på varandra följande tal, och varför är det
+    användbart?
+\end{enumerate}
+
+Talsystemen används i resten av boken, och de sitter först när du har räknat många omvandlingar
+själv. Räkna hellre för många än för få. Kalkylatorn i Windows, i läget \textbf{Programmerare},
+visar samma tal decimalt, binärt och hexadecimalt samtidigt. Använd den för att kontrollera dina
+svar, aldrig för att ta fram dem.
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c2:ch} handlar om logiska grindar och boolesk algebra:
+\begin{itemize}
+  \item Logiska grindar: NOT, AND, OR, NAND, NOR, XOR och XNOR, och deras sanningstabeller.
+  \item Boolesk algebra: notationen, räknelagarna och De Morgans lagar.
+  \item Från sanningstabell till grindnät, och från grindnät tillbaka till sanningstabell.
+  \item Samma logik byggd med strömkontakter på 24~V, inför Labb~1.
+\end{itemize}

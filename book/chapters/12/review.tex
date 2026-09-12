@@ -1,0 +1,282 @@
+% Section 12.1, from lectures/L12/appendix/a_review.md. Each lecture the review points back to is
+% the chapter of the same number, and each "L04 A.3" is the section it became (\secref{c4:a3}).
+
+\section{Repetition}
+\label{c12:app:a}
+
+\subsection{Så används det här avsnittet}
+\label{c12:a1}
+Kursen har gått fort: fyra ämnen på elva kapitel. Det här avsnittet går igenom dem igen, ordnat
+efter kursplanens lärandemål, så att du kan se vad du kan och vad du behöver läsa om.
+
+Varje avsnitt har tre delar:
+\begin{itemize}
+  \item \textbf{Det viktigaste}, kort, med de metoder som provet bygger på.
+  \item \textbf{Kan du \dots?}, en lista att bocka av. Svara på varje fråga på papper, utan att
+    titta, och kontrollera sedan mot avsnittet som hänvisningen pekar på.
+  \item \textbf{Vanliga fel}, de misstag som oftast kostar poäng.
+\end{itemize}
+
+Provets form, poäng och betygsgränser står i bilaga~\ref{app:exam}. Där finns också ett övningsprov,
+i bilaga~\ref{app:practice}, med lösningsförslag i bilaga~\ref{app:practice:answers}. Gör det under
+två timmar, utan miniräknare, med referensbladet i bilaga~\ref{app:avr} bredvid, precis som på det
+riktiga provet.
+
+\subsection{Talsystem och binära koder}
+\label{c12:a2}
+\emph{Lärandemål: beskriva binära, hexadecimala och decimala talsystem, och omvandla talvärden
+mellan dem.} (Kapitel~\ref{c1:ch}.)
+
+\subsubsection{Det viktigaste}
+\begin{itemize}
+  \item I ett \textbf{positionssystem} är varje siffra värd siffran gånger talbasen upphöjd till
+    positionen, räknat från 0 längst till höger. Binärt har basen 2, hexadecimalt 16.
+  \item \textbf{Binärt till decimalt}: addera vikterna för ettorna. \code{1010 1110} = 128 + 32 + 8
+    + 4 + 2 = 174.
+  \item \textbf{Decimalt till binärt}: dra av den största vikt som får plats, om och om igen, eller
+    dela med 2 och läs resterna nedifrån (\secref{c1:a4}).
+  \item \textbf{Binärt och hexadecimalt}: fyra bitar är en hexadecimal siffra. \code{1011 0110} =
+    \code{0xB6}. Omvandla alltid mellan decimalt och hexadecimalt \textbf{via binärt} om du är
+    osäker (\secref{c1:a6}).
+  \item \textbf{$n$ bitar} räcker till \code{2^n} värden, 0 till \code{2^n - 1}: en byte till
+    0--255.
+  \item \textbf{Binär addition} görs som för hand, med minnessiffra. En summa som inte får plats i
+    åtta bitar lämnar en minnessiffra, carry (\secref{c1:a7}).
+  \item \textbf{Koder}: BCD skriver varje decimal siffra med fyra bitar, Graykod ändrar en bit i
+    taget, och ASCII ger varje tecken ett tal: \code{'0'} = \code{0x30}, \code{'A'} = \code{0x41}
+    (\secref{c1:app:b}).
+\end{itemize}
+
+\subsubsection{Kan du \dots?}
+\begin{itemize}
+  \item \dots\ omvandla 1100 1011, 142 och \code{0x5E} till de två andra talsystemen, utan
+    miniräknare?
+  \item \dots\ förklara varför en hexadecimal siffra motsvarar exakt fyra bitar?
+  \item \dots\ addera två 8-bitars tal binärt och säga om det blir en minnessiffra?
+  \item \dots\ skriva 59 i BCD, och säga varför BCD inte är samma sak som 59 binärt?
+  \item \dots\ ange ASCII-koderna för tecknen \code{'4'} och \code{'C'}?
+\end{itemize}
+
+\subsubsection{Vanliga fel}
+\begin{itemize}
+  \item Att räkna positionerna från 1 i stället för från 0, så att varje vikt blir dubbelt för
+    stor.
+  \item Att gruppera bitar i fyror från vänster. Grupperna räknas \textbf{från höger}: \code{1 0110}
+    är \code{0x16}.
+  \item Att tro att BCD för 59 är 59 binärt. BCD är \code{0101 1001}, binärt är \code{0011 1011}.
+\end{itemize}
+
+\subsection{Grindar, boolesk algebra och kontaktnät}
+\label{c12:a3}
+\emph{Lärandemål: förklara grindar och logiska funktioner; beskriva logisk algebra och förenklingar
+av booleska uttryck.} (Kapitel~\ref{c2:ch} och~\ref{c3:ch}.)
+
+\subsubsection{Det viktigaste}
+\begin{itemize}
+  \item Sju grindar: NOT, AND, OR, NAND, NOR, XOR och XNOR. NAND, NOR och XNOR är inverserna av AND,
+    OR och XOR, och XOR är 1 när ingångarna är olika.
+  \item \textbf{Notation}: \code{A'} för NOT, \code{AB} för AND, \code{A + B} för OR. NOT binder
+    hårdast, sedan AND, sist OR.
+  \item \textbf{Från sanningstabell till uttryck}: en AND-term per etta, med varje variabel direkt
+    eller inverterad; OR:a ihop termerna. Det ger ett uttryck på \textbf{SP-form}
+    (\secref{c2:a6}).
+  \item \textbf{Förenkla} genom att bryta ut det gemensamma och använda \code{A + A' = 1}. Tre lagar
+    räcker långt: \code{A + AB = A}, \code{A + A'B = A + B} och De Morgan (\secref{c2:a4}).
+  \item \textbf{De Morgan}: \code{(A + B)' = A'B'} och \code{(AB)' = A' + B'}. Bryt strecket, byt
+    tecknet (\secref{c2:a5}).
+  \item \textbf{Analys av ett grindnät}: skriv uttrycket vid varje grinds utgång, från ingångarna
+    mot utgången, och räkna sedan ut sanningstabellen rad för rad (\secref{c2:a8}).
+  \item \textbf{Kontaktnät}: kontakter i serie är AND, parallellt OR, och en brytande kontakt är
+    NOT. Lampan lyser när det finns en sluten väg från +24~V till 0~V (\secref{c2:app:b} och
+    \secref{c3:app:a}).
+\end{itemize}
+
+\subsubsection{Kan du \dots?}
+\begin{itemize}
+  \item \dots\ rita symbolen och skriva sanningstabellen för var och en av de sju grindarna?
+  \item \dots\ läsa av ett uttryck på SP-form ur en sanningstabell med tre variabler?
+  \item \dots\ förenkla \code{AB + AB' + A'B} till två variabler, och säga vilken lag varje steg
+    använder?
+  \item \dots\ skriva \code{(A + B)'} utan parentes, och bygga OR av enbart NAND-grindar?
+  \item \dots\ skriva uttrycket och sanningstabellen för ett grindnät eller ett kontaktnät du inte
+    sett förut?
+  \item \dots\ rita ett kontaktnät för \code{S1(S2 + S3')}?
+\end{itemize}
+
+\subsubsection{Vanliga fel}
+\begin{itemize}
+  \item Att glömma att NOT binder hårdare än AND: \code{AB'} är \code{A(B')}, inte \code{(AB)'}.
+  \item Att använda De Morgan halvt: invertera variablerna men glömma att byta AND mot OR.
+  \item Att tro att en brytande kontakt är öppen: den är \textbf{sluten} tills knappen trycks.
+\end{itemize}
+
+\subsection{Karnaughdiagram och IC-kretsar}
+\label{c12:a4}
+\emph{Lärandemål: använda Karnaughdiagram för analys och minimering av booleska uttryck;
+syntetisera digitala kombinatoriska nät med IC-kretsar och kontakter; analysera digitala
+kombinatoriska nät.} (Kapitel~\ref{c4:ch} och~\ref{c5:ch}.)
+
+\subsubsection{Det viktigaste}
+\begin{itemize}
+  \item Ett \textbf{Karnaughdiagram} är sanningstabellen ritad så att grannrutor skiljer sig i
+    exakt en variabel. Raderna och kolumnerna står i \textbf{Graykod}: 00, 01, 11, 10.
+  \item \textbf{Gruppera} ettorna i rektanglar om 1, 2, 4 eller 8 rutor, så stora som möjligt och så
+    få som möjligt. Grupper får överlappa och gå runt kanterna; de fyra hörnen är grannar
+    (avsnitt~\ref{c4:a3} och~\ref{c4:a5}).
+  \item \textbf{Läs av} varje grupp som de variabler som är konstanta inom den. En grupp om fyra i
+    ett diagram med fyra variabler ger en term med två variabler.
+  \item \textbf{Don't care}, X, får räknas som 1 om det ger en större grupp, annars som 0.
+  \item \textbf{NAND-nät}: ett uttryck på SP-form blir två nivåer NAND-grindar, eftersom
+    \code{AB + CD} = \code{((AB)'(CD)')'}.
+  \item \textbf{74-serien}: fyra grindar per kapsel (sex inverterare i 74HC04), VCC på ben~14 och
+    GND på ben~7. Oanvända ingångar får aldrig flyta (\secref{c4:app:b}).
+  \item \textbf{Felsökning}: matningen på varje krets först, sedan ingångarna, sedan signalen grind
+    för grind (\secref{c5:app:a}).
+\end{itemize}
+
+\subsubsection{Kan du \dots?}
+\begin{itemize}
+  \item \dots\ rita ett tomt Karnaughdiagram för fyra variabler, med Graykoden rätt på båda
+    axlarna?
+  \item \dots\ fylla i det från en lista med mintermer, och gruppera det minimalt?
+  \item \dots\ förklara varför hörnen i ett diagram med fyra variabler kan bilda en grupp?
+  \item \dots\ räkna ut hur många 74HC-kretsar ett nät behöver?
+  \item \dots\ förklara vad som händer med en flytande ingång på en 74HC-krets?
+\end{itemize}
+
+\subsubsection{Vanliga fel}
+\begin{itemize}
+  \item Att skriva axlarna i vanlig binär ordning, 00, 01, 10, 11. Då är grannrutorna inte
+    grannar.
+  \item Att göra en grupp om tre, eller en grupp som inte är en rektangel.
+  \item Att behålla en grupp vars alla ettor redan täcks av andra grupper.
+\end{itemize}
+
+\subsection{Mikrodatorns uppbyggnad}
+\label{c12:a5}
+\emph{Lärandemål: redogöra för mikrodatorns uppbyggnad på blockschemanivå.}
+(Kapitel~\ref{c6:ch} och~\ref{c7:ch}.)
+
+\subsubsection{Det viktigaste}
+\begin{itemize}
+  \item En \textbf{mikrodator} består av en \textbf{CPU}, \textbf{minne} och \textbf{in- och
+    utportar}, sammankopplade med \textbf{bussar} och drivna av en \textbf{klocka}
+    (\secref{c6:b2}).
+  \item \textbf{CPU:n} har en \textbf{ALU} som räknar, \textbf{register} som håller värdena den
+    räknar med, och en \textbf{styrenhet} som avkodar instruktionerna och styr resten.
+  \item \textbf{Programräknaren}, PC, pekar på nästa instruktion. Instruktionscykeln är
+    \textbf{hämta, avkoda, utföra}, en gång per instruktion (\secref{c6:b4}).
+  \item ATmega328P har \textbf{tre minnen}: programmet i flash, som finns kvar utan ström;
+    variablerna och stacken i SRAM, som töms när strömmen bryts; och EEPROM (\secref{c7:a5}).
+  \item Varje block är byggt av det kursen redan har gått igenom: ALU:n av grindar, register och PC
+    av vippor, minnet av tusentals lås med en adressavkodare (\secref{c6:b10}).
+\end{itemize}
+
+\subsubsection{Kan du \dots?}
+\begin{itemize}
+  \item \dots\ rita mikrodatorns blockschema och säga vad varje block gör?
+  \item \dots\ beskriva vad som händer i hämta, avkoda och utföra för en instruktion som
+    \code{inc r16}?
+  \item \dots\ säga vilket minne programmet ligger i, och vilket stacken ligger i, och vilket av dem
+    som finns kvar när strömmen bryts?
+  \item \dots\ förklara vad en buss är, och nämna två?
+\end{itemize}
+
+\subsubsection{Vanliga fel}
+\begin{itemize}
+  \item Att blanda ihop registren med dataminnet. Registren är 32 byte inuti CPU:n; SRAM är
+    2048 byte utanför den.
+  \item Att tro att programmet ligger i SRAM. Det ligger i flash.
+\end{itemize}
+
+\subsection{Assemblerprogrammering}
+\label{c12:a6}
+\emph{Lärandemål: använda assemblerspråk för att programmera en mikrodator.}
+(Kapitel~\ref{c7:ch}--\ref{c10:ch}.)
+
+\subsubsection{Det viktigaste}
+\begin{itemize}
+  \item En rad assembler är en \textbf{etikett}, en \textbf{instruktion} med \textbf{operander}, och
+    en \textbf{kommentar}. \textbf{Direktiv} som \code{.include}, \code{.org}, \code{.equ} och
+    \code{.def} blir ingen maskinkod.
+  \item \code{ldi} laddar en konstant, men bara i \code{r16}--\code{r31}. Tal skrivs decimalt,
+    \code{0b...} eller \code{0x...}.
+  \item \textbf{Aritmetik och flaggor}: \code{add}, \code{sub}, \code{inc}, \code{dec} och resten
+    skriver flaggorna i SREG. \code{C} är minnessiffra eller lån, \code{Z} att resultatet blev noll,
+    \code{N} att bit~7 är satt (\secref{c8:a6}). Åtta bitar går runt: 255 + 1 blir 0.
+  \item \textbf{Logik}: \code{and}/\code{andi} nollställer bitar, \code{or}/\code{ori} ettställer,
+    \code{eor} inverterar, med en mask (\secref{c8:b2}). \code{lsl} multiplicerar med 2 och
+    \code{lsr} delar med 2.
+  \item \textbf{Hopp}: \code{cp}/\code{cpi} är en subtraktion som bara sparar flaggorna, och det
+    villkorliga hoppet läser dem: \code{breq}, \code{brne}, \code{brlo}, \code{brsh}
+    (\secref{c9:a4}).
+  \item \textbf{Loopar och fördröjningar}: en loop med \code{dec} och \code{brne} tar 3 cykler per
+    varv, utom det sista, som tar 2. Vid 16~MHz är en cykel 62,5~ns (\secref{c9:b3}).
+  \item \textbf{Portar}: \code{DDRx} väljer riktning, \code{PORTx} sätter en utgång eller pull-upen
+    på en ingång, \code{PINx} läser (\secref{c8:c2} och \secref{c10:b2}). En knapp mot jord med
+    pull-up läses som 0 när den är nedtryckt.
+  \item \textbf{Subrutiner och stacken}: \code{rcall} lägger returadressen på stacken och
+    \code{ret} hämtar den. En subrutin sparar varje register den ändrar med \code{push}, och
+    återställer dem med \code{pop} i omvänd ordning (\secref{c10:app:c}).
+\end{itemize}
+
+\subsubsection{Kan du \dots?}
+\begin{itemize}
+  \item \dots\ följa ett kort program instruktion för instruktion och ange registren och flaggorna
+    \code{C}, \code{Z} och \code{N} efter varje rad?
+  \item \dots\ räkna ut hur många cykler en loop tar, och hur lång tid det är vid 16~MHz?
+  \item \dots\ skriva ett program som läser en knapp och tänder en lysdiod?
+  \item \dots\ skriva en jämförelse och ett villkorligt hopp för \enquote{om \code{r16} är minst
+    100}?
+  \item \dots\ säga vad \code{SP} är efter ett \code{rcall} och två \code{push}, när den var
+    \code{0x08FF} från början?
+\end{itemize}
+
+\subsubsection{Vanliga fel}
+\begin{itemize}
+  \item Att tro att den gula pilen i simulatorn visar instruktionen som just kördes. Den visar
+    nästa.
+  \item Att lägga en instruktion som ändrar flaggorna mellan \code{cpi} och hoppet.
+  \item Att glömma att \code{inc} och \code{dec} inte ändrar \code{C}, och att \code{andi} inte
+    heller gör det.
+  \item Att räkna en loops sista varv som alla andra. Det sista villkorliga hoppet hoppar inte, och
+    tar en cykel mindre.
+  \item Att glömma \code{com} när knappar mot jord läses, så att programmet gör precis tvärtom.
+\end{itemize}
+
+\subsection{Styrobjekt}
+\label{c12:a7}
+\emph{Lärandemål: programmera mikrodatorn till att kontrollera styrobjekt.} (Kapitel~\ref{c11:ch}.)
+
+\subsubsection{Det viktigaste}
+\begin{itemize}
+  \item Ett styrsystem läser \textbf{ingångar}, fattar \textbf{beslut} och sätter
+    \textbf{utgångar}. En tillståndstabell och en flödesplan före koden gör programmet enkelt att
+    skriva och att kontrollera (\secref{c11:app:b}).
+  \item En lysdiod behöver ett \textbf{förkopplingsmotstånd}: \code{(5 V - 2 V) / 220 Ω ≈ 14 mA}.
+    Större laster styrs genom en transistor och ett relä (\secref{c11:app:a}).
+  \item En knapp \textbf{studsar}; ett program som räknar tryck väntar en kort stund efter varje
+    ändring.
+\end{itemize}
+
+\subsubsection{Kan du \dots?}
+\begin{itemize}
+  \item \dots\ räkna ut strömmen genom en lysdiod med ett givet motstånd?
+  \item \dots\ rita flödesplanen för ett trafikljus, och översätta den till ett program?
+  \item \dots\ förklara varför en knapp kan räknas flera gånger, och hur det förhindras?
+\end{itemize}
+
+\subsection{Tips inför provet}
+\label{c12:a8}
+\begin{itemize}
+  \item \textbf{Visa hur du räknar.} Metoden ger poäng även när svaret blir fel på grund av ett
+    slarvfel, och ett fel som förs vidare till nästa deluppgift kostar bara en gång.
+  \item \textbf{Kontrollera med en sanningstabell} när du har förenklat ett uttryck. Tre variabler
+    är åtta rader och tar en minut.
+  \item \textbf{Skriv alltid ut talsystemet}: \code{0x2C}, \code{0b0010 1100} eller 44. Ett tal utan
+    skrivsätt kan läsas på tre sätt.
+  \item \textbf{Följ ett program med en tabell}: en rad per instruktion och en kolumn per register
+    och flagga.
+  \item \textbf{Läs frågan två gånger.} Frågar den efter ett uttryck, en sanningstabell eller ett
+    grindnät? Frågar den efter \code{C} efter en viss instruktion, eller efter hela programmet?
+\end{itemize}

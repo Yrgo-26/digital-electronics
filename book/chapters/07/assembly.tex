@@ -1,0 +1,239 @@
+% Section 7.2, from lectures/L07/appendix/b_assembly_language.md. The example program
+% number_formats.asm, which the section only links to, is printed in full from its file.
+%
+% One correction to the source: the worked example in 7.2.5 said that an empty cell in its table
+% means an unchanged register, but the table has no empty cells; and it said that all registers
+% are 0 when the program starts, which is true of the simulator but not of the chip itself. Both
+% sentences are corrected here and in the source.
+%
+% The template in 7.2.6 has its comments eight columns further left than the source has them, so
+% that its two longest lines fit the page without wrapping; the code is the same.
+
+\section{Assemblerspråk}
+\label{c7:app:b}
+
+\subsection{Från assembler till maskinkod}
+\label{c7:b1}
+Processorn förstår bara maskinkod: tal i programminnet, som i \secref{c7:a6}.
+\textbf{Assemblerspråk} är maskinkoden skriven med ord i stället för tal. Varje rad med en
+instruktion blir en instruktion i maskinkod, och ingenting annat: \code{inc r16} blir exakt en
+instruktion, som ökar \code{r16} med ett.
+
+Programmet som översätter kallas \textbf{assemblern}, och översättningen kallas att
+\textbf{assemblera}. I Microchip Studio sker det när du bygger projektet med \textbf{F7}.
+
+\bookfigure{avr_toolchain}{Verktygskedjan: från \code{main.asm} till hexfil och
+listfil.}{c7:fig:toolchain}
+
+Assemblern är det enklaste verktyget i kedjan. Den ändrar inte ordning på något, den fyller inte i
+något du glömt, och den kontrollerar inte att programmet gör något vettigt. Den kontrollerar bara
+att varje rad går att översätta. Allt programmet gör är alltså sådant du själv har skrivit. Det är
+både det svåra och det fina med assembler: det finns ingenting dolt.
+
+\subsection{En rad assembler}
+\label{c7:b2}
+En rad i ett assemblerprogram kan ha fyra delar, och alla fyra är valfria:
+
+\bookfigure{l07_line_anatomy}{En rad assembler med etikett, instruktion, operand och
+kommentar.}{c7:fig:line_anatomy}
+
+\begin{itemize}
+  \item \textbf{Etikett}: ett namn följt av kolon, först på raden. Etiketten namnger adressen där
+    nästa instruktion hamnar, så att ett hopp kan hoppa dit med namn i stället för med en adress.
+    Bokens etiketter skrivs med små bokstäver och understreck: \code{main}, \code{loop},
+    \code{delay_loop}.
+  \item \textbf{Instruktion}: vad processorn ska göra, skrivet som en kort förkortning. \code{inc}
+    betyder \emph{increment}, öka med ett. Förkortningen kallas också instruktionens
+    \textbf{mnemonic}.
+  \item \textbf{Operander}: vad instruktionen ska arbeta med. \code{inc} har en operand, registret
+    som ska ökas. \code{ldi r16, 25} har två, åtskilda med kommatecken: registret och värdet. När
+    det finns två operander är den första nästan alltid \textbf{målet}, det som ändras.
+  \item \textbf{Kommentar}: allt efter ett semikolon. Assemblern hoppar över kommentarer; de är
+    till för den som läser programmet, vilket oftast är du själv en vecka senare.
+\end{itemize}
+
+Indrag är inte nödvändigt, men bokens program drar in instruktionerna fyra blanksteg och låter
+etiketterna stå längst till vänster. Då syns programmets struktur direkt.
+
+\subsection{Direktiv}
+\label{c7:b3}
+Vissa rader börjar med en punkt. De är \textbf{direktiv}: instruktioner till assemblern, inte till
+processorn. Ett direktiv blir ingen maskinkod.
+
+\begin{booktable}{@{}p{5.2em}p{12.6em}L@{}}
+  \thead{Direktiv} & \thead{Exempel} & \thead{Betydelse} \\
+  \midrule
+  \code{.include} & \code{.include "m328Pdef.inc"} & Läs in en annan fil här. \\
+  \code{.org} & \code{.org 0x0000} & Lägg nästa instruktion på den här adressen i
+    programminnet. \\
+  \code{.def} & \code{.def counter = r16} & Ge ett register ett eget namn. \\
+  \code{.equ} & \code{.equ LIMIT = 10} & Ge en konstant ett eget namn. \\
+\end{booktable}
+
+\textbf{\code{.include "m328Pdef.inc"}} står först i varje program. Filen \code{m328Pdef.inc}
+följer med Microchip Studio och innehåller namnen på alla ATmega328P:s register och konstanter:
+\code{PORTB}, \code{DDRB}, \code{PIND}, \code{RAMEND} och flera hundra till. Utan den vet
+assemblern inte vad \code{PORTB} betyder.
+
+\textbf{\code{.def}} gör ett program lättare att läsa. Efter \code{.def counter = r16} kan du
+skriva \code{inc counter}, och assemblern byter ut \code{counter} mot \code{r16}. Det blir samma
+maskinkod, men programmet säger nu vad registret används till. Du använder \code{.def} i
+\hyperref[lab3:d6]{del~6} av Labb~3 (bilaga~\ref{app:lab3}).
+
+\textbf{\code{.equ}} gör samma sak för tal. Efter \code{.equ LIMIT = 10} betyder \code{LIMIT}
+talet 10 överallt i programmet. Konstanter skrivs med stora bokstäver, så att de syns.
+
+\subsection{Talformat}
+\label{c7:b4}
+Ett tal kan skrivas på flera sätt i ett assemblerprogram. Det blir samma bitar i maskinkoden
+oavsett hur du skriver det. Talsystemen går tillbaka till kapitel~\ref{c1:ch}.
+
+\begin{booktable}{@{}p{11.4em}p{10.6em}L@{}}
+  \thead{Skrivsätt} & \thead{Exempel} & \thead{Värde} \\
+  \midrule
+  Decimalt & \code{ldi r16, 200} & 200 \\
+  Binärt, prefix \code{0b} & \code{ldi r16, 0b11001000} & 128 + 64 + 8 = 200 \\
+  Hexadecimalt, prefix \code{0x} & \code{ldi r16, 0xC8} & 12 · 16 + 8 = 200 \\
+  Hexadecimalt, prefix \code{$} & \code{ldi r16, $C8} & 200; äldre skrivsätt, vanligt i gamla
+    exempel \\
+  Tecken, inom apostrofer & \code{ldi r16, 'A'} & 65 = \code{0x41}, tecknets ASCII-kod \\
+\end{booktable}
+
+Välj skrivsätt efter vad talet \textbf{betyder}. Ett antal, till exempel hur många varv en loop ska
+gå, skrivs decimalt. Ett bitmönster, till exempel vilka lysdioder som ska lysa, skrivs binärt, så
+att man ser varje bit. Hexadecimalt är det kompakta sättet att skriva ett bitmönster, och det är så
+simulatorn visar registren.
+
+Exempelprogrammet \file{number_formats.asm} laddar samma tal på fyra sätt i fyra register. Stega
+igenom det och se att alla fyra blir \code{0xC8}.
+
+\asmfile{lectures/L07/examples/number_formats.asm}
+
+\subsection{De första instruktionerna}
+\label{c7:b5}
+Åtta instruktioner räcker för att skriva bokens första program. Antal klockcykler står inom
+parentes; varför några tar två cykler tas upp i kapitel~\ref{c9:ch}.
+
+\begin{booktable}{@{}llL@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} \\
+  \midrule
+  \code{ldi} & \code{ldi r16, 5} & Laddar ett fast värde i ett register, \code{r16}--\code{r31}.
+    (1) \\
+  \code{mov} & \code{mov r18, r16} & Kopierar ett register till ett annat. \code{r16} ändras
+    inte. (1) \\
+  \code{clr} & \code{clr r19} & Nollställer ett register: alla bitar blir 0. (1) \\
+  \code{ser} & \code{ser r20} & Ettställer ett register: alla bitar blir 1, \code{0xFF}. (1) \\
+  \code{inc} & \code{inc r18} & Ökar ett register med ett. (1) \\
+  \code{dec} & \code{dec r17} & Minskar ett register med ett. (1) \\
+  \code{rjmp} & \code{rjmp end} & Hoppar till en etikett. (2) \\
+  \code{nop} & \code{nop} & Gör ingenting, i en klockcykel. (1) \\
+\end{booktable}
+
+Lägg märke till ordningen i \code{mov r18, r16}: målet först, sedan källan. Det läses
+\enquote{flytta till \code{r18} från \code{r16}}, och det är samma ordning som i
+\code{ldi r16, 5}, där \code{r16} är det som ändras.
+
+\subsubsection{Genomarbetat exempel}
+Här är \file{first_program.asm}, bokens första program. Tabellen visar registren \textbf{efter}
+varje instruktion. I simulatorn är alla register 0 när programmet startar.
+
+\begin{asmcode}
+main:
+    ldi r16, 5                      ; r16 = 5
+    ldi r17, 3                      ; r17 = 3
+    mov r18, r16                    ; r18 = r16, so r18 = 5 (r16 is unchanged)
+    inc r18                         ; r18 = r18 + 1 = 6
+    dec r17                         ; r17 = r17 - 1 = 2
+    clr r19                         ; r19 = 0
+    ser r20                         ; r20 = 0xFF (all ones)
+
+end:
+    rjmp end                        ; Stay here forever.
+\end{asmcode}
+
+\begin{narrowtable}{@{}lccccc@{}}
+  \thead{Efter} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{\code{r18}} &
+    \thead{\code{r19}} & \thead{\code{r20}} \\
+  \midrule
+  \code{ldi r16, 5} & 5 & 0 & 0 & 0 & 0 \\
+  \code{ldi r17, 3} & 5 & 3 & 0 & 0 & 0 \\
+  \code{mov r18, r16} & 5 & 3 & 5 & 0 & 0 \\
+  \code{inc r18} & 5 & 3 & 6 & 0 & 0 \\
+  \code{dec r17} & 5 & 2 & 6 & 0 & 0 \\
+  \code{clr r19} & 5 & 2 & 6 & 0 & 0 \\
+  \code{ser r20} & 5 & 2 & 6 & 0 & 0xFF \\
+\end{narrowtable}
+
+\code{clr r19} ändrar ingenting synligt, eftersom \code{r19} redan var 0. Instruktionen körs ändå,
+och det är en god vana att nollställa ett register innan man använder det, i stället för att lita
+på att det redan är noll.
+
+\subsection{Programmets skelett}
+\label{c7:b6}
+Alla program i Labb~3 utgår från samma mall, \file{labs/lab3/code/template.asm}
+(sidan~\pageref{lab3:template}). Så här ser dess delar ut, rad för rad:
+
+\begin{asmcode}
+.include "m328Pdef.inc"     ; Register names for the ATmega328P: PORTB, DDRB ...
+
+.org 0x0000                 ; The processor starts here after reset.
+    rjmp main               ; Jump over everything else, to main.
+
+main:
+    ; Write your program here.
+
+end:
+    rjmp end                ; Stay here forever: there is nothing to return to.
+\end{asmcode}
+
+\begin{itemize}
+  \item \textbf{\code{.include}} ger registernamnen, se \secref{c7:b3}.
+  \item \textbf{\code{.org 0x0000}} säger att nästa instruktion ska ligga på adress 0 i
+    programminnet. Det är där processorn börjar efter en reset (\secref{c7:a4}).
+  \item \textbf{\code{rjmp main}} hoppar till etiketten \code{main}. Det kan verka onödigt,
+    eftersom \code{main} ändå kommer direkt efter. Men adresserna närmast 0 är reserverade för
+    avbrottsvektorer, som boken inte använder, och vanan att börja med ett hopp gör att programmet
+    fungerar även den dag något läggs där. Så börjar nästan alla AVR-program.
+  \item \textbf{\code{main:}} är där ditt program börjar.
+  \item \textbf{\code{end: rjmp end}} hoppar till sig självt, om och om igen. Processorn stannar
+    alltså aldrig; den står och stampar på samma ställe. Utan den raden skulle processorn fortsätta
+    in i det som råkar ligga efter programmet i flashminnet, vilket inte är något du har skrivit
+    (\secref{c7:a8}).
+\end{itemize}
+
+Från kapitel~\ref{c8:ch} och framåt byts \code{end} ofta ut mot en \textbf{huvudloop}: ett
+program som styr något gör samma sak om och om igen, till exempel läser en knapp och tänder en
+lysdiod.
+
+\subsection{Listfilen}
+\label{c7:b7}
+När projektet byggs skriver assemblern, utöver hexfilen, en \textbf{listfil}: programmet med
+adressen och maskinkoden bredvid varje rad. I Microchip Studio har den filändelsen \code{.lss} och
+ligger bland projektets utdatafiler, i katalogen \code{Debug}. Listfilen för
+\file{first_program.asm} innehåller bland annat de här raderna (formatet skiljer sig lite mellan
+versioner, men innehållet är detsamma):
+
+\begin{console}
+000000 c000      rjmp main
+000001 e005      ldi r16, 5
+000002 e013      ldi r17, 3
+000003 2f20      mov r18, r16
+000004 9523      inc r18
+000005 951a      dec r17
+000006 2733      clr r19
+000007 ef4f      ser r20
+000008 cfff      rjmp end
+\end{console}
+
+Första kolumnen är adressen i programminnet, räknad i ord, och andra kolumnen är maskinkoden,
+hexadecimalt. Tre saker är värda att lägga märke till:
+\begin{itemize}
+  \item \textbf{\code{ldi r16, 5} blir \code{0xE005}.} Samma mönster som i \secref{c7:a6}:
+    \code{1110}, konstantens höga halva \code{0000}, registerfältet \code{0000} för \code{r16},
+    konstantens låga halva \code{0101}.
+  \item \textbf{\code{clr r19} blir en helt annan instruktion än \code{ldi r19, 0}.} Den är i
+    själva verket \code{eor r19, r19}, en XOR av registret med sig självt, vilket alltid blir noll.
+    \code{clr} är ett bekvämt namn på den.
+  \item \textbf{Adresserna ökar med ett för varje rad}, eftersom varje instruktion här är ett ord
+    lång. Hela programmet ryms i nio ord, 18 byte, av programminnets 32\,768.
+\end{itemize}

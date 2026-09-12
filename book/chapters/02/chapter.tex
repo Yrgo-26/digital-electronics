@@ -1,0 +1,42 @@
+% Chapter 2, typeset from lectures/L02: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix D, the
+% solutions, is in back/answers/c02.tex.
+
+\chapter{Logiska grindar, boolesk algebra och kontaktnät}
+\label{c2:ch}
+
+{\large\itshape Hur ettor och nollor fattar beslut, med grindar och med kontakter.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item De logiska grindarna NOT, AND, OR, NAND, NOR, XOR och XNOR, deras sanningstabeller och
+    symboler.
+  \item Boolesk algebra: notationen, räknelagarna och De Morgans lagar.
+  \item Från sanningstabell till uttryck, och från uttryck till grindnät.
+  \item Analys: från ett färdigt grindnät till dess sanningstabell.
+  \item CircuitVerse: att bygga och simulera ett grindnät i webbläsaren.
+  \item Kontaktnät: samma logik byggd med tryckknappar, en lampa och 24~V, inför Labb~1.
+  \item Reläet, och en krets som minns: självhållningen.
+\end{itemize}
+\end{chapterbox}
+
+Kapitel~\ref{c1:ch} visade hur bitar bär tal och tecken. Det här kapitlet handlar om hur de fattar
+beslut: hur en utsignal bestäms av insignalerna, och hur en sådan funktion skrivs, förenklas och
+byggs. Kapitlet byggs kring ett enda exempel, bromsassistenten, som först blir ett grindnät och
+sedan ett kontaktnät.
+
+Arbeta igenom kapitlet i ordning. \Secref{c2:app:a} går igenom grindarna och den booleska
+algebran, och hur ett grindnät tas fram ur en sanningstabell och analyseras;
+\secref{c2:a1}--\ref{c2:a6} är grunden för allt annat. När du kommer till bromsassistenten i
+\secref{c2:a10}: läs kravet och försök ta fram ett uttryck för den själv, innan du läser
+härledningen. Grindnäten byggs och simuleras i CircuitVerse, som körs i webbläsaren utan att något
+behöver installeras (\secref{c2:a9}).
+
+\Secref{c2:app:b} om kontaktnät är förberedelsen inför Labb~1 (bilaga~\ref{app:lab1}). Gör
+förberedelseuppgifterna i labbhandledningen innan labben; utan dem hinner du inte klart. Övningarna
+i \secref{c2:sec:exercises} har sina lösningsförslag i bilaga~\ref{app:answers}.
+
+\input{chapters/02/gates}
+\input{chapters/02/contacts}
+\input{chapters/02/summary}
+\input{chapters/02/exercises}

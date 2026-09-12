@@ -1,0 +1,46 @@
+% Chapter 9, typeset from lectures/L09: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix D, the
+% solutions, is in back/answers/c09.tex. The two predictions from the README's lecture plan are
+% kept in the opener, since they are how the chapter is best read; the rest of the plan is not.
+
+\chapter{Programflöde, loopar och tidsfördröjningar}
+\label{c9:ch}
+
+{\large\itshape Hur ett program väljer väg, går varv efter varv och väntar exakt så länge det
+ska.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Flödesplaner: att rita ett program innan det skrivs, med fem symboler.
+  \item Jämförelser: \code{cp}, \code{cpi} och \code{tst}, och varför en jämförelse är en
+    subtraktion utan resultat.
+  \item Villkorliga hopp: \code{breq}, \code{brne}, \code{brlo}, \code{brsh} och de andra, och
+    om-annars i assembler.
+  \item Tal med och utan tecken: när \code{brlo} och när \code{brlt}.
+  \item Loopar med ett bestämt antal varv, med räknaren i ett register.
+  \item Tidsfördröjningar, räknade exakt från klockcykler och kontrollerade med simulatorns
+    stoppur.
+  \item Flerval, och att arbeta om en flödesplan så att programmet får en väg in och en väg ut.
+  \item Labb~3, del 11, 12 och 14--17 (bilaga~\ref{app:lab3}).
+\end{itemize}
+\end{chapterbox}
+
+Programmen i kapitel~\ref{c8:ch} gick rakt uppifrån och ned. Det här kapitlet ger dem det som
+riktiga program behöver: beslut, loopar och väntan. Besluten bygger på flaggorna från
+kapitel~\ref{c8:ch}, och väntan räknas ut exakt, klockcykel för klockcykel, och kontrolleras sedan
+med simulatorns stoppur.
+
+Läs \secref{c9:app:a} om flödesplaner och villkorliga hopp först, och repetera gärna flaggorna i
+\secref{c8:a6}. Läs sedan \secref{c9:app:b} om loopar och tidsfördröjningar. Gör två
+förutsägelser innan du kör något: hur många gånger \code{brne} körs, och hur många av dem den
+hoppar, i en loop som går 200 varv; och hur många klockcykler fördröjningen i
+\code{short_delay.asm} (\secref{c9:b4}) tar, och hur lång tid det är vid 16~MHz.
+
+Övningarna finns i \secref{c9:sec:exercises}, och lösningsförslagen till dem i
+bilaga~\ref{app:answers}. Till kapitlet hör Labb~3, del 11, 12 och 14--17 (\secref{lab3:sec:c}).
+Gör klart del 3--10 från kapitel~\ref{c8:ch} först, om de inte redan är gjorda.
+
+\input{chapters/09/flowcharts}
+\input{chapters/09/loops}
+\input{chapters/09/summary}
+\input{chapters/09/exercises}

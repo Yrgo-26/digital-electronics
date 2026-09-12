@@ -1,0 +1,209 @@
+% Section 3.1, from lectures/L03/appendix/a_contact_network_analysis.md.
+%
+% One correction, also made in the source: the bisection in 3.1.5 is compared with at most seven
+% measurements from the top, not eight, as in chapter 5's section on bisection.
+
+\section{Analys och felsökning av kontaktnät}
+\label{c3:app:a}
+
+\subsection{Kontaktnätet som uttryck}
+\label{c3:a1}
+\Secref{c2:b6} visade hur ett uttryck blir ett kontaktnät. Att \textbf{analysera} ett nät är samma
+sak baklänges: du har ett schema, och ska ta reda på vilken funktion det realiserar.
+
+Metoden är att arbeta \textbf{inifrån och ut}:
+\begin{enumerate}
+  \item Leta upp de minsta grupperna: två eller flera kontakter som sitter direkt i serie eller
+    direkt parallellt, utan något annat emellan. Skriv uttrycket för var och en: en seriekoppling
+    blir en produkt, en parallellkoppling en summa. En slutande kontakt är variabeln, en brytande
+    kontakt variabeln inverterad.
+  \item Betrakta varje sådan grupp som en enda kontakt, och upprepa: nu syns nästa nivå av serie-
+    och parallellkopplingar.
+  \item När hela strömvägen från +24~V till lampan har blivit ett enda uttryck är du klar.
+  \item Räkna fram sanningstabellen ur uttrycket, och sammanfatta den med en mening.
+\end{enumerate}
+
+Sätt parenteser runt varje grupp, också när de inte behövs. En parallellkoppling i serie med något
+annat är alltid en parentes, \code{(S1 + S2) · S3}, och den som glömmer den får
+\code{S1 + S2 · S3}, som är en helt annan funktion.
+
+\subsection{Genomarbetat exempel}
+\label{c3:a2}
+
+\bookfigure{l03_analysis_example}{Två kontaktnät med samma sanningstabell.}{c3:fig:analysis}
+
+\textbf{Nät a).} De minsta grupperna är de två parallellkopplingarna: \code{S1 + S2} överst och
+\code{S1 + S3} under. De två grupperna sitter i serie med varandra, och därefter lampan:
+
+\begin{textdrawing}
+H1 = (S1 + S2) · (S1 + S3)
+\end{textdrawing}
+
+\noindent Sanningstabellen, med varje grupp som en egen kolumn:
+
+\begin{narrowtable}{@{}cccccc@{}}
+  \thead{S1} & \thead{S2} & \thead{S3} & \thead{S1 + S2} & \thead{S1 + S3} & \thead{H1} \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 1 & 1 \\
+  1 & 0 & 0 & 1 & 1 & 1 \\
+  1 & 0 & 1 & 1 & 1 & 1 \\
+  1 & 1 & 0 & 1 & 1 & 1 \\
+  1 & 1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent Sammanfattat med ord: \textbf{lampan lyser om S1 är nedtryckt, eller om både S2 och S3 är
+det.}
+
+Men den meningen är ett annat uttryck, \code{S1 + S2 · S3}, och det är nät b). Att de två är samma
+funktion går att visa algebraiskt genom att multiplicera ut:
+
+\begin{textdrawing}
+(S1 + S2)(S1 + S3) = S1·S1 + S1·S3 + S2·S1 + S2·S3
+                   = S1 + S1·S3 + S1·S2 + S2·S3
+                   = S1(1 + S3 + S2) + S2·S3
+                   = S1 + S2·S3
+\end{textdrawing}
+
+Det är den andra distributiva lagen från \secref{c2:a4}, \code{A + BC = (A + B)(A + C)}, den som
+inte ser ut som vanlig algebra. I kontakter är den lätt att se: i nät a) behövs S1 i båda
+parallellkopplingarna, och i nät b) räcker det med en S1 som går förbi allt annat.
+
+Nät b) har tre kontakter i stället för fyra, och S1 behöver bara ett kontaktelement i stället för
+två. Färre kontakter betyder färre sladdar att koppla, färre ställen där något kan gå sönder, och i
+en maskin lägre kostnad.
+
+\subsection{Likvärdiga nät}
+\label{c3:a3}
+Två nät är \textbf{likvärdiga} om de har samma sanningstabell. De kan se helt olika ut, ha olika
+antal kontakter och vara kopplade på olika sätt; om lampan gör samma sak för varje kombination av
+knapparna är de, för den som trycker på knapparna, samma nät.
+
+Det finns två sätt att visa att två nät är likvärdiga:
+\begin{itemize}
+  \item \textbf{Med sanningstabeller.} Räkna fram tabellen för båda och jämför dem rad för rad. Det
+    fungerar alltid, och med två eller tre knappar är det bara fyra eller åtta rader.
+  \item \textbf{Med algebra.} Förenkla det ena uttrycket tills det blir det andra, som i
+    \secref{c3:a2}. Det är snabbare när man ser vägen, men lätt att räkna fel.
+\end{itemize}
+
+Ett exempel på ett nät med en onödig kontakt:
+
+\bookfigure{l03_equivalent}{Två likvärdiga nät, det ena med en onödig kontakt.}
+  {c3:fig:equivalent}
+
+Nät a) är \code{S1 + S1' · S2'}. Förenklingslagen från \secref{c2:a4}, \code{A + A'B = A + B} med
+\code{S2'} i B:s roll, säger direkt att det är \code{S1 + S2'}, alltså nät b).
+
+Varför kan den brytande kontakten S1 tas bort? Titta på de två fallen:
+\begin{itemize}
+  \item När S1 är \textbf{nedtryckt} leder den vänstra grenen, och lampan lyser vad den högra grenen
+    än gör.
+  \item När S1 är \textbf{släppt} är den brytande kontakten S1 sluten, och den högra grenen är bara
+    S2:s brytande kontakt.
+\end{itemize}
+
+Den brytande kontakten S1 avgör alltså aldrig något: i det enda fall där den är öppen spelar den
+högra grenen ingen roll. Den \textbf{påverkar strömmen}, men den \textbf{påverkar inte lampan}, och
+en kontakt som inte påverkar utgången kan ersättas med en ledning. Labb~1 har i
+\hyperref[lab1:u8]{uppgift~8} ett nät av samma slag, som du analyserar och förenklar själv.
+
+\subsection{Förutsäg innan du mäter}
+\label{c3:a4}
+Varje uppgift i Labb~1 följer samma arbetsgång:
+\begin{enumerate}
+  \item \textbf{Rita schemat} på papper, med beteckning och kontaktsort för varje kontakt.
+  \item \textbf{Förutsäg} lampans läge för varje kombination av knapparna, och skriv in det i
+    tabellen.
+  \item \textbf{Koppla} efter schemat, med spänningen frånslagen.
+  \item \textbf{Mät}: slå på spänningen, pröva varje kombination, och skriv in vad lampan gör.
+  \item \textbf{Jämför} de två kolumnerna.
+\end{enumerate}
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+Det kan kännas som en omväg att fylla i den förutsagda kolumnen när svaret ändå kommer om en
+minut. Det är det inte. \textbf{Den som bara mäter har inget att jämföra med}, och kan inte avgöra
+om lampan gör rätt eller fel. En avvikelse mellan de två kolumnerna är information: den säger att
+schemat, förutsägelsen eller kopplingen är fel, och vilken rad som avslöjar det. Det är där
+felsökningen börjar.
+
+\subsection{Felsökning}
+\label{c3:a5}
+Lampan gör inte som den ska. Det finns två sätt att hitta felet, och båda bygger på samma idé:
+\textbf{följ strömvägen från +24~V mot 0~V, och hitta det första stället där den är bruten.}
+
+\subsubsection{Med spänningen påslagen: mät spänning}
+Ställ multimetern på likspänning (V~DC), sätt den svarta mätsladden på 0~V, och mät med den röda i
+varje mätpunkt längs strömvägen, uppifrån och ned, som i figur~\ref{c3:fig:troubleshoot}. Tryck på
+de knappar som ska få lampan att lysa.
+
+\bookfigure[t]{l03_troubleshoot}{En strömväg med mätpunkterna M1, M2 och M3.}
+  {c3:fig:troubleshoot}
+
+Så länge vägen ovanför mätpunkten är sluten visar mätaren 24~V. Efter det element som bryter vägen
+visar den 0~V. Med S1 nedtryckt och S2 släppt ska lampan lysa, och mätningen avslöjar var den inte
+gör det:
+
+\begin{booktable}{@{}cccL@{}}
+  \thead{M1} & \thead{M2} & \thead{M3} & \thead{Slutsats} \\
+  \midrule
+  0~V & 0~V & 0~V & Ingen spänning alls: aggregatet är av, eller ledningen från +24~V är bruten. \\
+  24~V & 0~V & 0~V & S1 leder inte: fel kontaktelement, en lös sladd, eller en trasig kontakt. \\
+  24~V & 24~V & 0~V & S2 leder inte: troligen kopplad till de slutande anslutningarna i stället
+    för de brytande. \\
+  24~V & 24~V & 24~V & Vägen fram till lampan är hel: felet sitter i lampan eller i ledningen till
+    0~V. \\
+\end{booktable}
+
+I det sista fallet: mät direkt över lampan. 24~V över en släckt lampa betyder att lampan är
+trasig; 0~V betyder att ledningen från lampan till 0~V är bruten.
+
+\subsubsection{Med spänningen frånslagen: mät ledning}
+Slå av aggregatet, ställ multimetern på genomgångsprovning (ofta med en summer) eller resistans,
+och mät över ett element i taget. En sluten kontakt eller en hel sladd ger nästan 0~Ω och ett pip;
+en öppen kontakt eller en bruten sladd ger inget utslag. Tryck på knappen medan du mäter över dess
+kontakt, för att se att den ändrar sig som den ska.
+
+\begin{warning}
+\textbf{Mät aldrig resistans eller genomgång med spänningen påslagen.} Mätaren mäter resistans
+genom att skicka en egen liten ström, och en yttre spänning ger i bästa fall ett meningslöst värde
+och i värsta fall en trasig mätare.
+\end{warning}
+
+\subsubsection{Halveringsmetoden}
+I en lång strömväg lönar det sig att inte börja uppifrån, utan i \textbf{mitten}. Visar mätpunkten i
+mitten 24~V sitter felet i den nedre halvan; visar den 0~V sitter det i den övre. Mät sedan i mitten
+av den halva som återstår, och så vidare. Med åtta element hittar du felet på tre mätningar i
+stället för upp till sju.
+
+\subsection{Vanliga fel}
+\label{c3:a6}
+
+\begin{booktable}{@{}>{\raggedright\arraybackslash}p{11em}L@{}}
+  \thead{Symptom} & \thead{Trolig orsak} \\
+  \midrule
+  Lampan lyser aldrig & Aggregatet är av; en sladd sitter i fel hål; lampan är trasig; en kontakt
+    i serie är kopplad som slutande när den skulle vara brytande, eller omvänt. \\
+  Lampan lyser alltid & En kontakt är förbikopplad av en extra sladd; en parallell gren har fått en
+    brytande kontakt i stället för en slutande. \\
+  Lampan gör precis tvärtom mot tabellen & En kontakt är kopplad till fel kontaktelement: slutande
+    och brytande har bytt plats. \\
+  Lampan fungerar för en knapp men inte för den andra & Den andra knappens kontakt är inte med i
+    strömvägen; kontrollera att båda ändarna av den är anslutna. \\
+  Aggregatet går i strömbegränsning eller säkringen löser ut & Kortslutning: +24~V har fått en väg
+    till 0~V utan lampan emellan. Slå av och kontrollera schemat. \\
+\end{booktable}
+
+Den vanligaste orsaken av alla är att schemat och kopplingen inte stämmer överens. Kontrollera
+kopplingen mot schemat sladd för sladd, gärna med en kamrat som läser schemat högt medan du pekar på
+sladdarna, innan du börjar mäta.

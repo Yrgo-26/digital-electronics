@@ -1,0 +1,66 @@
+% Digitalteknik - the book.
+%
+% Built with LuaLaTeX; see the Makefile. The design is in dtbook.sty, the front matter in front/,
+% each chapter in chapters/NN/, one file per section, mirroring the appendices of the lecture it is
+% typeset from, and the back matter in back/: the three lab guides, the Microchip Studio guide and
+% the instruction sheet from info/, the practice exam from exam/, and the solutions to the
+% exercises that are not programs.
+%
+% `make part PART=04` builds the front matter and one chapter alone, with its solutions (or
+% PART=lab1, lab2, lab3, studio, avr, exam or answers), for checking one piece quickly: \onlypart
+% names it, and every piece skipped still steps the chapter counter, so the one built keeps its
+% number.
+\documentclass[10pt, twoside, openright]{book}
+\usepackage{dtbook}
+
+% Nothing named means the whole book. \def rather than \providecommand, which would make it
+% \long and so never equal to \empty.
+\ifdefined\onlypart\else\def\onlypart{}\fi
+\makeatletter
+% \bookpart{key}{file}: input file, unless one other part was asked for.
+\newcommand{\bookpart}[2]{%
+  \ifx\onlypart\empty\input{#2}\else
+    \def\@tempa{#1}\ifx\@tempa\onlypart\input{#2}\else\refstepcounter{chapter}\fi
+  \fi}
+% \bookanswers{key}{file}: one chapter's solutions, input with the whole book, with the solutions
+% alone, or with the chapter they answer.
+\newcommand{\bookanswers}[2]{%
+  \ifx\onlypart\empty\input{#2}\else
+    \def\@tempa{#1}\ifx\@tempa\onlypart\input{#2}\else
+      \def\@tempa{answers}\ifx\@tempa\onlypart\input{#2}\fi\fi
+  \fi}
+\makeatother
+
+\begin{document}
+
+\frontmatter
+\input{front/title}
+\tableofcontents
+\input{front/preface}
+
+\mainmatter
+\bookpart{01}{chapters/01/chapter}
+\bookpart{02}{chapters/02/chapter}
+\bookpart{03}{chapters/03/chapter}
+\bookpart{04}{chapters/04/chapter}
+\bookpart{05}{chapters/05/chapter}
+\bookpart{06}{chapters/06/chapter}
+\bookpart{07}{chapters/07/chapter}
+\bookpart{08}{chapters/08/chapter}
+\bookpart{09}{chapters/09/chapter}
+\bookpart{10}{chapters/10/chapter}
+\bookpart{11}{chapters/11/chapter}
+\bookpart{12}{chapters/12/chapter}
+
+\appendix
+\bookpart{lab1}{back/lab1}
+\bookpart{lab2}{back/lab2}
+\bookpart{lab3}{back/lab3/lab3}
+\bookpart{studio}{back/studio}
+\bookpart{avr}{back/avr}
+\bookpart{exam}{back/exam/about}
+\bookpart{exam}{back/exam/practice}
+\bookpart{exam}{back/exam/practice_answers}
+\input{back/answers/answers}
+
+\end{document}

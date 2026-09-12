@@ -1,0 +1,119 @@
+% Section 7.3, from lectures/L07/appendix/c_microchip_studio_simulator.md.
+
+\section{Simulering i Microchip Studio}
+\label{c7:app:c}
+
+\subsection{Arbetsgången}
+\label{c7:c1}
+Allt arbete i Labb~3 följer samma slinga: skriv, bygg, förutsäg, stega och jämför.
+
+\bookfigure{l07_workflow}{Arbetsgången: skriv, bygg, förutsäg, stega och
+jämför.}{c7:fig:workflow}
+
+Hur du skapar ett projekt, bygger och startar simulatorn står i bilaga~\ref{app:studio},
+\secref{studio:2}--\ref{studio:4}. Det här avsnittet handlar om hur du \textbf{använder}
+simulatorn för att lära dig vad instruktionerna gör.
+
+\textbf{Varför simulatorn?} Ett riktigt kort kör upp till 16 miljoner instruktioner i sekunden, och
+du ser bara slutresultatet: en lysdiod som lyser eller inte. Simulatorn låter dig köra en
+instruktion i taget och se varje register, varje flagga och varje port ändras. Det är det bästa
+sättet att förstå vad ett program gör, och att hitta felet när det inte gör det du tänkt. Nästan
+hela Labb~3 görs i simulatorn; kortet används först i kapitel~\ref{c11:ch}.
+
+\subsection{Att stega och läsa registren}
+\label{c7:c2}
+Starta simuleringen med \textbf{Debug $\rightarrow$ Start Debugging and Break}
+(\textbf{Alt+F5}). Programmet stannar på första instruktionen, och en gul pil visar var.
+
+\textbf{Den gula pilen pekar på den instruktion som står på tur, inte på den som just körts.} Det
+är den vanligaste källan till förvirring första gången. När pilen står på \code{inc r18} har
+\code{inc r18} ännu inte körts; tryck \textbf{F11} (\emph{Step Into}), så körs den, och pilen
+flyttar till nästa rad.
+
+Öppna fönstret \textbf{Processor Status} (\textbf{Debug $\rightarrow$ Windows $\rightarrow$
+Processor Status}). Där finns:
+\begin{itemize}
+  \item \textbf{\code{R00}--\code{R31}}: de 32 registren. Ett register som ändrades i det senaste
+    steget visas i rött.
+  \item \textbf{Program Counter}: adressen till nästa instruktion. Jämför den med adresserna i
+    listfilen (\secref{c7:b7}).
+  \item \textbf{Status Register}: SREG, med en ruta per flagga. Flaggorna tas upp i
+    kapitel~\ref{c8:ch}.
+  \item \textbf{Cycle Counter} och \textbf{Stop Watch}: hur många klockcykler, och hur lång tid,
+    programmet har kört. Se \secref{c7:c5}.
+\end{itemize}
+
+Registren visas hexadecimalt, så \code{r18 = 6} visas som \code{0x06} och \code{r16 = 200} som
+\code{0xC8}. Vänj dig vid det: det är så datablad, listfiler och instruktionslistor skriver, och
+omvandlingen är den från kapitel~\ref{c1:ch}.
+
+\subsection{Förutsäg före varje steg}
+\label{c7:c3}
+Att trycka F11 och titta på vad som händer lär dig mindre än man kan tro. Du ser att något
+ändrades, men inte om det var det du väntade dig. Därför en regel för hela Labb~3:
+
+\textbf{Skriv ned vad du väntar dig innan du trycker F11.}
+
+Det enklaste sättet är en tabell med en rad per instruktion och en kolumn per register du bryr dig
+om, som tabellen i \secref{c7:b5}. Fyll i raden, tryck F11, och jämför med Processor Status:
+\begin{itemize}
+  \item \textbf{Stämmer det} vet du att du förstår instruktionen.
+  \item \textbf{Stämmer det inte} har du hittat något att lära dig: antingen gör instruktionen
+    något annat än du trodde, eller så står programmet inte där du trodde. Båda är värda att reda ut
+    innan du går vidare.
+\end{itemize}
+
+Samma vana gäller när programmen blir längre. Då förutsäger du inte varje steg, utan värdet vid en
+viss rad, och kör fram till den med en brytpunkt eller \textbf{Run To Cursor}
+(\textbf{Ctrl+F10}).
+
+\subsection{Felmeddelanden}
+\label{c7:c4}
+Ett program som inte går att assemblera ger felmeddelanden i fönstret \textbf{Error List} när du
+bygger. Varje meddelande har ett radnummer; dubbelklicka på det så hoppar editorn dit. Tre fel är
+vanligast i början:
+
+\begin{booktable}{@{}>{\raggedright\arraybackslash}p{8.6em}lL@{}}
+  \thead{Felmeddelandet handlar om} & \thead{Exempel på rad} & \thead{Rättelse} \\
+  \midrule
+  ett ogiltigt register & \code{ldi r5, 3} & \code{ldi} når bara \code{r16}--\code{r31}: använd
+    \code{ldi r20, 3}. \\
+  en okänd symbol & \code{rjmp mian} & Etiketten heter \code{main}. Stavningen måste stämma
+    exakt. \\
+  syntax & \code{ldi r16 7} & Kommatecknet saknas: \code{ldi r16, 7}. \\
+\end{booktable}
+
+Två råd som sparar mycket tid:
+\begin{itemize}
+  \item \textbf{Rätta det första felet först, och bygg om.} Ett enda fel ger ibland flera följdfel
+    längre ned, som försvinner av sig själva.
+  \item \textbf{Läs raden, inte bara meddelandet.} Meddelandet säger vad assemblern inte förstod,
+    men felet kan sitta en bit tidigare på raden än där assemblern gav upp.
+\end{itemize}
+
+Ett program som assembleras utan fel kan fortfarande vara fel. Assemblern kontrollerar bara att
+varje rad går att översätta, inte att programmet gör det du vill. Det är simulatorns uppgift, och
+din förutsägelse är det du kontrollerar mot.
+
+\subsection{Cykelräknaren}
+\label{c7:c5}
+\textbf{Cycle Counter} i Processor Status räknar hur många klockcykler programmet har kört sedan
+start, och \textbf{Stop Watch} visar samma sak som tid. Kontrollera först att fältet
+\textbf{Frequency} står på \textbf{16~MHz}, så att tiden stämmer med ett Arduino Uno-kort
+(bilaga~\ref{app:studio}, \secref{studio:4-4}).
+
+Kör \file{first_program.asm} fram till raden \code{end:}. Cykelräknaren visar då \textbf{9}:
+\begin{itemize}
+  \item \code{rjmp main} tar 2 cykler;
+  \item de sju instruktionerna i \code{main} tar 1 cykel var, 7 cykler;
+  \item totalt 2 + 7 = 9 cykler, vilket är 9 · 62,5~ns = 562,5~ns.
+\end{itemize}
+
+Det är värt att räkna så en gång nu, för i kapitel~\ref{c9:ch} blir cykelräknaren det verktyg som
+mäter hur lång tid en tidsfördröjning tar. Då räknar du ut antalet cykler för hand först, och
+kontrollerar med stoppuret.
+
+\textbf{Ett tips till sist.} Medan simuleringen står stilla kan du ändra värdet i ett register
+direkt i Processor Status, genom att dubbelklicka på värdet och skriva in ett nytt. Det är ett
+snabbt sätt att prova ett program med olika startvärden utan att bygga om det, och det används i
+\hyperref[lab3:d12]{del~12} av Labb~3.

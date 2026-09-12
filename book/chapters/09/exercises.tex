@@ -1,0 +1,195 @@
+% Section 9.4, from lectures/L09/appendix/c_exercises.md. The note under the lecture's intro, which
+% exercise is the Kontroll, is folded into the aside, as in Chapter 1. Exercise 9 uses the whole of
+% long_delay.asm, lines outside the delay included, so the program is printed there in full.
+
+\section{Övningar}
+\label{c9:sec:exercises}\label{c9:app:c}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Rita flödesplanen innan du skriver programmet, och
+förutsäg resultatet innan du simulerar. Övningarna märkta \textbf{Program} och \textbf{Kontroll}
+görs i Microchip Studio; tidsfördröjningar mäts med stoppuret enligt \secref{c9:b6}.
+
+Övriga övningar görs med papper och penna. Lösningsförslag finns i bilaga~\ref{app:answers}.
+
+Varje övning är märkt med sin sort. Det finns en \textbf{Kontroll} i det här kapitlet,
+övning~\ref{c9:ex:9}.
+\end{aside}
+
+\exercise{Rita en flödesplan}{Konstruktion}
+\label{c9:ex:1}
+Ett program ska läsa ett tal i \code{r16} och tända PB0 om talet är jämnt, annars PB1. Ett tal är
+jämnt om bit~0 är 0.
+\begin{parts}
+  \item Rita flödesplanen.
+  \item Vilken instruktion och mask använder du för att ta reda på bit~0? Tips: \secref{c8:b2}.
+  \item Vilket villkorligt hopp passar efter den instruktionen?
+\end{parts}
+
+\exercise{Vilket hopp?}{Förståelse}
+\label{c9:ex:2}
+Skriv en jämförelse och ett villkorligt hopp till etiketten \code{yes} för varje villkor. Talen är
+utan tecken om inget annat sägs.
+\begin{parts}
+  \item \code{r16} är lika med \code{r17}.
+  \item \code{r16} är inte noll.
+  \item \code{r16} är mindre än 100.
+  \item \code{r16} är 100 eller större.
+  \item \code{r16} är större än 100.
+  \item \code{r16} är negativt, när det läses med tecken.
+  \item \code{r16} är mindre än \code{r17}, när båda läses med tecken.
+\end{parts}
+
+\exercise{Följ programmet}{Räkna för hand}
+\label{c9:ex:3}
+Vilket värde får \code{PORTB} när \code{r16} börjar med 5, 10, 99, 100 respektive 200?
+
+\begin{asmcode}
+    ldi r17, 0
+    cpi r16, 10
+    brlo small
+    cpi r16, 100
+    brsh big
+    ldi r17, 2
+    rjmp done
+small:
+    ldi r17, 1
+    rjmp done
+big:
+    ldi r17, 3
+done:
+    out PORTB, r17
+\end{asmcode}
+
+\noindent Rita också programmets flödesplan. Vad är programmets uppgift, med en mening?
+
+\exercise{Om, annars}{Program}
+\label{c9:ex:4}
+\begin{parts}
+  \item Skriv ett program som tänder alla lysdioder på port B om \code{r16} är 42, och släcker
+    alla annars.
+  \item Testa programmet med \code{r16} = 42 och med \code{r16} = 41. Byt värde antingen i
+    \code{ldi}-raden eller i Processor Status.
+  \item Ta bort \code{rjmp}-instruktionen efter den första grenen. Vad händer nu för
+    \code{r16}~=~41, och för \code{r16}~=~42? Förklara.
+\end{parts}
+
+\exercise{Hur många varv?}{Räkna för hand}
+\label{c9:ex:5}
+
+\begin{asmcode}
+    ldi r16, N
+loop:
+    inc r17
+    dec r16
+    brne loop
+\end{asmcode}
+
+\noindent\code{r17} är 0 från början. Vad är \code{r17} efter loopen när
+\begin{parts}
+  \item N = 5?
+  \item N = 1?
+  \item N = 0? Förklara svaret.
+  \item Hur många gånger körs \code{brne} när N = 5, och hur många av dem hoppar den?
+\end{parts}
+
+\exercise{Summera}{Program}
+\label{c9:ex:6}
+\begin{parts}
+  \item Skriv ett program som räknar ut $1 + 2 + \dots + n$, med $n$ i \code{r16} och summan i
+    \code{r17}.
+  \item Prova med $n = 15$. Vilket svar ska du få?
+  \item Vilket är det största $n$ som ger rätt svar i en byte? Vad får du för $n = 23$, och
+    varför?
+\end{parts}
+
+\exercise{Räkna cykler}{Räkna för hand}
+\label{c9:ex:7}
+\begin{parts}
+  \item Hur många klockcykler tar fördröjningen i \secref{c9:b4} om startvärdet är 100 i stället
+    för 200? Hur lång tid är det vid 16~MHz?
+  \item Samma fråga för startvärdet 1.
+  \item Samma fråga för startvärdet 0.
+\end{parts}
+
+\exercise{Välj konstanter}{Konstruktion}
+\label{c9:ex:8}
+\begin{parts}
+  \item En fördröjning ska vara 40~µs. Hur många varv ska loopen i \secref{c9:b4} gå? Hur nära
+    40~µs kommer du, och hur kan du komma exakt?
+  \item En fördröjning ska vara 5~ms. Välj OUTER och INNER för loopen i \secref{c9:b5}, först utan
+    och sedan med en \code{nop} i den yttre loopen. Hur nära 5~ms kommer du i de två fallen?
+  \item Varför går det inte att göra en fördröjning på en sekund med två loopar?
+\end{parts}
+
+\exercise{Räkna, mät och förklara}{Kontroll}
+\label{c9:ex:9}
+\emph{Räkna ut för hand, mät med stoppuret, förklara skillnaden.}
+
+Använd \code{long_delay.asm}, med OUTER = 208 och INNER = 255:
+
+\asmfile{lectures/L09/examples/long_delay.asm}
+
+\begin{parts}
+  \item Räkna ut antalet klockcykler från raden \code{delay_start} till raden \code{delay_end},
+    med en tabell som den i \secref{c9:b4}: en rad per instruktion, cykler, antal gånger och
+    summa. Räkna om till millisekunder.
+  \item Mät samma sak i simulatorn med brytpunkter och stoppuret. Stämmer det?
+  \item Flytta den första brytpunkten till raden \code{sbi PORTB, 0} och den andra till raden
+    \code{cbi PORTB, 0}. Förutsäg först hur mycket mätningen ändras, mät sedan. Förklara
+    skillnaden.
+  \item Ändra OUTER till 100 och förutsäg den nya tiden med formeln. Mät och jämför.
+  \item En kamrat har räknat ut att fördröjningen tar $\text{OUTER} \cdot \text{INNER} \cdot 3 =
+    159\,120$ cykler. Vad har kamraten glömt, och hur stort blir felet i procent?
+\end{parts}
+
+\exercise{Flerval}{Program}
+\label{c9:ex:10}
+Ett program ska visa ett mönster på port B beroende på läget i \code{r16}:
+\begin{itemize}
+  \item läge 0: alla släckta;
+  \item läge 1: bara PB0;
+  \item läge 2: PB0 och PB1;
+  \item alla andra lägen: alla tända, som en felindikering.
+\end{itemize}
+\begin{parts}
+  \item Rita flödesplanen, med en gemensam ruta för \code{PORTB = mönster}.
+  \item Skriv programmet och testa alla fyra fallen.
+\end{parts}
+
+\exercise{Arbeta om}{Konstruktion}
+\label{c9:ex:11}
+Programmet nedan fungerar, men det har tre slut och tre kopior av \code{out}. Rita dess flödesplan,
+arbeta om den enligt \secref{c9:a8}, och skriv det omarbetade programmet.
+
+\begin{asmcode}
+    cpi r16, 1
+    breq one
+    cpi r16, 2
+    breq two
+    ldi r17, 0
+    out PORTB, r17
+end_1:
+    rjmp end_1
+one:
+    ldi r17, 1
+    out PORTB, r17
+end_2:
+    rjmp end_2
+two:
+    ldi r17, 3
+    out PORTB, r17
+end_3:
+    rjmp end_3
+\end{asmcode}
+
+\exercise{Minusgrader}{Förståelse, Fördjupning}
+\label{c9:ex:12}
+Värmaren i \secref{c9:a5} ska användas utomhus, där temperaturen kan bli negativ. Den lagras som
+ett tal med tecken.
+\begin{parts}
+  \item Vad gör programmet när temperaturen är $-5$ grader? Följ \code{cpi} och \code{brlo} steg
+    för steg.
+  \item Vilket hopp ska användas i stället, och vilken flagga läser det?
+  \item Fungerar det rättade programmet även för temperaturen 25 grader? För 100 grader?
+\end{parts}

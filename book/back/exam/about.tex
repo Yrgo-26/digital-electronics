@@ -1,0 +1,156 @@
+% Appendix, from exam/README.md: the form of the written exam, its grade limits, what it covers and
+% how it is marked; and from info/README.md, its sections "Examination" (how the labs and the exam
+% are graded, and the final grade) and "Lärandemål" (where each learning outcome is taught and
+% examined), with the lectures L01 to L12 given as the chapters they became.
+%
+% Deliberate differences: everything that belongs to one run of the course is left out, the school
+% and its routines, the dates, and the lecture the exam is written in ("i L12" is "i slutet av
+% kursen"). info/README.md's own paragraph on the written exam repeats exam/README.md's, and is
+% folded into it. The exam itself and its solutions are the teacher's and are not in the book.
+
+\chapter{Det skriftliga provet}
+\label{app:exam}
+
+Kursen avslutas med ett skriftligt prov, efter kapitel~\ref{c12:ch}. Här står hur provet är upplagt,
+vad det omfattar och hur det bedöms, och hur det tillsammans med laborationerna ger kursens betyg.
+
+Ett övningsprov finns att träna på: frågorna står i bilaga~\ref{app:practice}, och
+lösningsförslagen, med poäng per deluppgift, i bilaga~\ref{app:practice:answers}. Gör det under två
+timmar, innan du tittar i lösningarna. Själva provet och dess lösningar är lärarens och finns inte
+i boken.
+
+\section*{Provets form}
+\markright{Provets form}
+\begin{itemize}
+  \item \textbf{Två timmar}, individuellt, i slutet av kursen.
+  \item \textbf{Hjälpmedel:} penna, suddgummi och linjal. Ingen miniräknare. Ett referensblad med
+    AVR-instruktionerna, bilaga~\ref{app:avr}, delas ut tillsammans med provet; det är samma blad
+    som använts under kursen.
+  \item \textbf{40 poäng}, fördelade på sex frågor. Varje fråga har deluppgifter, och poängen står
+    vid varje deluppgift.
+  \item Svaren skrivs på separata papper, med en ny fråga på ett nytt papper.
+\end{itemize}
+
+\subsection*{Betygsgränser}
+
+\begin{narrowtable}{@{}ll@{}}
+  \thead{Betyg} & \thead{Poäng} \\
+  \midrule
+  U & under 20 \\
+  G & 20--29 \\
+  VG & 30--40 \\
+\end{narrowtable}
+
+\noindent Slutbetyget på kursen bygger på provet och laborationerna tillsammans; se \enquote{Provet
+och laborationerna} nedan.
+
+\section*{Vad provet omfattar}
+\markright{Vad provet omfattar}
+Provet omfattar hela kursen utom sekvensnät och vippor, som förekommer bara som en del av
+mikrodatorns uppbyggnad. Frågorna är desamma till form och poäng på varje prov:
+
+\begin{booktable}{@{}p{2.6em}Lp{3.6em}Lr@{}}
+  \thead{Fråga} & \thead{Område} & \thead{Kapitel} & \thead{Lärandemål} & \thead{Poäng} \\
+  \midrule
+  1 & Talsystem och koder & 1 & beskriva talsystem; omvandla talvärden & 8 \\
+  2 & Grindar och boolesk algebra & 2 & förklara grindar; beskriva logisk algebra och förenkling &
+    8 \\
+  3 & Karnaughdiagram & 4 & använda Karnaughdiagram för minimering & 6 \\
+  4 & Analys av ett kombinatoriskt nät, grindnät eller kontaktnät & 2--5 & analysera digitala
+    kombinatoriska nät & 6 \\
+  5 & Mikrodatorns uppbyggnad & 6--7 & redogöra för mikrodatorns uppbyggnad & 4 \\
+  6 & Assemblerprogrammering & 7--10 & använda assemblerspråk för att programmera en mikrodator &
+    8 \\
+  \midrule
+    & & & & \textbf{40} \\
+\end{booktable}
+
+\noindent Lärandemålen om att syntetisera nät med IC-kretsar och kontakter, och att styra
+styrobjekt, examineras i laborationerna, där de hör hemma.
+
+Assemblerfrågorna gäller ATmega328P med klockfrekvensen 16~MHz, och de instruktioner som står på
+referensbladet. Ingen fråga kräver att en instruktionskod eller en cykeltid kan utantill; det som
+behövs står på bladet.
+
+\section*{Hur provet bedöms}
+\markright{Hur provet bedöms}
+\begin{itemize}
+  \item \textbf{Metoden ger poäng.} En korrekt uträkning med ett slarvfel är värd mer än ett rätt
+    svar utan uträkning. Ett svar utan uträkning kan få full poäng bara där frågan inte ber om
+    någon.
+  \item \textbf{Följdfel kostar en gång.} Om en deluppgift bygger på svaret i en tidigare, och det
+    svaret var fel, bedöms den senare deluppgiften utifrån det felaktiga svaret. Ett fel i en
+    sanningstabell som förs vidare till ett Karnaughdiagram kostar poäng i tabellen, inte i
+    diagrammet.
+  \item \textbf{Talsystemet ska synas.} Ett svar som \code{2C} utan skrivsätt är tvetydigt och ger
+    inte full poäng. Skriv \code{0x2C}, \code{0010 1100} eller 44.
+  \item \textbf{Program bedöms efter vad de gör, inte efter stavningen.} Ett program som skulle
+    fungera men har ett felstavat registernamn eller ett saknat kommatecken förlorar ingenting. Ett
+    program som läser fel bit, eller glömmer att en knapp är aktivt låg, förlorar de poäng den delen
+    gäller.
+  \item \textbf{Namngivna fällor.} Några deluppgifter finns till för att se om ett vanligt misstag
+    undviks, till exempel en flagga som en instruktion inte ändrar, eller en Karnaughaxel i binär
+    ordning i stället för Graykod. Lösningsförslagen säger var fällorna finns, och ett svar som går
+    i en fälla förlorar de poäng som fällan gäller, inte hela deluppgiftens. Lösningsförslagen till
+    övningsprovet, i bilaga~\ref{app:practice:answers}, visar hur det ser ut.
+\end{itemize}
+
+\section*{Provet och laborationerna}
+\markright{Provet och laborationerna}
+\begin{itemize}
+  \item \textbf{Labb~1} och \textbf{Labb~2} bedöms med \textbf{U/G}.
+  \item \textbf{Labb~3} bedöms med \textbf{U/G/VG}.
+  \item Det \textbf{skriftliga provet}, två timmar i slutet av kursen, bedöms med \textbf{U/G/VG}.
+    \textbf{G} kräver 20 poäng av 40, och \textbf{VG} kräver 30.
+\end{itemize}
+
+\subsection*{Laborationerna}
+En laboration är godkänd när samtliga uppgifter för godkänt är redovisade för läraren, och båda i
+paret kan förklara lösningen. Redovisning sker under laborationspassen. Handledningarna finns i
+bilaga~\ref{app:lab1}, \ref{app:lab2} och~\ref{app:lab3}.
+
+\begin{booktable}{@{}p{5.6em}LL@{}}
+  \thead{Laboration} & \thead{Krav för G} & \thead{Krav för VG} \\
+  \midrule
+  Labb~1 & Uppgift 1--8 & -- \\
+  Labb~2 & Labb~2-1 uppgift 1--4 och Labb~2-2 uppgift 1--3 & -- \\
+  Labb~3 & Del 1.1--12, 14--16, 21 och slutuppgiften del A & Samtliga delar 1.1--23 och
+    slutuppgiften del B \\
+\end{booktable}
+
+\subsection*{Slutbetyg}
+
+\begin{booktable}{@{}p{5.6em}L@{}}
+  \thead{Betyg} & \thead{Krav} \\
+  \midrule
+  G & Samtliga laborationer godkända och godkänt skriftligt prov. \\
+  VG & Samtliga laborationer godkända, VG på Labb~3 och VG på det skriftliga provet. \\
+\end{booktable}
+
+\noindent För godkänt betyg krävs att alla kursens lärandemål är uppnådda. Omprov och
+restlaborationer genomförs enligt skolans rutiner.
+
+\needspace{20\baselineskip}
+\section*{Lärandemålen}
+\markright{Lärandemålen}
+Var varje lärandemål i kursplanen undervisas, och var det examineras.
+
+\begin{booktable}{@{}Lp{5.4em}p{9em}@{}}
+  \thead{Lärandemål} & \thead{Kapitel} & \thead{Examineras} \\
+  \midrule
+  Förklara grindar och logiska funktioner & 2, 4 & Labb~1, Labb~2, prov \\
+  Beskriva binära, hexadecimala och decimala talsystem & 1 & Prov \\
+  Beskriva logisk algebra och förenklingar av booleska uttryck & 2, 4 & Prov \\
+  Redogöra för mikrodatorns uppbyggnad på blockschemanivå & 6, 7 & Prov \\
+  Omvandla talvärden mellan olika talsystem & 1, 7, 8 & Prov, Labb~3 \\
+  Syntetisera digitala kombinatoriska nät med IC-kretsar och kontakter & 2--5 & Labb~1, Labb~2 \\
+  Använda Karnaughdiagram för analys och minimering av booleska uttryck & 4 & Labb~2, prov \\
+  Använda assemblerspråk för att programmera en mikrodator & 7--10 & Labb~3, prov \\
+  Programmera mikrodatorn till att kontrollera styrobjekt & 8, 10, 11 & Labb~3 \\
+  Analysera digitala kombinatoriska nät & 2--5 & Labb~1, Labb~2, prov \\
+\end{booktable}
+
+\noindent Sekvensnät och vippor (kapitel~\ref{c6:ch}) ingår inte i kursplanens lärandemål. De tas
+med för att mikrodatorn annars blir en svart låda: register, programräknare och minne är vippor,
+och det är den kopplingen som gör blockschemat begripligt. På provet förekommer vippor bara som en
+del av mikrodatorns uppbyggnad.

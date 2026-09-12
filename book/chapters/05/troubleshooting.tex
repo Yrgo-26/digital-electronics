@@ -1,0 +1,223 @@
+% Section 5.1, from lectures/L05/appendix/a_troubleshooting.md.
+%
+% One correction, also made in the source: in 5.1.6 the first symptom was "every row wrong, the
+% output always 0 or always 1", which cannot both hold; a stuck output is wrong only on the rows
+% where the function has the other value. It now reads "the output never changes".
+
+\section{Felsökning av grindnät}
+\label{c5:app:a}
+
+\subsection{Varför felsöka systematiskt}
+\label{c5:a1}
+Förr eller senare kopplar du upp ett nät som inte gör vad det ska. Det är inget misslyckande, det
+händer alla, och det är ingen slump heller: ett nät med tre kretsar och tjugo sladdar har tjugo
+ställen där en sladd kan sitta i fel hål, och du behöver bara en.
+
+Den vanligaste reaktionen är att börja flytta sladdar, trycka till kretsar och prova igen. Ibland
+fungerar det, och då vet du inte varför, vilket betyder att felet kan komma tillbaka. Oftast gör
+det saken värre, eftersom en ny felkoppling läggs till den gamla.
+
+Det finns ett bättre sätt, och det bygger på samma idé som resten av boken: \textbf{förutsäg, mät,
+jämför}. Du vet vad varje ledning ska ha för värde för en viss kombination av ingångarna, eftersom
+du har sanningstabellen och grindnätet. Mät vad den faktiskt har. Det första stället där mätt och
+förväntat skiljer sig är felet, eller precis bredvid det.
+
+Figur~\ref{c5:fig:troubleshooting} visar arbetsgången i en figur, och resten av det här avsnittet
+går igenom stegen ett i taget.
+
+\bookfigure[!t]{l05_troubleshooting}{Flödesplan för felsökning av ett grindnät.}
+  {c5:fig:troubleshooting}
+
+\subsection{Att mäta en logisk nivå}
+\label{c5:a2}
+Allt du behöver är en \textbf{multimeter} inställd på likspänning (V med ett rakt streck, eller
+\code{DCV}), med ett mätområde på 20~V om den inte väljer själv.
+\begin{itemize}
+  \item Sätt den \textbf{svarta} mätsladden på \textbf{jord}, till exempel matningsskenan märkt
+    \code{-}. Den får sitta kvar där hela tiden.
+  \item Peka med den \textbf{röda} mätsladden på det ben eller den ledning du vill mäta.
+\end{itemize}
+
+\noindent Tolka värdet med logiknivåerna från \secref{c4:b3}:
+
+\begin{narrowtable}{@{}ll@{}}
+  \thead{Mätt spänning} & \thead{Betyder} \\
+  \midrule
+  under 1,5~V & logisk \textbf{0} \\
+  över 3,5~V & logisk \textbf{1} \\
+  mellan 1,5 och 3,5~V & \textbf{fel}: ingen giltig nivå \\
+\end{narrowtable}
+
+\noindent En giltig utgång ligger nästan alltid mycket nära 0~V eller 5~V: under 0,3~V när den är
+låg och över 4~V när den är hög, även med en lysdiod ansluten. Ett värde mitt emellan betyder nästan
+alltid något av tre saker:
+\begin{itemize}
+  \item en \textbf{flytande ingång} (\secref{c5:a7}), som kan visa vad som helst och ofta ändrar sig
+    när du rör handen;
+  \item \textbf{två utgångar} som är kopplade mot varandra, där den ena driver hög och den andra
+    låg;
+  \item en \textbf{krets utan matning}, där ingenting ligger på en bestämd nivå.
+\end{itemize}
+
+En lysdiod på utgången är en utmärkt indikator, men den visar bara slutresultatet. Multimetern
+låter dig titta på varje ledning i nätet, och det är vad felsökning kräver.
+
+\subsection{Börja med matningen}
+\label{c5:a3}
+\textbf{Mät alltid matningen först}, på varje krets: röd mätsladd på ben~14, svart på ben~7. Du ska
+se ungefär 5~V.
+
+Det låter onödigt, och det är det inte. En krets utan matning ger inte ett tydligt fel; den ger
+konstiga, halvt fungerande resultat, eftersom den kan få en del ström genom sina ingångar. Den
+enskilt vanligaste orsaken till att ett nät \enquote{nästan} fungerar är en krets där ben~7 eller
+ben~14 sitter i fel kolumn, eller en matningsskena som är delad på mitten av kopplingsdäcket.
+
+Mät mellan benen, inte mellan skenorna: det är spänningen \textbf{på kretsen} som räknas. En skena
+med 5~V hjälper inte om sladden till ben~14 sitter i kolumnen bredvid.
+
+\begin{warning}
+Om kretsen \textbf{blir varm}: bryt matningen direkt. En varm 74HC-krets är nästan alltid felvänd,
+eller har en utgång som är kortsluten mot matningen eller mot en annan utgång.
+\end{warning}
+
+\subsection{Följ signalen}
+\label{c5:a4}
+När matningen är kontrollerad:
+\begin{enumerate}
+  \item \textbf{Välj en rad i sanningstabellen där utgången blir fel}, och ställ in ingångarna på
+    den. Använd inte vilken rad som helst; använd en rad där du vet att resultatet är fel.
+  \item \textbf{Skriv upp vad varje ledning i nätet ska ha för värde} för just den raden. Gå från
+    ingångarna genom varje grind fram till utgången.
+  \item \textbf{Mät grind för grind}, i samma ordning: först ingångarna på den första grinden,
+    sedan dess utgång, sedan nästa grind.
+  \item \textbf{Stanna vid den första grinden där mätt och förväntat skiljer sig.} Då finns två
+    fall:
+    \begin{itemize}
+      \item \textbf{En ingång är fel.} Felet sitter före grinden: i ledningen dit, i den
+        föregående grindens utgång, eller i att sladden sitter i fel kolumn. Mät i andra änden av
+        ledningen.
+      \item \textbf{Alla ingångar är rätt men utgången är fel.} Då är det grinden: fel ben (du
+        mäter på en annan grind än du tror), fel krets (en 74HC32 där det skulle sitta en
+        74HC08), eller i sällsynta fall en trasig krets.
+    \end{itemize}
+\end{enumerate}
+
+Kom ihåg att mäta \textbf{på kretsens ben}, inte bara på sladden du tror går dit. Poängen är att
+hitta skillnaden mellan det du tror att du har kopplat och det du faktiskt har kopplat.
+
+\subsection{Halvering}
+\label{c5:a5}
+I ett nät med många grindar i rad går det snabbare att börja i mitten än i början:
+
+\bookfigure{l05_half_split}{Halvering i en kedja av åtta inverterare.}{c5:fig:half_split}
+
+Mät efter halva kedjan. Om värdet där är rätt sitter felet i den andra halvan, annars i den
+första. Mät sedan i mitten av den halva som återstår, och så vidare. Varje mätning
+\textbf{halverar} området där felet kan sitta, så åtta grindar kräver högst tre mätningar och
+sexton högst fyra, i stället för sju respektive femton om du börjar från början och mäter efter
+varje grind.
+
+I ett litet nät som i Labb~2, med tre eller fyra grindar, är det ingen stor vinst. Men metoden
+gäller för allt som går att dela i två: en lång kabel, ett program, en maskin med många steg. Det
+är den viktigaste felsökningsmetoden som finns, och den kommer tillbaka i bokens mikrodatordel, när
+ett program ska felsökas i simulatorn.
+
+\subsection{Läs felet ur sanningstabellen}
+\label{c5:a6}
+Innan du mäter något alls kan tabellen berätta mycket. Jämför den uppmätta tabellen med den
+förväntade, och titta på \textbf{vilka rader} som blir fel:
+\begin{itemize}
+  \item \textbf{Utgången ändras aldrig}, den är alltid 0 eller alltid 1: utgången är inte kopplad
+    till det du tror, kretsen saknar matning, eller lysdioden sitter fel.
+  \item \textbf{Utgången är inverterad} på varje rad: en NAND där det skulle vara en AND, eller en
+    lysdiod kopplad mot 5~V i stället för mot jord.
+  \item \textbf{Utgången beror inte alls på en viss ingång}: den ingången når inte fram. Sladden
+    sitter i fel kolumn, eller går till en oanvänd grind.
+  \item \textbf{Bara några rader fel}, och de har något gemensamt: de pekar ut en grind. Om
+    \code{X = AB + C} blir fel precis när \code{C = 0} och \code{A = B = 1}, är det AND-grindens
+    bidrag som saknas, och den ska mätas först.
+\end{itemize}
+
+Det sista fallet är värt att öva på, för det sparar mest tid. Frågan att ställa är:
+\textbf{vilken del av uttrycket är det enda som kan göra de här raderna 1?}
+
+\subsection{Vanliga fel}
+\label{c5:a7}
+De fel du med störst sannolikhet kommer att göra, och hur de ser ut:
+
+\begin{booktable}{@{}>{\raggedright\arraybackslash}p{11em}LL@{}}
+  \thead{Symptom} & \thead{Trolig orsak} & \thead{Kontrollera} \\
+  \midrule
+  Ingenting fungerar alls & Matningen saknas & Mät mellan ben~14 och ben~7 \\
+  Kretsen blir varm & Kretsen felvänd, eller en utgång kortsluten & Bryt matningen; kontrollera
+    hacket och ben~1 \\
+  Utgången flimrar eller ändras när du rör handen & Flytande ingång & Mät alla ingångar, också på
+    oanvända grindar \\
+  En ingång påverkar ingenting & Sladden i fel kolumn eller på fel grind & Mät på kretsens ben,
+    inte på sladden \\
+  Mätt värde mellan 1,5 och 3,5~V & Flytande ingång eller två utgångar mot varandra & Följ
+    ledningen, hitta vad som driver den \\
+  Lysdioden lyser aldrig, fast utgången är 5~V & Lysdioden felvänd & Långa benet mot utgången \\
+  74HC02 fungerar inte alls & Kopplad som en 74HC00 & Benplaceringen: utgången först \\
+  Kretsen fungerar ibland & Glappkontakt, eller en flytande ingång & Tryck till sladdarna; mät
+    igen \\
+\end{booktable}
+
+\subsection{Ett felsökningsexempel}
+\label{c5:a8}
+Ett par i Labb~2-1 har kopplat upp \code{X = AB + C} med en 74HC08 och en 74HC32. De går igenom
+tabellen och får:
+
+\begin{narrowtable}{@{}ccccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{X, förväntat} & \thead{X, mätt} \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 1 & 1 \\
+  0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 1 \\
+  1 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 1 & 1 \\
+  1 & 1 & 0 & 1 & \textbf{0} \\
+  1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\textbf{Läs tabellen först (\secref{c5:a6}).} Bara raden \code{110} är fel. Det är den enda raden
+där \code{X} ska bli 1 tack vare \code{AB} och inte tack vare \code{C}. Så \code{C} når fram genom
+OR-grinden, men \code{AB} gör det inte. Misstanken faller på AND-grinden eller ledningen från den.
+
+\textbf{Matningen (\secref{c5:a3}).} Ben~14 till ben~7 på båda kretsarna: 5,0~V. Den är inte
+felet.
+
+\needspace{10\baselineskip}
+\textbf{Följ signalen (\secref{c5:a4})}, för raden \code{ABC = 110}:
+
+\begin{narrowtable}{@{}lcl@{}}
+  \thead{Mätpunkt} & \thead{Förväntat} & \thead{Mätt} \\
+  \midrule
+  U1 ben 1 (A) & 1 & 4,9~V: 1 \\
+  U1 ben 2 (B) & 1 & 4,9~V: 1 \\
+  U1 ben 3 (AB) & 1 & 4,8~V: 1 \\
+  U2 ben 1 (AB) & 1 & \textbf{0,0~V: 0} \\
+  U2 ben 2 (C) & 0 & 0,0~V: 0 \\
+  U2 ben 3 (X) & 1 & 0,0~V: 0 \\
+\end{narrowtable}
+
+\noindent AND-grindens utgång är rätt, men OR-grindens ingång är fel. Felet sitter \textbf{i
+ledningen mellan dem}. En titt på kopplingsdäcket visar att sladden från U1 ben~3 sitter i kolumnen
+\textbf{bredvid} U2 ben~1, i en tom kolumn. Den flyttas ett hål, och alla åtta raderna stämmer.
+
+Lägg märke till vad paret \textbf{inte} gjorde: de bytte inte kretsen, och de kopplade inte om hela
+nätet. Två minuter och sex mätningar pekade ut en enda sladd.
+
+\subsection{Hur mycket en utgång orkar}
+\label{c5:a9}
+Den spänning en utgång ger beror på hur mycket ström den levererar. Utan last ligger en hög
+74HC-utgång mycket nära 5~V; med en lysdiod som drar 9~mA sjunker den en bit, eftersom
+utgångstransistorerna har en viss inre resistans. Databladet lovar minst 3,84~V vid 4~mA och
+matningen 4,5~V (\secref{c4:b3}), och i praktiken ser du något i stil med 4,3--4,7~V med en
+lysdiod ansluten.
+
+Det är därför förkopplingsmotståndet ska dimensioneras för några få milliampere. Ju mer ström en
+utgång levererar, desto närmare det förbjudna området hamnar dess nivå, och desto mindre marginal
+har nästa grind som läser den. Kontrolluppgiften, övning~\ref{c5:ex:10}, låter dig mäta precis
+det.

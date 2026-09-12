@@ -1,0 +1,44 @@
+% Chapter 3, typeset from lectures/L03: the README is the opener and the closing summary, and
+% appendix A is a section; the exercises follow the summary. Appendix C, the solutions, is in
+% back/answers/c03.tex. The lab guide the chapter goes with, labs/lab1/README.md, is bilaga
+% \ref{app:lab1}; its tasks are linked with \hyperref, so the text reads "uppgift 8" whatever the
+% label prints.
+
+\chapter{Analys och felsökning av kontaktnät}
+\label{c3:ch}
+
+{\large\itshape Från schema till lampa och tillbaka: att bygga, läsa och felsöka ett
+kontaktnät.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Labbstationen: aggregatet, tryckknapparnas kontaktelement och lampan.
+  \item Säkerhet och arbetssätt: rita först, koppla med spänningen frånslagen, förutsäg innan du
+    mäter.
+  \item \textbf{Labb~1}: AND, OR, NOT, NAND, NOR, XOR och XNOR med två tryckknappar och en lampa på
+    24~V.
+  \item Syntes: från en sanningstabell till ett kontaktnät med så få kontakter som möjligt.
+  \item Analys: från ett färdigt kontaktnät till dess uttryck, och vidare till ett mindre nät.
+  \item Felsökning: vad man gör när lampan inte gör som schemat säger.
+\end{itemize}
+\end{chapterbox}
+
+I kapitel~\ref{c2:ch} blev ett uttryck ett kontaktnät på papperet. Det här kapitlet hör ihop med
+Labb~1, vars handledning finns i bilaga~\ref{app:lab1}: där bygger du näten med två tryckknappar,
+en lampa och ett aggregat på 24~V. Kapitlet ger dig det du behöver för att gå åt andra hållet
+också, från ett färdigt nät till dess uttryck och till ett mindre nät som gör samma sak, och från
+en lampa som inte gör som schemat säger till felet som orsakar det.
+
+Förbered dig innan labben. Läs \secref{c2:app:b} om kontaktnät igen om det behövs, läs hela
+labbhandledningen, och gör dess förberedelseuppgifter F1--F4: de ska vara klara innan du börjar
+koppla. Läs också \secref{c3:app:a}, åtminstone avsnitt~\ref{c3:a1}--\ref{c3:a4}; resten, om
+felsökning, är det du slår upp när lampan inte lyser.
+
+Gör sedan uppgift 1--8 i labben i ordning, och redovisa varje uppgift när den är klar, inte alla på
+en gång i slutet. Uppgift~9 är frivillig. Övningarna i \secref{c3:sec:exercises} tränar samma
+analys, syntes och felsökning på papper, och deras lösningsförslag finns i
+bilaga~\ref{app:answers}.
+
+\input{chapters/03/analysis}
+\input{chapters/03/summary}
+\input{chapters/03/exercises}

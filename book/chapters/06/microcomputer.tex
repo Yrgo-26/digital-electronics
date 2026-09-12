@@ -1,0 +1,299 @@
+% Section 6.2, from lectures/L06/appendix/b_microcomputer.md.
+%
+% One correction to the source: the clock table in 6.2.8 said that 16 MHz is 16 000 000 edges a
+% second, which is twice as many edges as there are; it is 16 000 000 periods, and the source is
+% corrected to match. And 6.2.8 said the Uno's clock comes from a crystal; the ATmega328P on the
+% Uno is clocked by a ceramic resonator (the crystal clocks the USB chip), as 11.1.7 says, and the
+% source is corrected to match.
+
+\section{Mikrodatorns uppbyggnad}
+\label{c6:app:b}
+
+\subsection{Vad en mikrodator är}
+\label{c6:b1}
+En \textbf{dator} är en maskin som utför en lista av instruktioner, ett \textbf{program}, och som
+kan läsa och skriva data medan den gör det. Den består av en centralenhet som utför
+instruktionerna, minne som håller programmet och datat, och in- och utenheter som förbinder den med
+omvärlden.
+
+En \textbf{mikrodator} är en dator där allt detta sitter i en eller några få kretsar. När hela
+datorn, centralenhet, minnen och portar, sitter på \textbf{ett enda chip} kallas kretsen en
+\textbf{mikrokontroller}. Den ATmega328P som sitter på ett Arduino Uno-kort, och som du
+programmerar från kapitel~\ref{c7:ch}, är en mikrokontroller.
+
+Mikrokontroller finns överallt där något ska styras: i tvättmaskiner, kaffebryggare, bilar, hissar,
+fjärrkontroller och industrirobotar. En modern bil har hundratals. De kallas \textbf{inbyggda
+system}, eftersom datorn är inbyggd i en produkt och sällan syns. Till skillnad från en persondator
+kör en mikrokontroller oftast ett enda program, från det att strömmen slås på tills den slås av,
+och programmet handlar om att läsa givare och styra saker: det som kursplanen kallar
+\textbf{styrobjekt}.
+
+\subsection{Blockschemat}
+\label{c6:b2}
+Alla datorer, från den minsta mikrokontroller till en server, är uppbyggda av samma block:
+
+\bookfigure[tbp]{l06_microcomputer}{Mikrodatorns blockschema.}{c6:fig:microcomputer}
+
+\begin{booktable}{@{}p{11.6em}L@{}}
+  \thead{Block} & \thead{Uppgift} \\
+  \midrule
+  \textbf{CPU} (centralenhet) & Hämtar instruktioner och utför dem. Består av styrenhet, register
+    och ALU. \\
+  \textbf{Styrenhet} & Tolkar (avkodar) varje instruktion och styr de andra blocken så att den
+    utförs. \\
+  \textbf{Programräknare, PC} & Håller adressen till nästa instruktion. \\
+  \textbf{Instruktionsregister, IR} & Håller den instruktion som utförs just nu. \\
+  \textbf{Register} & Snabba lagringsplatser inuti CPU:n, där räkningarna görs. \\
+  \textbf{ALU} & Aritmetisk-logisk enhet: adderar, subtraherar, jämför och gör logiska
+    operationer. \\
+  \textbf{SREG} & Statusregistret: flaggor som beskriver resultatet av den senaste räkningen. \\
+  \textbf{Programminne} & Håller programmet, instruktion för instruktion. \\
+  \textbf{Dataminne} & Håller variabler och annat data medan programmet kör. \\
+  \textbf{In- och utportar} & Förbinder datorn med omvärlden: knappar och givare in, lysdioder
+    och reläer ut. \\
+  \textbf{Bussar} & Ledningarna mellan blocken, som adresser och data går på. \\
+  \textbf{Klocka} & Ger takten som alla vippor i datorn uppdateras i. \\
+\end{booktable}
+
+Resten av det här avsnittet går igenom blocken ett i taget, och slutar med hur de ser ut i
+ATmega328P.
+
+\subsection{CPU:n: ALU, register och styrenhet}
+\label{c6:b3}
+\textbf{Registren} är små, snabba minnen inuti CPU:n. I ATmega328P finns 32 stycken, \code{r0}
+till \code{r31}, med 8 bitar vardera: varje register är åtta D-vippor med gemensam klocka
+(\secref{c6:a6}). All räkning sker i registren. Ett tal i dataminnet måste först hämtas in i ett
+register innan något kan göras med det.
+
+\textbf{ALU:n}, den aritmetisk-logiska enheten, är det enda ställe i datorn där något faktiskt
+räknas. Den tar ett eller två tal från registren, utför en operation och lämnar resultatet i ett
+register. Den är ett stort \textbf{kombinatoriskt nät}: samma sorts nät som i kapitel~\ref{c2:ch}
+och \ref{c4:ch}, bara större. Kärnan i den är en \textbf{adderare}, byggd av heladderare
+(\secref{c4:a8}):
+
+\bookfigure{l06_full_adder}{En heladderare av två XOR-grindar, två AND-grindar och en
+OR-grind.}{c6:fig:full_adder}
+
+En heladderare adderar tre bitar: två siffror och minnessiffran från positionen till höger. Åtta
+heladderare i rad, där varje \code{Cut} blir nästa positions \code{Cin}, adderar två 8-bitars tal,
+precis som när du adderar två binära tal för hand i \secref{c1:a7}. Den sista minnessiffran, den
+som inte får plats i 8 bitar, är \textbf{carry-flaggan}.
+
+\textbf{Statusregistret, SREG}, är ett register där ALU:n sparar information om resultatet: blev
+det noll, blev det en minnessiffra över, blev det negativt? De här bitarna kallas
+\textbf{flaggor}. Programmet använder dem för att fatta beslut, \enquote{hoppa om resultatet blev
+noll}, vilket är ämnet för kapitel~\ref{c8:ch} och \ref{c9:ch}.
+
+\textbf{Styrenheten} läser instruktionen, avgör vad den betyder, och skickar
+\textbf{styrsignaler} till de andra blocken: vilka register ALU:n ska läsa, vilken operation den
+ska göra, vart resultatet ska. Den är i grunden ett sekvensnät, som stegar sig igenom varje
+instruktion.
+
+\subsection{Programräknaren och instruktionscykeln}
+\label{c6:b4}
+Ett program är en lista av instruktioner i programminnet, en efter en, var och en på sin adress.
+\textbf{Programräknaren}, PC (\emph{program counter}), håller adressen till den instruktion som
+står på tur. Den är en räknare (\secref{c6:a7}), och det är den som gör att datorn går framåt i
+programmet.
+
+Allt en CPU gör är att upprepa samma tre steg, \textbf{instruktionscykeln}:
+
+\bookfigure{l06_instruction_cycle}{Instruktionscykeln: hämta, avkoda och
+utför.}{c6:fig:instruction_cycle}
+
+\begin{enumerate}
+  \item \textbf{Hämta} (\emph{fetch}): läs instruktionen på den adress PC pekar på, lägg den i
+    instruktionsregistret, och räkna upp PC så att den pekar på nästa instruktion.
+  \item \textbf{Avkoda} (\emph{decode}): styrenheten tolkar bitarna i instruktionen. Vilken
+    operation? Vilka register?
+  \item \textbf{Utför} (\emph{execute}): ALU:n räknar, ett register skrivs, eller data flyttas
+    till eller från minnet eller en port.
+\end{enumerate}
+
+Sedan börjar det om, med nästa instruktion. Ett litet exempel, tre instruktioner i
+programminnet:
+
+\begin{narrowtable}{@{}cll@{}}
+  \thead{Adress} & \thead{Instruktion} & \thead{Betyder} \\
+  \midrule
+  0 & \code{ldi r16, 5} & lägg talet 5 i register r16 \\
+  1 & \code{inc r16} & öka r16 med 1 \\
+  2 & \code{rjmp 1} & hoppa till adress 1 \\
+\end{narrowtable}
+
+\begin{narrowtable}{@{}cclllc@{}}
+  \thead{Steg} & \thead{PC före} & \thead{Hämtas} & \thead{Utförs} & \thead{r16 efter} &
+    \thead{PC efter} \\
+  \midrule
+  1 & 0 & \code{ldi r16, 5} & r16 = 5 & 5 & 1 \\
+  2 & 1 & \code{inc r16} & r16 = r16 + 1 & 6 & 2 \\
+  3 & 2 & \code{rjmp 1} & PC = 1 & 6 & 1 \\
+  4 & 1 & \code{inc r16} & r16 = r16 + 1 & 7 & 2 \\
+  5 & 2 & \code{rjmp 1} & PC = 1 & 7 & 1 \\
+\end{narrowtable}
+
+Lägg märke till steg 3. Ett \textbf{hopp} är ingenting annat än en instruktion som skriver ett nytt
+värde i programräknaren. Normalt räknar PC uppåt ett steg i taget; ett hopp låter programmet gå
+tillbaka och upprepa något, eller hoppa över något. Alla loopar och alla beslut i ett program är
+byggda på det, och det är vad kapitel~\ref{c9:ch} handlar om.
+
+På ATmega328P tar de flesta instruktioner \textbf{en klockcykel}: hämtningen av nästa instruktion
+sker samtidigt som den förra utförs. Vid 16~MHz blir det upp till sexton miljoner instruktioner i
+sekunden.
+
+\subsection{Minnen: programminne, dataminne och EEPROM}
+\label{c6:b5}
+En mikrodator har flera sorters minne, för olika ändamål:
+
+\begin{narrowtable}{@{}lllc@{}}
+  \thead{Minne} & \thead{Håller} & \thead{Bevaras utan ström?} & \thead{I ATmega328P} \\
+  \midrule
+  \textbf{Programminne} (flash) & programmet & ja & 32~kB \\
+  \textbf{Dataminne} (SRAM) & variabler och stacken & nej & 2~kB \\
+  \textbf{EEPROM} & inställningar som ska sparas & ja & 1~kB \\
+\end{narrowtable}
+
+\textbf{Flashminnet} håller programmet. Det skrivs när du programmerar kretsen, i
+kapitel~\ref{c11:ch}, och finns kvar när strömmen slås av, så att programmet startar igen nästa
+gång. Det kan skrivas om ungefär tiotusen gånger, vilket räcker gott för utveckling men inte för
+data som ändras hela tiden.
+
+\textbf{SRAM} (\emph{static RAM}) är dataminnet: variabler, mellanresultat och \textbf{stacken},
+där datorn sparar returadresser när den anropar en subrutin (kapitel~\ref{c10:ch}). Det är snabbt
+och kan skrivas hur många gånger som helst, men innehållet försvinner när strömmen bryts. Varje bit
+i ett SRAM är i princip ett lås.
+
+\textbf{EEPROM} bevarar sitt innehåll utan ström, som flashminnet, men kan skrivas en byte i taget.
+Det används till sådant som ska överleva ett strömavbrott: en kalibrering, en inställning, en
+räknare av driftstimmar. Boken använder det inte.
+
+Lägg märke till att programminnet och dataminnet är \textbf{separata} minnen med var sin buss. Det
+kallas en \textbf{Harvardarkitektur}, och det betyder att CPU:n kan hämta nästa instruktion
+samtidigt som den läser eller skriver data. De flesta persondatorer har i stället program och data i
+samma minne, en \textbf{von Neumann-arkitektur}. För dig som programmerar betyder skillnaden att ett
+tal i programminnet och ett tal i dataminnet ligger på olika ställen och nås med olika
+instruktioner, vilket du märker i kapitel~\ref{c7:ch}.
+
+\subsection{Bussar}
+\label{c6:b6}
+Blocken är förbundna med \textbf{bussar}: grupper av ledningar som bär ett tal i taget, en bit per
+ledning.
+\begin{itemize}
+  \item \textbf{Adressbussen} säger \textbf{var}: vilken minnesplats eller vilket register som ska
+    läsas eller skrivas. Med \code{n} ledningar kan den peka ut \code{2^n} olika adresser.
+    Programminnet i ATmega328P har 16\,384 instruktionsplatser, och $2^{14} = 16\,384$, så
+    programräknaren behöver 14 bitar.
+  \item \textbf{Databussen} bär \textbf{vad}: själva värdet som läses eller skrivs. I en 8-bitars
+    dator som ATmega328P är den 8 bitar bred, och det är därför den kallas 8-bitars: den hanterar
+    en byte i taget.
+  \item \textbf{Styrsignalerna} säger \textbf{hur}: läs eller skriv, och när.
+\end{itemize}
+
+En buss är ingen ny sorts komponent. Den är ledningar, och i en mikrokontroller sitter de inuti
+chipet. Men begreppet förklarar mycket: allt som ska flyttas mellan två block går över en buss, en
+sak i taget, och det är därför en instruktion som flyttar data mellan minnet och ett register
+ibland tar två klockcykler i stället för en.
+
+\subsection{In- och utportar}
+\label{c6:b7}
+En dator som inte kan påverka något eller känna av något är ganska meningslös för den som ska styra
+en maskin. \textbf{Portarna} är förbindelsen med omvärlden.
+
+En \textbf{utport} är ett register vars utgångar är kopplade till kretsens \textbf{stift}. Skriver
+programmet en etta i en bit, blir motsvarande stift 5~V; skriver det en nolla, blir stiftet 0~V.
+Koppla en lysdiod med ett förkopplingsmotstånd till stiftet, precis som till en grindutgång i
+Labb~2, så styr programmet lysdioden. Koppla ett relä via en transistor, så styr programmet en lampa
+på 24~V eller en motor.
+
+En \textbf{inport} är motsatsen: ett sätt för programmet att läsa av spänningen på ett antal stift,
+som ettor och nollor. En knapp, en gränslägesbrytare eller en nivågivare blir då en bit som
+programmet kan fatta beslut utifrån.
+
+I ATmega328P kan varje stift vara antingen in- eller utgång, och det väljer programmet själv. Tre
+register per port styr det: \code{DDRx} (riktningen), \code{PORTx} (vad en utgång ska ge) och
+\code{PINx} (vad en ingång läser). Hur de används är ämnet för kapitel~\ref{c8:ch} och
+\ref{c10:ch}.
+
+\subsection{Klockan}
+\label{c6:b8}
+Allt i mikrodatorn går i takt med \textbf{klockan}, samma sorts fyrkantvåg som styr vipporna i
+\secref{c6:a5}. Vid varje stigande flank tar varje register, programräknaren och styrenheten ett
+steg.
+
+På ett Arduino Uno-kort kommer klockan från en \textbf{keramisk resonator} på 16~MHz bredvid
+chipet. Det ger:
+
+\begin{narrowtable}{@{}ll@{}}
+  \thead{Storhet} & \thead{Värde} \\
+  \midrule
+  Klockfrekvens & 16~MHz = 16\,000\,000 perioder per sekund \\
+  En klockcykel & 1 / 16\,000\,000~s = 62,5~ns \\
+  Instruktioner per sekund & upp till 16 miljoner (de flesta tar en cykel) \\
+\end{narrowtable}
+
+Att varje instruktion tar ett känt antal klockcykler gör att du kan räkna ut exakt hur lång tid en
+del av ett program tar. Det är så en tidsfördröjning byggs, utan någon klocka på väggen: låt datorn
+räkna ett visst antal varv, och räkna ut hur många cykler det blir. Det gör du i
+kapitel~\ref{c9:ch}.
+
+\subsection{ATmega328P och Arduino Uno}
+\label{c6:b9}
+Mikrokontrollern i resten av boken är \textbf{ATmega328P} från Microchip, samma krets som sitter på
+ett \textbf{Arduino Uno}-kort. Den är en 8-bitars mikrokontroller i familjen \textbf{AVR}.
+
+\bookfigure[tbp]{l06_atmega328p}{Förenklat blockschema för ATmega328P.}{c6:fig:atmega328p}
+
+\begin{booktable}{@{}p{11.5em}L@{}}
+  \thead{Egenskap} & \thead{ATmega328P} \\
+  \midrule
+  Arkitektur & 8-bitars AVR, Harvard \\
+  Arbetsregister & 32 st, \code{r0}--\code{r31}, 8 bitar vardera \\
+  Programminne (flash) & 32~kB, varav en liten del upptas av Arduinos bootloader \\
+  Dataminne (SRAM) & 2~kB \\
+  EEPROM & 1~kB \\
+  Klocka på Arduino Uno & 16~MHz (keramisk resonator) \\
+  Portar & B, C och D; 23 stift som kan vara in- eller utgångar \\
+  Kringenheter & tre timrar, seriekommunikation (USART), analog-till-digital-omvandlare
+    (ADC) \\
+  Matning & 5~V på Arduino Uno \\
+\end{booktable}
+
+Blocken från \secref{c6:b2} finns alla där. CPU:n med sina 32 register, sin ALU och sitt SREG är
+kärnan. Flashminnet håller programmet, SRAM variablerna. Portarna B, C och D är utportar och
+inportar, och kortets numrerade stift (0--13, A0--A5) är kopplade till dem. Därtill kommer
+\textbf{kringenheter}, egna små hårdvarublock för sådant som är vanligt i styrning: timrar som
+räknar tid, en seriekanal för att prata med en dator, och en omvandlare som mäter analoga
+spänningar. Boken använder portarna; resten får vänta till en fortsättningskurs.
+
+Två saker är värda att veta innan du börjar programmera:
+\begin{itemize}
+  \item Arduino-kortets stiftnummer är \textbf{kortets} numrering, inte kretsens. Stift 13 på
+    kortet, där den inbyggda lysdioden sitter, är bit~5 i port B, \code{PB5}. Kopplingen mellan
+    dem kommer i kapitel~\ref{c8:ch}.
+  \item Boken programmerar kretsen direkt i \textbf{assembler}, utan Arduinos egna
+    programbibliotek. Varje instruktion du skriver blir en instruktion i flashminnet, och du ser
+    exakt vad CPU:n gör.
+\end{itemize}
+
+\subsection{Från grind till dator}
+\label{c6:b10}
+Varje block i mikrodatorn går tillbaka till något du redan har byggt:
+
+\begin{booktable}{@{}p{8.8em}Lp{9.8em}@{}}
+  \thead{Block} & \thead{Byggt av} & \thead{Där du mötte det} \\
+  \midrule
+  ALU & kombinatoriska nät: adderare, AND, OR, XOR & kapitel~\ref{c2:ch} och \ref{c4:ch} \\
+  Heladderare & XOR, AND, OR & \secref{c4:a8} \\
+  Register & D-vippor med gemensam klocka & \secref{c6:a6} \\
+  Programräknare & en räknare av vippor & \secref{c6:a7} \\
+  Instruktionsregister & ett register & \secref{c6:a6} \\
+  Statusregistret & ett register, en vippa per flagga & \secref{c6:a6} \\
+  Dataminne (SRAM) & tusentals lås, och avkodare som väljer ut rätt byte & \secref{c6:a4},
+    kapitel~\ref{c4:ch} \\
+  Utport & ett register kopplat till stiften & \secref{c6:a6} \\
+  Adressavkodning & kombinatoriska nät som väljer en adress & kapitel~\ref{c4:ch} \\
+  Styrenhet & ett sekvensnät & \secref{c6:a1} \\
+\end{booktable}
+
+Ingenting i en dator är magiskt. Den är grindar och vippor, i stora mängder, i takt med en klocka.
+Det du lär dig i resten av boken är hur man styr dem med ett program.

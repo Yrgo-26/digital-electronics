@@ -1,0 +1,136 @@
+% Appendix: Labb 3, from labs/lab3/README.md: the goals, how the lab is run, the program template,
+% the table of parts, the grading and what to do when something does not work. Each of the five
+% guides is a section after these, in its own file: first_steps.tex (a_first_steps.md),
+% arithmetic.tex (b_arithmetic_and_logic.md), program_flow.tex (c_program_flow.md),
+% io_subroutines.tex (d_io_and_subroutines.md) and final_task.tex (e_final_task.md). The
+% solutions in labs/lab3/solutions/ are deliberately not in the book.
+%
+% Deliberate differences: the README shows the template without its header comment; the book
+% prints the whole file, labs/lab3/code/template.asm, so the two cannot drift apart. The table of
+% parts gives each part's chapter and section instead of its lecture and guide file, and the
+% lecture links are chapter and section references.
+
+\chapter{Labb 3: Mikrodatorn}
+\label{app:lab3}
+
+\section{Mål}
+\label{lab3:sec:goals}
+I Labb~3 programmerar du mikrodatorn ATmega328P i assembler. Du börjar med att ladda ett tal i ett
+register och slutar med ett trafikljus som körs på ett riktigt Arduino Uno-kort. På vägen använder
+du allt kursens mikrodatordel tar upp: talformat, aritmetik och flaggor, logiska operationer, skift,
+villkorliga hopp, loopar, tidsfördröjningar, in- och utportar, subrutiner och stacken.
+
+Efter laborationen ska du kunna:
+\begin{itemize}
+  \item skapa, bygga, rätta och simulera ett assemblerprogram i Microchip Studio;
+  \item förutsäga vad ett kort program gör med register, flaggor och portar, och kontrollera det i
+    simulatorn;
+  \item skriva program med beslut, loopar och tidsfördröjningar utifrån en flödesplan;
+  \item programmera mikrodatorn att styra ett styrobjekt: lysdioder som tänds och släcks, och en
+    knapp som läses av.
+\end{itemize}
+
+\section{Upplägg}
+\label{lab3:sec:setup}
+Labb~3 löper över de fem mikrodatorpassen, som hör till kapitel~\ref{c7:ch}--\ref{c11:ch}. Varje
+pass börjar med en genomgång, och resten av passet är laborationstid. Laborationen består av många
+små delar som görs \textbf{i ordning, så långt ni hinner}. Delarna bygger på varandra, så hoppa
+inte över någon.
+\begin{itemize}
+  \item \textbf{Arbeta i par}, vid en dator med Microchip Studio installerat
+    (bilaga~\ref{app:studio}). Byt den som skriver vid varje ny del.
+  \item \textbf{Ett projekt per del.} Döp projektet efter delen, till exempel \code{lab3_06} för
+    del~6, så att ni kan öppna det igen vid redovisningen.
+  \item \textbf{Förutsäg innan ni simulerar.} Varje del ber er skriva ned vad ni väntar er innan ni
+    stegar. Gör det på riktigt, på papper eller i en kommentar i programmet. Det är förutsägelsen
+    som visar om ni har förstått, och en avvikelse är det snabbaste sättet att hitta ett fel
+    (\secref{c7:c3}).
+  \item \textbf{Redovisa} för läraren vid varje ställe som är markerat
+    \kindtag[fillaccent]{Redovisa}. Visa programmet i simulatorn och förklara det; båda i paret ska
+    kunna svara på frågor.
+\end{itemize}
+
+Nästan allt görs i simulatorn. Arduino-kortet behövs först i slutuppgiften, i
+kapitel~\ref{c11:ch}.
+
+\section{Programmallen}
+\label{lab3:template}
+Varje program utgår från mallen, \file{labs/lab3/code/template.asm}. Kopiera in den i
+\code{main.asm} när projektet är skapat, och skriv programmet mellan \code{main:} och \code{end:}.
+
+\asmfile{labs/lab3/code/template.asm}
+
+Vad varje rad gör förklaras i \secref{c7:b6}. Instruktionerna finns samlade på referensbladet i
+bilaga~\ref{app:avr}.
+
+\section{Delarna}
+\label{lab3:sec:parts}
+Numreringen följer den laborationssamling kursen bygger på. Del 13 ingår inte, så numreringen
+hoppar från 12 till 14.
+
+\begin{booktable}{@{}p{2.4em}Lp{4em}p{4em}@{}}
+  \thead{Del} & \thead{Innehåll} & \thead{Kapitel} & \thead{Avsnitt} \\
+  \midrule
+  1.1 & Microchip Studio: skapa, skriva, spara, assemblera, simulera & \ref{c7:ch} &
+    \ref{lab3:sec:a} \\
+  1.2 & Öppna, ändra, rätta, assemblera, simulera & \ref{c7:ch} & \ref{lab3:sec:a} \\
+  2 & Decimalt, binärt eller hexadecimalt & \ref{c7:ch} & \ref{lab3:sec:a} \\
+  3 & Addition & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  4 & Subtraktion & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  5 & Addition och subtraktion decimalt, binärt och hexadecimalt & \ref{c8:ch} &
+    \ref{lab3:sec:b} \\
+  6 & Utporten PORTB, inc, I/O-simulering och .def & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  7 & Logiska operationer & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  8 & Rotationer och skift & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  9 & Aritmetisk rundgång & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  10 & Flaggorna i SREG & \ref{c8:ch} & \ref{lab3:sec:b} \\
+  11 & Vitsen med flaggor: jämförelse med cp & \ref{c9:ch} & \ref{lab3:sec:c} \\
+  12 & Flödesplan och villkorliga hopp & \ref{c9:ch} & \ref{lab3:sec:c} \\
+  14 & Loop med visst antal varv & \ref{c9:ch} & \ref{lab3:sec:c} \\
+  15 & Kort tidsfördröjning & \ref{c9:ch} & \ref{lab3:sec:c} \\
+  16 & Längre tidsfördröjning & \ref{c9:ch} & \ref{lab3:sec:c} \\
+  17 & Flervalssituationer och omarbetning av flödesplaner & \ref{c9:ch} & \ref{lab3:sec:c} \\
+  18 & ASCII-koder för hexadecimala siffertecken & \ref{c10:ch} & \ref{lab3:sec:d} \\
+  19 & 16-bitarsoperationer & \ref{c10:ch} & \ref{lab3:sec:d} \\
+  20 & Lång tidsfördröjning & \ref{c10:ch} & \ref{lab3:sec:d} \\
+  21 & Inporten PORTD (PIND) & \ref{c10:ch} & \ref{lab3:sec:d} \\
+  22 & Subrutiner & \ref{c10:ch} & \ref{lab3:sec:d} \\
+  23 & Använda stacken som lagringsplats & \ref{c10:ch} & \ref{lab3:sec:d} \\
+  A & Slutuppgift del A: trafikljuset & \ref{c11:ch} & \ref{lab3:sec:e} \\
+  B & Slutuppgift del B: övergångsställe & \ref{c11:ch} & \ref{lab3:sec:e} \\
+\end{booktable}
+
+Varje pass hör ihop med en del av laborationen, men ni behöver inte bli klara med alla delar på
+samma pass. Fortsätt där ni slutade nästa gång.
+
+\section{Redovisning och bedömning}
+\label{lab3:sec:grading}
+
+\begin{booktable}{@{}p{5.4em}LL@{}}
+  \thead{Laboration} & \thead{Krav för G} & \thead{Krav för VG} \\
+  \midrule
+  Labb 3 & Del 1.1--12, 14--16, 21 och slutuppgiften del A & Samtliga delar 1.1--23 och
+    slutuppgiften del B \\
+\end{booktable}
+
+En del är godkänd när programmet är redovisat för läraren i simulatorn, eller på kortet i
+slutuppgiften, och båda i paret kan förklara det. Skriv upp vilka delar som är redovisade, och
+spara projekten tills kursen är slut.
+
+\section{När något inte fungerar}
+\label{lab3:sec:trouble}
+\begin{itemize}
+  \item \textbf{Bygg om och läs det första felet} i Error List (\secref{c7:c4}).
+  \item \textbf{Stega fram till felet.} Leta upp den första instruktion där registren inte blir det
+    ni förutsade. Felet sitter där eller strax före.
+  \item \textbf{Ändra en sak i taget}, och bygg om efter varje ändring.
+  \item \textbf{Fråga.} Läraren hjälper hellre till tidigt än ser er fastna i en halvtimme.
+\end{itemize}
+
+Vanliga fel samlas i tabellen i \secref{studio:6}.
+
+\input{back/lab3/first_steps}
+\input{back/lab3/arithmetic}
+\input{back/lab3/program_flow}
+\input{back/lab3/io_subroutines}
+\input{back/lab3/final_task}

@@ -1,0 +1,183 @@
+% Solutions to Chapter 9's exercises, from lectures/L09/appendix/d_solutions.md.
+%
+% The programs are left out, as everywhere in the book. Exercise 1 keeps its answers a) to c) but
+% not the program fragment printed under c), whose answer is the branch named in the text. Exercise
+% 4 keeps b) and c), and c) is worded without the labels of the program the lecture's solution
+% shows; 6 keeps b) and c); 10 keeps the advice on testing b); and 11 keeps the flow chart and the
+% reasoning, with its closing remarks worded for the reworked program the reader writes. The
+% instruction pairs of exercise 2 are kept, since they are the answer.
+
+\answerchapter{c9:ch}
+
+\answer{c9:ex:1}{Rita en flödesplan}
+\pt{a}Start, en process \enquote{läs talet i r16}, ett beslut \enquote{bit 0 = 0?}, en utmatning
+\enquote{PB0 = 1} på Ja-grenen och \enquote{PB1 = 1} på Nej-grenen, grenarna möts, stopp.
+
+\pt{b}\code{andi r16, 0b00000001} behåller bara bit~0. Resultatet är noll precis när talet är
+jämnt, och då sätts \code{Z = 1}. Vill man inte förstöra \code{r16} kopierar man det först till ett
+annat register.
+
+\pt{c}\code{breq} hoppar när \code{Z = 1}, alltså när talet är jämnt.
+
+\answer{c9:ex:2}{Vilket hopp?}
+
+\begin{booktable}{@{}p{12em}L@{}}
+  \thead{Villkor} & \thead{Instruktioner} \\
+  \midrule
+  \textbf{a)} \code{r16} = \code{r17} & \code{cp r16, r17} / \code{breq yes} \\
+  \textbf{b)} \code{r16} $\neq$ 0 & \code{tst r16} / \code{brne yes}, eller \code{cpi r16, 0} /
+    \code{brne yes} \\
+  \textbf{c)} \code{r16} $<$ 100 & \code{cpi r16, 100} / \code{brlo yes} \\
+  \textbf{d)} \code{r16} $\geq$ 100 & \code{cpi r16, 100} / \code{brsh yes} \\
+  \textbf{e)} \code{r16} $>$ 100 & \code{cpi r16, 101} / \code{brsh yes} \\
+  \textbf{f)} \code{r16} negativt & \code{tst r16} / \code{brmi yes} \\
+  \textbf{g)} \code{r16} $<$ \code{r17}, med tecken & \code{cp r16, r17} / \code{brlt yes} \\
+\end{booktable}
+
+\noindent \textbf{e)} är den som brukar bli fel. Det finns inget hopp för \enquote{större än}, men
+\code{r16 > 100} är samma sak som \code{r16 ≥ 101}. Ett annat sätt är att byta ordning i
+jämförelsen: \code{ldi r17, 100} / \code{cp r17, r16} / \code{brlo yes}, som frågar om 100 $<$
+\code{r16}.
+
+\answer{c9:ex:3}{Följ programmet}
+
+\begin{booktable}{@{}p{3em}Lp{4em}@{}}
+  \thead{\code{r16}} & \thead{Väg} & \thead{\code{PORTB}} \\
+  \midrule
+  5 & \code{brlo small} hoppar & 1 \\
+  10 & \code{brlo} hoppar inte (10 är inte $<$ 10), \code{brsh big} hoppar inte & 2 \\
+  99 & som för 10 & 2 \\
+  100 & \code{brsh big} hoppar (100 $\geq$ 100) & 3 \\
+  200 & \code{brsh big} hoppar & 3 \\
+\end{booktable}
+
+\noindent Programmet delar in talet i tre klasser: \textbf{ensiffrigt} (1), \textbf{tvåsiffrigt} (2)
+och \textbf{tresiffrigt} (3). Flödesplanen har två beslut i rad, \enquote{r16 $<$ 10?} och
+\enquote{r16 $\geq$ 100?}, tre grenar som var och en sätter \code{r17}, och en gemensam utmatning
+\code{PORTB = r17}.
+
+Gränsfallen 10 och 100 är de man ska testa. \code{brlo} betyder strikt mindre än, \code{brsh}
+betyder större än eller lika med.
+
+\answer{c9:ex:4}{Om, annars}
+\pt{b}\code{PORTB} blir \code{0xFF} för 42 och \code{0x00} för 41.
+
+\pt{c}Utan \code{rjmp} efter den första grenen fortsätter programmet, när det har tänt alla
+lysdioderna, rakt ned i annars-grenen och släcker dem igen. För 42 blir \code{PORTB} då
+\code{0x00}, alltså fel. För 41 blir det fortfarande rätt, eftersom hoppet (\code{brne}) går förbi
+den första grenen. Felet syns alltså bara för det ena värdet, och det är därför båda grenarna måste
+testas.
+
+\answer{c9:ex:5}{Hur många varv?}
+\pt{a}5. Loopen går lika många varv som startvärdet.
+
+\pt{b}1. \code{dec} gör räknaren till 0, och \code{brne} hoppar inte.
+
+\pt{c}\textbf{256}, och eftersom \code{r17} är en byte blir den $256 - 256 = \mathbf{0}$. Den första
+\code{dec} gör 0 till 255, och sedan går loopen 255 varv till. En loop med testet sist körs alltid
+minst en gång (\secref{c9:b1}).
+
+\pt{d}\code{brne} körs 5 gånger och hoppar 4 av dem. Den femte gången är räknaren 0, och då
+fortsätter programmet efter loopen.
+
+\answer{c9:ex:6}{Summera}
+\pt{b}$1 + 2 + \dots + 15 = 15 \cdot 16 / 2 = \mathbf{120}$.
+
+\pt{c}Summan $1 + \dots + n$ är $n(n + 1) / 2$. För $n = 22$ är den 253, som får plats; för
+$n = 23$ är den 276, som inte gör det. Det största $n$ är alltså \textbf{22}. För $n = 23$ blir
+\code{r17} = $276 - 256 = \mathbf{20}$: summan slår om (\secref{c8:a3}), och programmet märker
+ingenting.
+
+\answer{c9:ex:7}{Räkna cykler}
+Fördröjningen tar $3n$ klockcykler, och en cykel tar 62,5~ns.
+
+\pt{a}$3 \cdot 100 = \mathbf{300}$ \textbf{cykler}, $300 \cdot 62,5$~ns = \textbf{18,75~µs}.
+
+\pt{b}$3 \cdot 1 = \mathbf{3}$ \textbf{cykler}: \code{ldi} (1), \code{dec} (1) och \code{brne} som
+inte hoppar (1). 187,5~ns.
+
+\pt{c}Startvärdet 0 ger 256 varv: $3 \cdot 256 = \mathbf{768}$ \textbf{cykler}, \textbf{48~µs}.
+Den längsta fördröjning en loop kan ge.
+
+\answer{c9:ex:8}{Välj konstanter}
+\pt{a}40~µs = $40 \cdot 16 = 640$ cykler. $n = 640 / 3 = 213,3$. Med \textbf{$\mathbf{n = 213}$}
+blir det 639 cykler, 39,94~µs, en cykel för kort. Lägg till en \code{nop} före eller efter loopen,
+så blir det exakt 640 cykler, 40~µs.
+
+\pt{b}5~ms = $5000 \cdot 16 = 80\,000$ cykler.
+\begin{itemize}
+  \item \textbf{Utan \code{nop}}: cykler = $\text{OUTER} \cdot (3 \cdot \text{INNER} + 3)$. Med
+    INNER = 255 är ett yttre varv 768 cykler, och OUTER = $80\,000 / 768 = 104,2$.
+    \textbf{OUTER = 104} ger $104 \cdot 768 = 79\,872$ cykler, \textbf{4,992~ms}.
+  \item \textbf{Med \code{nop}}: cykler = $\text{OUTER} \cdot (3 \cdot \text{INNER} + 4)$.
+    \textbf{OUTER = 125, INNER = 212} ger $125 \cdot 640 = 80\,000$ cykler, \textbf{exakt 5~ms}.
+    Det är samma INNER som för 10~ms i \secref{c9:b5}, med halva antalet yttre varv.
+\end{itemize}
+
+\pt{c}En sekund är 16\,000\,000 cykler. Två loopar ger högst $256 \cdot 771 = 197\,376$ cykler,
+ungefär 12,3~ms. Det behövs ytterligare en loop runt de två, som går ungefär 81 varv, eller en
+räknare med 16 bitar, som i kapitel~\ref{c10:ch}.
+
+\answer{c9:ex:9}{Räkna, mät och förklara}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}lccr@{}}
+  \thead{Instruktion} & \thead{Cykler} & \thead{Gånger} & \thead{Summa} \\
+  \midrule
+  \code{ldi r19, 208} & 1 & 1 & 1 \\
+  \code{ldi r18, 255} & 1 & 208 & 208 \\
+  \code{dec r18} & 1 & $208 \cdot 255 = 53\,040$ & 53\,040 \\
+  \code{brne delay_inner}, hoppar & 2 & $208 \cdot 254 = 52\,832$ & 105\,664 \\
+  \code{brne delay_inner}, hoppar inte & 1 & 208 & 208 \\
+  \code{dec r19} & 1 & 208 & 208 \\
+  \code{brne delay_outer}, hoppar & 2 & 207 & 414 \\
+  \code{brne delay_outer}, hoppar inte & 1 & 1 & 1 \\
+  \midrule
+  \textbf{Totalt} & & & \textbf{159\,744} \\
+\end{narrowtable}
+
+\noindent $159\,744 \cdot 62,5$~ns = \textbf{9,984~ms}. Samma som formeln
+$\text{OUTER} \cdot (3 \cdot \text{INNER} + 3) = 208 \cdot 768$.
+
+\pt{b}Stoppuret ska visa 159\,744 cykler och 9\,984~µs. Stämmer det inte, kontrollera först var
+brytpunkterna sitter, och sedan att Frequency är 16~MHz om det är tiden som skiljer.
+
+\pt{c}Mätningen blir \textbf{2 cykler längre}, 159\,746. Brytpunkten på \code{sbi PORTB, 0} stoppar
+innan \code{sbi} har körts, så nu räknas \code{sbi} med, och den tar 2 cykler. \code{cbi} räknas
+fortfarande inte, eftersom brytpunkten på den stoppar innan den körs. Det här är en viktig vana: en
+mätning mäter exakt det som ligger mellan brytpunkterna, och man måste veta vad det är.
+
+\pt{d}$100 \cdot 768 = \mathbf{76\,800}$ \textbf{cykler}, 4,8~ms. Mätningen ska stämma exakt.
+
+\pt{e}Kamraten har räknat tre cykler per varv i den inre loopen och ingenting annat. Ett helt yttre
+varv kostar $3 \cdot \text{INNER} + 3$ cykler (\secref{c9:b5}): den yttre loopens egna
+instruktioner, \code{ldi r18}, \code{dec r19} och \code{brne delay_outer}, kostar 4 cykler, och den
+inre loopens sista \code{brne} sparar 1. Det är 3 cykler per yttre varv som saknas,
+$3 \cdot 208 = \mathbf{624}$ \textbf{cykler}, eller \textbf{0,39~\%}. Litet här, men felet växer ju
+fler loopar som ligger i varandra, och det är precis den sortens fel en mätning avslöjar.
+
+\answer{c9:ex:10}{Flerval}
+\pt{b}Testa alla fyra fallen: läge 0, 1, 2 och ett felläge, till exempel 9. Glöm inte felläget: det
+är det alternativ som oftast saknas.
+
+\answer{c9:ex:11}{Arbeta om}
+Flödesplanen har två beslut, tre grenar, och tre utmatningar med var sitt stopp. Det som skiljer
+grenarna åt är bara värdet i \code{r17}; \code{out} och slutet är gemensamma. I den omarbetade
+flödesplanen lägger varje gren bara sitt värde i \code{r17}, och alla tre möts i en enda utmatning,
+\code{PORTB = r17}, följd av ett enda stopp.
+
+Det omarbetade programmet gör exakt samma sak, men har en \code{out} och ett slut. Ska programmet
+senare gå i en loop, räcker det att ändra slutet till ett hopp tillbaka till början, på ett ställe i
+stället för tre.
+
+\answer{c9:ex:12}{Minusgrader}
+\pt{a}$-5$ lagras som \code{0xFB} = 251 (\secref{c8:a5}). \code{cpi r16, 20} räknar
+$251 - 20 = 231$ utan lån, så \code{C = 0}. \code{brlo} hoppar inte, och programmet \textbf{slår av}
+värmen, vid $-5$ grader. Programmet läser talet utan tecken och tror att det är 251 grader varmt.
+
+\pt{b}\code{brlt}, som läser \code{S}. Efter \code{cpi r16, 20} med \code{r16} = $-5$ är
+\code{S = 1}, eftersom $-5 - 20 = -25$ är negativt, och \code{brlt} hoppar till \code{heater_on}.
+
+\pt{c}Ja. För 25 är $25 - 20 = 5$ positivt, \code{S = 0}, och \code{brlt} hoppar inte: värmen slås
+av, som den ska. För 100 gäller samma sak. Med tecken går temperaturerna att jämföra från $-128$
+till 127 grader, vilket räcker för en termostat.

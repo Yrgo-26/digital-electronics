@@ -1,0 +1,361 @@
+% Labb 3, parts 18 to 23, from labs/lab3/d_io_and_subroutines.md. Each part is a \labtask, and its
+% Mål, Bakgrund, Programmet, Uppgifter and Frågor are \task headings. The programs given in parts
+% 20 (with its two constants left to fill in) and 23 (with its deliberate fault) are the
+% handout's. One deliberate difference: the last comment of the program in part 23 says to copy
+% delay_ms from part 22, where the guide says L10 Appendix C.4, a name the book does not use.
+
+\section{Del 18--23: Text, 16 bitar, inporten och subrutiner}
+\label{lab3:sec:d}
+Delarna hör till kapitel~\ref{c10:ch}. Läs \secref{c10:app:a} före del 18--20, \secref{c10:app:b}
+före del~21 och \secref{c10:app:c} före del 22--23. Instruktionerna finns på referensbladet i
+bilaga~\ref{app:avr}.
+
+Del 21 krävs för godkänt. Del 18--20 och 22--23 krävs för VG, och del~22 behövs dessutom för
+slutuppgiften i kapitel~\ref{c11:ch}, så gör den även om ni inte siktar på VG.
+
+\labtask{Del 18}{ASCII-koder för hexadecimala siffertecken}\phantomsection\label{lab3:d18}
+\task{Mål}
+Göra om värden till de tecken som skriver ut dem, och tillbaka, och lägga text i minnet.
+
+\task{Bakgrund}
+ASCII-tabellen och luckan på sju mellan \code{'9'} och \code{'A'} finns i
+\secref{c10:a1}--\ref{c10:a2}. En byte blir två tecken med \code{swap} och \code{andi} enligt
+\secref{c10:a3}, och \code{sts} beskrivs i \secref{c10:a5}. Kom ihåg att \code{subi r17, -0x30}
+adderar \code{0x30}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{En siffra blir ett tecken.} Ladda \code{r17} med 7 och gör om det till tecknet
+    \code{'7'} med en enda instruktion. \emph{Förutsäg} \code{r17} hexadecimalt innan ni stegar.
+  \item \textbf{En hexadecimal siffra blir ett tecken.} Ladda \code{r18} med ett värde 0--15,
+    kopiera det till \code{r19} och gör om \code{r19} till tecknet för siffran, med \code{cpi},
+    \code{brlo} och två \code{subi}. Fyll i tabellen \textbf{innan} ni kör programmet, och
+    kontrollera sedan varje rad genom att byta värdet i \code{ldi}:
+
+    \begin{filltable}{@{}p{5em}YY@{}}
+      \thead{\code{r18}} & \thead{\code{r19}, förutsagt} & \thead{\code{r19}, i simulatorn} \\
+      \midrule
+      \code{0x00} & & \fillrule
+      \code{0x09} & & \fillrule
+      \code{0x0A} & & \fillrule
+      \code{0x0B} & & \fillrule
+      \code{0x0F} & & \\
+    \end{filltable}
+  \item \textbf{En byte blir text.} Ladda \code{r16} med \code{0xA7}. Gör om den höga nibblen till
+    ett tecken i \code{r20} och den låga till ett tecken i \code{r21}, och lägg dem på adress
+    \code{0x0100} och \code{0x0101} med \code{sts}. Öppna fönstret \textbf{Memory}, välj
+    \textbf{data IRAM} och gå till adress \code{0x0100}. Står texten \code{A7} i ASCII-kolumnen
+    till höger? Prova också \code{0x3C}, \code{0xFF} och \code{0x00}.
+  \item \textbf{Tillbaka från tecken till värde.} Ladda \code{r22} med \code{'F'} och gör om det
+    till värdet 15, enligt \secref{c10:a4}. Prova också \code{'0'}, \code{'9'} och \code{'A'}.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför måste den höga nibblen flyttas ned med \code{swap} innan den kan göras om till ett
+    tecken?
+  \item Vad blir tecknet om man glömmer \code{andi r20, 0x0F} efter \code{swap}, för byten
+    \code{0xA7}?
+\end{itemize}
+
+\redovisa{uppgift 3 och 4 i simulatorn, med texten synlig i Memory-fönstret.}
+
+\labtask{Del 19}{16-bitarsoperationer}\phantomsection\label{lab3:d19}
+\task{Mål}
+Räkna med tal som inte får plats i en byte: addera, subtrahera, räkna och jämföra 16-bitarstal.
+
+\task{Bakgrund}
+Registerpar och \code{low()}/\code{high()} finns i \secref{c10:a6}, addition och subtraktion med
+minnessiffra i \secref{c10:a7}, \code{adiw}, \code{sbiw} och \code{movw} i \secref{c10:a8} och
+jämförelsen med \code{cpi}/\code{cpc} i \secref{c10:a9}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Addition.} Beräkna 1000 + 2000 med \code{r25:r24} och \code{r23:r22}, med
+    \code{add} och \code{adc}. Kopiera resultatet till \code{r19:r18} med \code{movw}.
+
+    \emph{Förutsäg} först, med additionen uppställd för hand: vad blir \code{r24} och flaggan
+    \code{C} efter \code{add}, och vad blir \code{r25} efter \code{adc}? Stega sedan och jämför i
+    Processor Status.
+  \item \textbf{Subtraktion.} Beräkna 3000 -- 1234 med \code{sub} och \code{sbc}, och lägg
+    resultatet i \code{r21:r20}. \emph{Förutsäg} båda bytena hexadecimalt. Blir det ett lån från
+    den låga byten?
+  \item \textbf{En 16-bitars räknare.} Nollställ \code{r25:r24} och räkna upp det med \code{adiw}
+    tills det är 1000, med \code{cpi} och \code{cpc} i loopen. Sätt en etikett direkt efter loopen.
+
+    \emph{Förutsäg} hur många cykler loopen tar, med samma metod som i kapitel~\ref{c9:ch}. Mät
+    sedan med brytpunkter före och efter loopen och fönstret Processor Status
+    (\secref{studio:4-4}). Stämmer siffrorna? Om inte: vilket varv räknade ni fel på?
+  \item \textbf{När 16 bitar inte räcker.} Ladda \code{r27:r26} med \code{0xFFFF} och addera 1 med
+    \code{adiw}. \emph{Förutsäg} resultatet och flaggorna \code{C} och \code{Z}.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför måste de låga bytena adderas först?
+  \item Varför behövs registret med \code{high(1000)} i uppgift~3, när den låga byten kan jämföras
+    direkt med \code{cpi}?
+\end{itemize}
+
+\redovisa{uppgift 1--4, och er förutsägelse och mätning i uppgift~3.}
+
+\labtask{Del 20}{Lång tidsfördröjning}\phantomsection\label{lab3:d20}
+\task{Mål}
+Konstruera en fördröjning på en halv sekund, exakt på cykeln, och få en lysdiod att blinka en gång
+per sekund.
+
+\task{Bakgrund}
+Metoden, en 16-bitars inre loop i en yttre 8-bitars loop, och formeln \code{M(4N + 4)} finns i
+\secref{c10:a10}. Exemplet där blinkar med en sekunds halvperiod; här ska det gå dubbelt så fort.
+
+\task{Programmet}
+Fyll i de två konstanterna.
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.equ OUTER_TURNS = ?                ; Work these two out before you run anything.
+.equ INNER_TURNS = ?
+
+.org 0x0000
+    rjmp main
+
+main:
+    sbi DDRB, 5                     ; PB5, Arduino pin 13, is an output.
+    ldi r17, 0b00100000             ; The mask that selects bit 5.
+
+loop:
+    in r16, PORTB                   ; Toggle PB5.
+    eor r16, r17
+    out PORTB, r16
+
+delay_begin:
+    ldi r20, OUTER_TURNS
+delay_outer:
+    ldi r24, low(INNER_TURNS)
+    ldi r25, high(INNER_TURNS)
+delay_inner:
+    sbiw r24, 1
+    brne delay_inner
+    dec r20
+    brne delay_outer
+delay_end:
+    rjmp loop
+\end{asmcode}
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Räkna först.} Hur många cykler är en halv sekund vid 16~MHz? Välj
+    \code{INNER_TURNS} så att ett varv i den yttre loopen tar 200\,000 cykler, och räkna ut
+    \code{OUTER_TURNS}. Skriv upp uträkningen.
+  \item \textbf{Mät.} Sätt stoppurets frekvens till 16~MHz, sätt en brytpunkt på
+    \code{delay_begin} och en på \code{delay_end}, och mät tiden mellan dem. \emph{Förutsäg}
+    stoppurets värde innan ni kör.
+  \item \textbf{Hela perioden.} Hur lång är en hel blinkperiod, från en tändning till nästa, räknat
+    i cykler? Varför är den inte exakt en sekund? Hur mycket fel är den, i mikrosekunder?
+  \item \textbf{En annan tid.} Ändra till en fjärdedels sekund. Vilken av de två konstanterna ändrar
+    ni, och till vad?
+\end{enumerate}
+
+\begin{aside}
+\textbf{Tips.} Simulatorn behöver en stund för att köra åtta miljoner cykler. Använd
+\textbf{Continue} (\textbf{F5}) mellan brytpunkterna, inte \textbf{Step Into}.
+\end{aside}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför är det enklare att välja ett \enquote{jämnt} antal cykler för den yttre loopen först,
+    och räkna ut antalet varv sedan?
+  \item Vad händer om \code{OUTER_TURNS} sätts till 0?
+\end{itemize}
+
+\redovisa{uträkningen och mätningen.}
+
+\labtask{Del 21}{Inporten PORTD (PIND)}\phantomsection\label{lab3:d21}
+\task{Mål}
+Läsa knappar på port D och styra lysdioder på port B utifrån dem, och bygga logiska funktioner i
+mjukvara.
+
+\task{Bakgrund}
+Pull-up-motståndet och varför en nedtryckt knapp läses som 0 finns i \secref{c10:b2}, att läsa
+hela porten i \secref{c10:b3} och \code{sbic}/\code{sbis} i \secref{c10:b4}. Så simuleras en
+knapp: \secref{studio:4-5}.
+
+I hela delen sitter knapparna mellan stiftet och jord, och de inbyggda pull-uparna används. En
+\textbf{tom} ruta i \code{PIND} är alltså en \textbf{nedtryckt} knapp.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Knapparna på lysdioderna.} Skriv av programmet \code{buttons_to_leds.asm} från
+    \secref{c10:b3}. Kör till loopen, stoppa, och ändra \code{PIND} för hand. \emph{Förutsäg}
+    \code{PORTB} för varje rad innan ni stegar:
+
+    \begin{filltable}{@{}p{6.4em}YYY@{}}
+      \thead{\code{PIND}} & \thead{Nedtryckta knappar} & \thead{\code{PORTB}, förutsagt} &
+        \thead{\code{PORTB}, i simulatorn} \\
+      \midrule
+      \code{0b11111111} & & & \fillrule
+      \code{0b11111011} & & & \fillrule
+      \code{0b11110011} & & & \fillrule
+      \code{0b01111110} & & & \\
+    \end{filltable}
+  \item \textbf{En knapp, en lysdiod.} Skriv ett program där lysdioden på PB5 lyser så länge
+    knappen på PD2 hålls nedtryckt, med \code{sbic} eller \code{sbis} och utan att läsa hela porten.
+  \item \textbf{AND och OR i mjukvara.} Två knappar, på PD2 och PD3. Lysdioden på PB0 ska lysa när
+    \textbf{båda} är nedtryckta, och lysdioden på PB1 när \textbf{minst en} är det. Det är samma två
+    funktioner som seriekopplingen och parallellkopplingen i Labb~1 (bilaga~\ref{app:lab1}).
+
+    Rita en flödesplan först. Fyll sedan i sanningstabellen, med förutsägelsen före simuleringen:
+
+    \begin{filltable}{@{}p{5.6em}p{5.6em}YY@{}}
+      \thead{PD2} & \thead{PD3} & \thead{PB0 (AND)} & \thead{PB1 (OR)} \\
+      \midrule
+      släppt & släppt & & \fillrule
+      släppt & nedtryckt & & \fillrule
+      nedtryckt & släppt & & \fillrule
+      nedtryckt & nedtryckt & & \\
+    \end{filltable}
+  \item \textbf{Extra.} Lägg till lysdioden på PB2, som ska lysa när \textbf{exakt en} av knapparna
+    är nedtryckt. Vilken grind från kapitel~\ref{c2:ch} är det? Vilken koppling i Labb~1 gjorde
+    samma sak?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vad läser programmet på en ingång utan pull-up, när knappen är släppt?
+  \item I uppgift~3 behövs \code{com} och \code{andi} innan jämförelsen. Vad gör var och en av dem,
+    och vad går fel om man hoppar över \code{andi}?
+  \item Varför är det enklare att ändra funktionen i uppgift~3 än i Labb~1?
+\end{itemize}
+
+\redovisa{uppgift~3, med sanningstabellen, i simulatorn.}
+
+\labtask{Del 22}{Subrutiner}\phantomsection\label{lab3:d22}
+\task{Mål}
+Flytta en fördröjning till en subrutin, se returadressen på stacken, och skriva en subrutin som tar
+en parameter.
+
+\task{Bakgrund}
+\code{rcall}, \code{ret}, stacken och stackpekaren finns i \secref{c10:c2}--\ref{c10:c3},
+subrutinen \code{delay_ms} med parameter i \secref{c10:c4}, och en subrutin som anropar en annan i
+\secref{c10:c7}.
+
+Från och med den här delen ska varje program som använder \code{rcall} börja med att initiera
+stackpekaren, med de fyra raderna i \secref{c10:c3}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Fördröjningen blir en subrutin.} Ta programmet från del~20. Flytta fördröjningen,
+    från \code{delay_begin} till och med \code{brne delay_outer}, till en subrutin
+    \code{delay_500ms} som slutar med \code{ret}, och anropa den med \code{rcall} där fördröjningen
+    stod. Lägg till initieringen av \code{SP}. Programmet ska blinka precis som förut.
+  \item \textbf{Returadressen.} \emph{Förutsäg} \code{SP} före \code{rcall}, i början av
+    subrutinen och efter \code{ret}. Leta upp adressen till instruktionen efter \code{rcall} i
+    listfilen (\code{.lss}, \secref{c7:b7}). Stega in i subrutinen med \textbf{F11} och läs de två
+    översta bytena i stacken i fönstret Memory (\textbf{data IRAM}, adress
+    \code{0x08FE}--\code{0x08FF}). Är det returadressen? Vilken byte ligger var?
+  \item \textbf{En parameter.} Skriv av \code{delay_ms} från \secref{c10:c4}. Skriv om
+    \code{delay_500ms} så att den laddar \code{r24} med 250 och anropar \code{delay_ms} två gånger.
+    Glöm inte att \code{delay_500ms} själv ändrar \code{r24}, och alltså ska spara det.
+  \item \textbf{Järnvägsövergången.} Ändra huvudprogrammet så att lysdioderna på PB0 och PB1
+    blinkar växelvis, en halv sekund var, som vid en järnvägsövergång.
+  \item \textbf{Mät ett anrop.} \emph{Förutsäg} hur många cykler ett anrop av \code{delay_500ms}
+    tar, från \code{rcall} till instruktionen efter, med formeln för \code{delay_ms} och cyklerna
+    för \code{rcall}, \code{push}, \code{ldi}, \code{pop} och \code{ret}. Mät sedan med
+    stoppuret.
+  \item \textbf{Den djupaste punkten.} Stoppa programmet mitt i \code{delay_ms}, när den har
+    anropats från \code{delay_500ms}. \emph{Förutsäg} \code{SP} först, och kontrollera. Hur många
+    byte ligger på stacken, och vad är var och en?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vad skulle hända om \code{delay_ms} inte sparade \code{r24}?
+  \item \code{rcall} kostar 3 cykler och \code{ret} 4. Är det ett argument mot att använda
+    subrutiner?
+\end{itemize}
+
+\redovisa{uppgift 2, 4 och 5.}
+
+\labtask{Del 23}{Använda stacken som lagringsplats}\phantomsection\label{lab3:d23}
+\task{Mål}
+Använda \code{push} och \code{pop} för att spara register, förstå varför ordningen spelar roll, och
+se vad som händer när stacken inte stämmer.
+
+\task{Bakgrund}
+\code{push}, \code{pop} och sist in, först ut finns i \secref{c10:c5}, och kursens regel om att
+spara det man ändrar i \secref{c10:c6}.
+
+\task{Programmet}
+Huvudprogrammet räknar i \code{r16} hur många gånger det har anropat \code{flash_all}, och slutar
+efter tre gånger. Subrutinen \code{flash_all} tänder alla lysdioder på port B i 100~ms och släcker
+dem i 100~ms, och använder själv \code{r16} till något helt annat. Den saknar \code{push} och
+\code{pop}, med flit.
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.org 0x0000
+    rjmp main
+
+main:
+    ldi r16, high(RAMEND)
+    out SPH, r16
+    ldi r16, low(RAMEND)
+    out SPL, r16
+
+    ldi r16, 0xFF
+    out DDRB, r16                   ; Port B: all outputs.
+
+    clr r16                         ; r16 counts the flashes.
+loop:
+    inc r16
+    rcall flash_all
+    cpi r16, 3
+    brne loop
+    out PORTB, r16                  ; Show the count.
+end:
+    rjmp end
+
+flash_all:
+    ldi r16, 0xFF                   ; All LEDs on ...
+    out PORTB, r16
+    ldi r24, 100
+    rcall delay_ms                  ; ... for 100 ms ...
+    clr r16                         ; ... and off ...
+    out PORTB, r16
+    ldi r24, 100
+    rcall delay_ms                  ; ... for 100 ms.
+    ret
+
+; Copy delay_ms from part 22 here.
+\end{asmcode}
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Byt plats med stacken.} Ladda \code{r20} med \code{0x55} och \code{r21} med
+    \code{0xAA} i ett eget litet program. Lägg dem på stacken med \code{push r20}, \code{push r21},
+    och hämta dem med \code{pop r20}, \code{pop r21}. \emph{Förutsäg} värdena i \code{r20} och
+    \code{r21} efteråt, och \code{SP} efter varje instruktion.
+  \item \textbf{Felet.} Kör programmet ovan. \emph{Förutsäg} först vad det gör. Hur många gånger
+    blinkar det? Stega igenom ett varv i loopen och följ \code{r16}. Förklara vad som går fel.
+  \item \textbf{Rättningen.} Lägg till \code{push} och \code{pop} i \code{flash_all} så att
+    subrutinen följer kursens regel. Vilka register måste sparas? Programmet ska nu blinka tre
+    gånger och sedan visa talet 3 på lysdioderna.
+  \item \textbf{Djupet.} Stoppa programmet mitt i den första \code{delay_ms}. \emph{Förutsäg}
+    \code{SP}, och kontrollera. Hur många byte ligger på stacken, och vad är var och en?
+  \item \textbf{Fel ordning.} Byt plats på de två \code{pop} i \code{flash_all}, så att de inte
+    längre står i omvänd ordning mot \code{push}. Vad händer? Förklara med stacken.
+  \item \textbf{En pop för lite.} Ta bort en av \code{pop}-instruktionerna. Stega fram till
+    \code{ret} i \code{flash_all} och läs \code{SP}. Stega en gång till: vart hoppar programmet?
+    Förklara med stacken.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför måste \code{pop} göras i omvänd ordning mot \code{push}?
+  \item Felet i uppgift~6 syns tydligare än felet i uppgift~5. Varför är det i själva verket en
+    fördel?
+\end{itemize}
+
+\redovisa{uppgift 2, 3 och 4.}

@@ -1,0 +1,57 @@
+% Section 12.2, from lectures/L12/README.md: the course's learning outcomes, the questions to test
+% yourself with, and, as this is the last chapter, "Efter kursen" in the place of the next lecture.
+
+\section{Sammanfattning}
+\label{c12:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Kursplanens lärandemål. Efter kursen ska du kunna:
+\begin{itemize}
+  \item förklara grindar och logiska funktioner;
+  \item beskriva binära, hexadecimala och decimala talsystem, och omvandla talvärden mellan dem;
+  \item beskriva logisk algebra och förenklingar av booleska uttryck;
+  \item redogöra för mikrodatorns uppbyggnad på blockschemanivå;
+  \item syntetisera digitala kombinatoriska nät med IC-kretsar och kontakter;
+  \item använda Karnaughdiagram för analys och minimering av booleska uttryck;
+  \item använda assemblerspråk för att programmera en mikrodator, och programmera den att styra
+    styrobjekt;
+  \item analysera digitala kombinatoriska nät.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Vilket tal är \code{0xB6} decimalt, och hur ser det ut binärt?
+  \item Vad säger De Morgans lagar, och varför kan varje logisk funktion byggas av enbart
+    NAND-grindar?
+  \item Varför står raderna i ett Karnaughdiagram i ordningen 00, 01, 11, 10?
+  \item Vad gör programräknaren, och vad händer med den vid ett \code{rcall}?
+  \item Efter \code{ldi r16, 200} och \code{subi r16, 201}: vad är \code{r16}, och vad är
+    \code{C}?
+  \item En loop med \code{dec} och \code{brne} går 100 varv. Hur många cykler tar den, och hur lång
+    tid är det vid 16~MHz?
+  \item Varför läses en nedtryckt knapp som noll, och vad behövs för att den ska läsas som något
+    alls när den är släppt?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Efter kursen}
+Kursen har gått från ettor och nollor till en mikrodator som styr ett trafikljus. Varje steg på
+vägen finns kvar i det du har byggt: grindarna finns i ALU:n, vipporna i registren och
+programräknaren, kontaktnätens logik i programmets villkorliga hopp.
+
+Vill du vidare finns några naturliga nästa steg:
+\begin{itemize}
+  \item \textbf{PLC-programmering.} Kontaktnät och stegdiagram från kapitel~\ref{c2:ch}, med samma
+    idé om ingångar, beslut och utgångar som i kapitel~\ref{c11:ch}, i den form industrin
+    använder.
+  \item \textbf{C för mikrokontroller.} Samma ATmega328P och samma register, \code{DDRB},
+    \code{PORTB} och \code{PIND}, men i ett språk där kompilatorn skriver assemblern åt dig. Den
+    som har skrivit assembler vet vad kompilatorn gör.
+  \item \textbf{Programmerbar logik.} Grindnät och vippor beskrivna i ett hårdvarubeskrivande
+    språk, och körda på en FPGA.
+\end{itemize}
+
+Spara projekten från Labb~3. Ett program som fungerar är den bästa referensen när nästa program
+ska skrivas.

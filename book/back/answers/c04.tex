@@ -1,0 +1,405 @@
+% Solutions to Chapter 4's exercises, from lectures/L04/appendix/d_solutions.md. Every exercise in
+% the chapter is worked on paper, so every one is answered. The appendix's opening paragraph, which
+% only points back to the exercises, is left out; the two on checking and counting gates are kept.
+
+\answerchapter{c4:ch}
+
+Varje uttryck nedan är kontrollerat mot sin sanningstabell, rad för rad. Gör samma sak med dina
+egna svar: det är den enda kontroll som säger att en gruppering är rätt och inte bara ser rätt ut.
+
+Grindantal räknas med grindar som de ritas i nätet. Där kretsantal efterfrågas räknas med
+74-seriens grindar, som har två ingångar (en AND med tre ingångar blir då två AND-grindar i rad).
+
+\answer{c4:ex:1}{Graykod och grannar}
+\pt{a}Två rutor som ligger bredvid varandra ska skilja sig i \textbf{exakt en} ingång. Då betyder
+två ettor bredvid varandra att utgången inte beror på den ingången, och den kan strykas. I
+ordningen \code{00, 01, 10, 11} ändras båda bitarna mellan \code{01} och \code{10}, så de två
+mittkolumnerna skulle se ut som grannar utan att vara det.
+
+\pt{b}Ruta 5 är \code{0101}. Byt en bit i taget:
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{Bit som byts} & \thead{Ny kombination} & \thead{Minterm} \\
+  \midrule
+  A & 1101 & 13 \\
+  B & 0001 & 1 \\
+  C & 0111 & 7 \\
+  D & 0100 & 4 \\
+\end{narrowtable}
+
+\noindent Grannarna är \textbf{1, 4, 7 och 13}. I diagrammet ligger de ovanför, till vänster, till
+höger och nedanför ruta 5.
+
+\pt{c}Ruta 0 är \code{0000}, och grannarna är 8 (\code{1000}), 4 (\code{0100}), 2 (\code{0010})
+och 1 (\code{0001}). \textbf{Ruta 2} ligger i kolumnen \code{CD = 10} längst till höger och
+\textbf{ruta 8} på raden \code{AB = 10} längst ned: båda är grannar över en kant.
+
+\pt{d}En grupp om $2^{k}$ rutor är precis de rutor där $k$ ingångar tar alla sina kombinationer
+medan resten är fasta. Tre rutor kan inte vara det: två ingångar ger fyra kombinationer, en ingång
+ger två. Tre ettor på rad ringas in som två överlappande par.
+
+\needspace{20\baselineskip}
+\answer{c4:ex:2}{Två ingångar}
+\pt{a) och b}\leavevmode
+
+\bookfigure{l04_sol_2var}{Övning~\ref{c4:ex:2}: kolumnen \code{B = 1} är en grupp.}%
+{c4:fig:sol_2var}
+
+\noindent Båda ettorna ligger i kolumnen \code{B = 1}. \code{A} är 0 i den ena och 1 i den andra,
+och stryks:
+
+\begin{console}
+X = B
+\end{console}
+
+\noindent\code{X} beror \textbf{inte alls} på \code{A}. Kretsen är en ledning från \code{B} till
+\code{X}, och \code{A} behöver inte ens kopplas in.
+
+\pt{c}Direkt ur tabellen: raderna \code{01} och \code{11} ger \code{X = A'B + AB}. Bryt ut
+\code{B}: \code{X = B(A' + A) = B · 1 = B}. Samma svar. Karnaughdiagrammet gör precis den
+förenklingen: \code{A' + A = 1} är det som händer när två grannrutor slås ihop.
+
+\answer{c4:ex:3}{Tre ingångar}
+\pt{a}Ettorna ligger i rutorna 0, 1, 4 och 5, alltså på raderna \code{AB = 00} och
+\code{AB = 10}. På papperet ligger de överst och nederst, men de \textbf{är} grannar: de skiljer
+sig bara i \code{A}, och diagrammets översta och nedersta rad hänger ihop runt kanten
+(\secref{c4:a5}).
+
+\needspace{20\baselineskip}
+\pt{b}\leavevmode
+
+\bookfigure{l04_sol_3var_b}{Övning~\ref{c4:ex:3}: översta och nedersta raden är en grupp över
+kanten.}{c4:fig:sol_3var_b}
+
+\noindent En grupp om fyra, över kanten. \code{A} varierar, \code{C} varierar, och \code{B = 0} i
+alla fyra rutorna:
+
+\begin{console}
+X = B'
+\end{console}
+
+\pt{c}Det minimerade nätet är \textbf{en} inverterare. Den direkta avläsningen,
+\code{X = A'B'C' + A'B'C + AB'C' + AB'C}, hade krävt fyra AND-grindar med tre ingångar, en OR-grind
+med fyra ingångar och tre inverterare, åtta grindar i allt.
+
+\ptnote{Vanligt fel}Att ringa in raderna \code{00} och \code{10} som två separata par, \code{A'B'}
+och \code{AB'}. Svaret \code{A'B' + AB'} är korrekt men inte minimalt, och går att förenkla vidare
+till \code{B'}. Glöm inte kanterna.
+
+\needspace{14\baselineskip}
+\answer{c4:ex:4}{Från mintermer}
+\pt{a}Mintermerna 0, 2, 5 och 7 är \code{000}, \code{010}, \code{101} och \code{111}:
+
+\begin{narrowtable}{@{}cc@{}}
+  \thead{ABC} & \thead{X} \\
+  \midrule
+  000 & 1 \\
+  001 & 0 \\
+  010 & 1 \\
+  011 & 0 \\
+  100 & 0 \\
+  101 & 1 \\
+  110 & 0 \\
+  111 & 1 \\
+\end{narrowtable}
+
+\needspace{20\baselineskip}
+\pt{b}\leavevmode
+
+\bookfigure{l04_sol_3var_xnor}{Övning~\ref{c4:ex:4}: grupperna \code{A'C'} och
+\code{AC}.}{c4:fig:sol_3var_xnor}
+
+\noindent Rutorna 0 och 2 ligger på raderna \code{00} och \code{01} i kolumnen \code{C = 0}:
+\code{A = 0} och \code{C = 0}, \code{B} varierar, termen blir \code{A'C'}. Rutorna 5 och 7 ligger
+på raderna \code{10} och \code{11} i kolumnen \code{C = 1}: \code{A = 1} och \code{C = 1}, termen
+blir \code{AC}.
+
+\begin{console}
+X = A'C' + AC
+\end{console}
+
+\noindent Lägg märke till att raderna \code{11} och \code{10} ligger bredvid varandra i diagrammet,
+trots att de kommer i omvänd ordning mot vanlig binär räkning. Det är Graykoden igen.
+
+\pt{c}\code{X} är 1 när \code{A} och \code{C} är lika. Det är \textbf{XNOR}:
+\code{X = (A xor C)'}, en enda grind. \code{B} påverkar inte utgången.
+
+\needspace{20\baselineskip}
+\answer{c4:ex:5}{Två utgångar}
+\pt{a) och b}\leavevmode
+
+\bookfigure{l04_sol_x}{Övning~\ref{c4:ex:5}, \code{X}: raderna \code{AB = 01} och \code{AB = 10}
+är två grupper om fyra.}{c4:fig:sol_x}
+
+\noindent\code{X} har ettor på hela raden \code{AB = 01} och hela raden \code{AB = 10}. Två grupper
+om fyra, där \code{C} och \code{D} varierar över hela raden:
+
+\begin{console}
+X = A'B + AB'
+\end{console}
+
+\bookfigure{l04_sol_y}{Övning~\ref{c4:ex:5}, \code{Y}: kolumnerna \code{CD = 00} och
+\code{CD = 11} är två grupper om fyra.}{c4:fig:sol_y}
+
+\noindent\code{Y} har ettor i hela kolumnen \code{CD = 00} och hela kolumnen \code{CD = 11}:
+
+\begin{console}
+Y = C'D' + CD
+\end{console}
+
+\noindent\code{X} påverkas inte av \code{C} och \code{D}: dess grupper är hela \textbf{rader}, där
+\code{C} och \code{D} tar alla värden. \code{Y} påverkas inte av \code{A} och \code{B}: dess
+grupper är hela \textbf{kolumner}. När en grupp sträcker sig över hela diagrammet i en riktning
+betyder det att variablerna i den riktningen saknar betydelse.
+
+\pt{c}\code{X = A'B + AB'} är \textbf{XOR} av \code{A} och \code{B}. \code{Y = C'D' + CD} är
+\textbf{XNOR} av \code{C} och \code{D}. Två grindar i stället för fyra AND, två OR och fyra
+inverterare.
+
+\needspace{20\baselineskip}
+\answer{c4:ex:6}{Hörnen}
+\pt{a}\leavevmode
+
+\bookfigure{l04_sol_corners}{Övning~\ref{c4:ex:6}: de fyra hörnen är en grupp, och ruta 15 står
+ensam.}{c4:fig:sol_corners}
+
+\noindent Hörnen 0, 2, 8 och 10 är en grupp om fyra, \code{B'D'} (se \secref{c4:a5}). Ruta 15 står
+ensam:
+
+\begin{console}
+X = B'D' + ABCD
+\end{console}
+
+\pt{b}Nej. Ruta 15:s grannar är 7, 11, 13 och 14, och ingen av dem är en etta. En grupp får bara
+innehålla ettor, så ruta 15 blir en grupp om en, med alla fyra ingångarna kvar i termen. En ensam
+etta är ingen felgruppering, bara en funktion som inte går att förenkla mer just där.
+
+\needspace{20\baselineskip}
+\answer{c4:ex:7}{Segment e i en sifferdisplay}
+\pt{a) och b}\leavevmode
+
+\bookfigure{l04_sol_segment_e}{Övning~\ref{c4:ex:7}: segment e, med don't care i rutorna 10--15
+och två grupper.}{c4:fig:sol_segment_e}
+
+\noindent Ettor i 0, 2, 6 och 8. Utan X-rutorna kan 0, 2 och 8 bara bilda par. Med X i ruta 10 blir
+hörnen en grupp om fyra, \code{B'D'}. Ruta 6 går ihop med 2, 14 och 10 i kolumnen \code{CD = 10},
+där 14 och 10 är X: \code{CD'}.
+
+\begin{console}
+e = B'D' + CD'
+\end{console}
+
+\needspace{14\baselineskip}
+\pt{c}\leavevmode
+
+\begin{narrowtable}{@{}cccccl@{}}
+  \thead{Siffra} & \thead{ABCD} & \thead{\code{B'D'}} & \thead{\code{CD'}} & \thead{e} &
+    \thead{Ska vara} \\
+  \midrule
+  0 & 0000 & 1 & 0 & 1 & tänd \\
+  1 & 0001 & 0 & 0 & 0 & släckt \\
+  2 & 0010 & 1 & 1 & 1 & tänd \\
+  3 & 0011 & 0 & 0 & 0 & släckt \\
+  4 & 0100 & 0 & 0 & 0 & släckt \\
+  5 & 0101 & 0 & 0 & 0 & släckt \\
+  6 & 0110 & 0 & 1 & 1 & tänd \\
+  7 & 0111 & 0 & 0 & 0 & släckt \\
+  8 & 1000 & 1 & 0 & 1 & tänd \\
+  9 & 1001 & 0 & 0 & 0 & släckt \\
+\end{narrowtable}
+
+\noindent Alla tio stämmer.
+
+\pt{d}\code{1010} ger \code{B'D' = 1}, så segment e lyser. Displayen visar något som inte är en
+siffra. Det är inget problem så länge kretsen framför bara skickar BCD, och det var just det
+antagandet som gav oss rätt att använda X-rutorna. Om kombinationen \textbf{kan} komma, är den inte
+\enquote{don't care}, och då måste diagrammet ha nollor där.
+
+\answer{c4:ex:8}{Fläkten}
+\pt{a) och b}\code{F = 1} när \code{(T = 1 och W = 0) eller C = 1}, och \code{B = 0}. Ettorna blir
+mintermerna 2, 6, 8, 10 och 14 (\code{TWCB} = 0010, 0110, 1000, 1010, 1110):
+
+\bookfigure{l04_sol_fan}{Övning~\ref{c4:ex:8}: grupperna \code{CB'} och \code{TW'B'}, den senare
+över kanten.}{c4:fig:sol_fan}
+
+\noindent Kolumnen \code{CB = 10} är full: \code{C = 1} och \code{B = 0}, termen \code{CB'}. Raden
+\code{TW = 10} har ettor i kolumnerna \code{00} och \code{10}, som är grannar över kanten:
+\code{T = 1}, \code{W = 0}, \code{B = 0}, termen \code{TW'B'}.
+
+\begin{console}
+F = TW'B' + CB'
+\end{console}
+
+\noindent Läs det tillbaka mot specifikationen: \enquote{varmt och fönstret stängt, och inget
+brandlarm; eller hög koldioxidhalt, och inget brandlarm}. Det är precis det som stod.
+
+\ptnote{Vanligt fel}Att glömma brandlarmet i en av termerna, till exempel \code{F = TW'B' + C}. Då
+går fläkten när koldioxidhalten är hög, även under en brand. En sanningstabell som är härledd ur
+kravet, och inte ur en skiss av nätet, fångar det direkt.
+
+\pt{c}Två inverterare (\code{W'} och \code{B'}), en AND-grind med tre ingångar för \code{TW'B'}, en
+AND med två för \code{CB'} och en OR med två, fem grindar. Med tvåingångsgrindar blir det sex,
+eftersom AND-grinden med tre ingångar blir två (se d). Bryter du ut \code{B'},
+\code{F = B'(TW' + C)}, räcker två AND-grindar med två ingångar, en OR och samma två inverterare:
+fem grindar, ingen med mer än två ingångar.
+
+\pt{d}Med \code{F = TW'B' + CB'} och tvåingångsgrindar: två inverterare ur \textbf{en 74HC04}, tre
+AND-grindar (två för \code{TW'B'}, en för \code{CB'}) ur \textbf{en 74HC08}, och en OR-grind ur
+\textbf{en 74HC32}. Tre kretsar, med fyra inverterare, en AND och tre OR över till annat.
+
+\answer{c4:ex:9}{Enbart NAND}
+\pt{a}En inverterare för \code{B'}, en AND-grind för \code{AB'} och en OR-grind som lägger till
+\code{C}.
+
+\pt{b}Varje AND blir en NAND, OR-grinden blir en NAND, och \code{C}, som går direkt till
+OR-grinden, måste inverteras. Inverterare görs av NAND med ingångarna ihopkopplade:
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{Grind} & \thead{Ingångar} & \thead{Utgång} \\
+  \midrule
+  N1 & B, B & \code{B'} \\
+  N2 & A, N1 & \code{(AB')'} \\
+  N3 & C, C & \code{C'} \\
+  N4 & N2, N3 & X \\
+\end{narrowtable}
+
+\pt{c}\code{X = ((AB')' · C')'}. Med De Morgan, \code{(PQ)' = P' + Q'}:
+\code{X = (AB')'' + C'' = AB' + C}. Stämmer.
+
+\pt{d}Fyra NAND-grindar, precis \textbf{en 74HC00}. AND-OR-NOT-versionen hade krävt tre kretsar:
+en 74HC04, en 74HC08 och en 74HC32.
+
+\answer{c4:ex:10}{Enbart NOR}
+\pt{a}\code{(A + B)C} är en \textbf{produkt av summor} (PS-form): en OR-term \code{(A + B)} och en
+term med en enda variabel, \code{C}, ihop med AND.
+
+\pt{b}Varje OR blir en NOR, AND-grinden blir en NOR, och \code{C}, som går direkt till
+AND-grinden, inverteras med en NOR med ingångarna ihopkopplade:
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{Grind} & \thead{Ingångar} & \thead{Utgång} \\
+  \midrule
+  N1 & A, B & \code{(A + B)'} \\
+  N2 & C, C & \code{C'} \\
+  N3 & N1, N2 & X \\
+\end{narrowtable}
+
+\noindent\code{X = ((A + B)' + C')'}, och med De Morgan, \code{(P + Q)' = P'Q'}:
+\code{X = (A + B)'' · C'' = (A + B)C}.
+
+\needspace{12\baselineskip}
+\pt{c}\leavevmode
+
+\begin{narrowtable}{@{}ccccccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{N1} & \thead{N2} & \thead{X} &
+    \thead{\code{(A + B)C}} \\
+  \midrule
+  0 & 0 & 0 & 1 & 1 & 0 & 0 \\
+  0 & 0 & 1 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+  1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  1 & 0 & 1 & 0 & 0 & 1 & 1 \\
+  1 & 1 & 0 & 0 & 1 & 0 & 0 \\
+  1 & 1 & 1 & 0 & 0 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent Tre NOR-grindar, en 74HC02.
+
+\answer{c4:ex:11}{Kretsar och ben}
+\pt{a}74HC00, grind 3: ingångar på \textbf{ben 9 och 10}, utgång på \textbf{ben 8}. 74HC02,
+grind 3: ingångar på \textbf{ben 8 och 9}, utgång på \textbf{ben 10}. Samma grindnummer, olika ben:
+74HC02 har utgången först i varje grupp.
+
+\pt{b}Sex AND-grindar kräver \textbf{två 74HC08} (åtta grindar, två över), och inverteraren
+\textbf{en 74HC04}. Tre kretsar.
+
+\pt{c}\leavevmode
+\[
+  R = \frac{5 - 2,1}{0,005} = 580\ \Omega
+\]
+Närmaste standardvärde uppåt är \textbf{680~Ω}, som ger \code{I = 2,9 / 680 ≈ 4,3 mA}. Det är gott
+nog: en lysdiod lyser tydligt vid några milliampere. 560~Ω, närmast nedåt, ger 5,2~mA och går också
+bra.
+
+\pt{d}En CMOS-ingång som inte är ansluten har ingen bestämd nivå (\secref{c4:b4}). Den kan läsas
+som 0 eller 1, växla av störningar, eller hamna mitt emellan, där kretsen drar onödigt mycket ström
+och kan bli varm. Att det \enquote{fungerar} betyder bara att de oanvända grindarnas utgångar inte
+är kopplade till något du tittar på. Men störningen påverkar hela kretsen genom den gemensamma
+matningen, och felet kommer och går med handens närhet och luftfuktigheten. Koppla oanvända
+ingångar till GND.
+
+\answer{c4:ex:12}{Kontroll: minimerat och ominimerat nät}
+\pt{a}\textbf{För hand.} Mintermerna 1, 3, 5, 7, 9 och 11 är \code{0001}, \code{0011},
+\code{0101}, \code{0111}, \code{1001} och \code{1011}:
+
+\begin{console}
+X = A'B'C'D + A'B'CD + A'BC'D + A'BCD + AB'C'D + AB'CD
+\end{console}
+
+\bookfigure{l04_sol_check}{Övning~\ref{c4:ex:12}: grupperna \code{A'D} och \code{B'D}, den senare
+över kanten.}{c4:fig:sol_check}
+
+\noindent Alla ettor ligger i kolumnerna \code{CD = 01} och \code{CD = 11}, där \code{D = 1}.
+Raderna \code{00} och \code{01} ger en grupp om fyra, \code{A'D}. Raderna \code{00} och \code{10}
+ger en grupp om fyra över kanten, \code{B'D}.
+
+\begin{console}
+X = A'D + B'D
+\end{console}
+
+\pt{b}\textbf{Förutsäg.} Den direkta avläsningen: sex AND med fyra ingångar, en OR med sex, och tre
+inverterare (\code{A'}, \code{B'} och \code{C'}; \code{D'} behövs aldrig, eftersom \code{D} står
+oinverterad i alla sex termerna). Med tvåingångsgrindar blir varje fyraingångs-AND tre grindar,
+alltså 18 AND, och OR-grinden fem, totalt 26 grindar: fem 74HC08, två 74HC32 och en 74HC04,
+\textbf{åtta kretsar}.
+
+Det minimerade uttrycket: två inverterare, två AND och en OR, fem grindar i \textbf{tre kretsar}
+(74HC04, 74HC08, 74HC32).
+
+\pt{c) och d}De två utgångarna ska vara lika på alla sexton raderna: 1 för raderna 1, 3, 5, 7, 9
+och 11, och 0 för övriga. De två uttrycken beskriver samma funktion, så varje avvikelse är ett fel i
+ett av näten, oftast en felkopplad ledning i CircuitVerse, inte i minimeringen. Om de skiljer sig
+på en rad: kontrollera den raden i båda uttrycken för hand. Det uttryck som ger fel värde där är det
+felaktiga, och den AND-term eller grupp som borde ha täckt raden är den som ska granskas.
+
+\pt{e}\code{X = D(A' + B') = D · (AB)'}: en NAND-grind och en AND-grind, i en 74HC00 och en
+74HC08, \textbf{två kretsar}. Eller med enbart NAND: \code{N1 = (AB)'}, \code{N2 = (N1 · D)'},
+\code{X = (N2 · N2)' = N1 · D}, tre NAND-grindar i \textbf{en} 74HC00. Från åtta kretsar till en,
+för samma sanningstabell. Det är hela poängen med att minimera, och med att ibland tänka ett steg
+längre än diagrammet.
+
+\needspace{14\baselineskip}
+\answer{c4:ex:13}{Multiplexern}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{S} & \thead{A} & \thead{B} & \thead{X} \\
+  \midrule
+  0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 1 \\
+  0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 1 \\
+  1 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 \\
+  1 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent När \code{S = 0} är \code{X} en kopia av \code{B}, när \code{S = 1} en kopia av \code{A}.
+
+\needspace{20\baselineskip}
+\pt{b}\leavevmode
+
+\bookfigure{l04_sol_mux}{Övning~\ref{c4:ex:13}: grupperna \code{S'B} och
+\code{SA}.}{c4:fig:sol_mux}
+
+\begin{console}
+X = S'B + SA
+\end{console}
+
+\pt{c}En inverterare för \code{S'}, två AND-grindar och en OR-grind. Den övre AND-grinden får
+\code{S'} och \code{B}, den nedre \code{S} och \code{A}. Eftersom \code{S} och \code{S'} aldrig är
+1 samtidigt kan högst en av AND-grindarna släppa igenom något: \code{S} fungerar som en
+strömbrytare som öppnar den ena vägen och stänger den andra. Samma idé, med fler väljarbitar, sitter
+inuti mikrokontrollern och väljer vilken av dess analoga ingångar som ska mätas.

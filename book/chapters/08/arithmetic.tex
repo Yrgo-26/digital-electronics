@@ -1,0 +1,264 @@
+% Section 8.1, from lectures/L08/appendix/a_arithmetic_and_flags.md.
+%
+% Typesetting only: in the subtraction example of 8.1.4 the comments start four columns further
+% left than in the lecture, so that the longest line fits the listing's width.
+
+\needspace{10\baselineskip}
+\section{Aritmetik och flaggor}
+\label{c8:app:a}
+
+\subsection{Addition i ett register}
+\label{c8:a1}
+Instruktionen \code{add} adderar två register och lägger summan i det första:
+
+\begin{asmcode}
+    ldi r16, 25
+    ldi r17, 17
+    add r16, r17                    ; r16 = r16 + r17 = 42. r17 is unchanged.
+\end{asmcode}
+
+\noindent Processorn räknar binärt, precis som i \secref{c1:app:a}: bit för bit från höger, med en
+minnessiffra, \textbf{carry}, när en kolumn blir 2 eller mer.
+
+\begin{textdrawing}
+   carry     0 0 1 0 0 0 1 0  (in to each column)
+   25    =   0 0 0 1 1 0 0 1
+ + 17    =   0 0 0 1 0 0 0 1
+   ---------------------------
+   42    =   0 0 1 0 1 0 1 0  =  0x2A
+\end{textdrawing}
+
+\noindent Bit~0: 1 + 1 = 10 binärt, alltså 0 och en etta i minne till bit~1. Bit~4: 1 + 1 = 10
+igen, en etta i minne till bit~5. Resten av kolumnerna blir 0 eller 1 utan minne.
+
+Två instruktioner till adderar:
+\begin{itemize}
+  \item \textbf{\code{inc r16}} adderar 1. Den har redan dykt upp i kapitel~\ref{c7:ch}.
+  \item \textbf{\code{adc r16, r17}} adderar \code{r17} \textbf{och carryflaggan} till \code{r16}.
+    Den behövs för tal större än en byte, och tas upp i kapitel~\ref{c10:ch}.
+\end{itemize}
+
+Det finns \textbf{ingen instruktion som adderar en konstant}, ingen \code{addi}. Hur man ändå gör
+det står i \secref{c8:a4}.
+
+\subsection{När summan inte får plats}
+\label{c8:a2}
+En byte har åtta bitar och rymmer talen 0 till 255. Vad händer med 200 + 100 = 300?
+
+\begin{textdrawing}
+   200   =     1 1 0 0 1 0 0 0
+ + 100   =     0 1 1 0 0 1 0 0
+   -----------------------------
+   300   =   1 0 0 1 0 1 1 0 0
+             ^
+             nionde biten: hamnar i carryflaggan C
+\end{textdrawing}
+
+\noindent Summan behöver nio bitar. Registret behåller de åtta lägsta, \code{0010 1100} =
+\textbf{44}, och den nionde biten, minnessiffran ut ur bit~7, hamnar i \textbf{carryflaggan
+\code{C}} i statusregistret. Så \code{C = 1} efter additionen betyder: \enquote{resultatet fick inte
+plats, det riktiga svaret är 256 större}. 44 + 256 = 300.
+
+Processorn stannar inte, och säger inte ifrån. Det är programmets sak att titta på \code{C} om det
+spelar roll, och det är just det flaggorna är till för (\secref{c8:a6}).
+
+\subsection{Aritmetisk rundgång}
+\label{c8:a3}
+En byte fungerar som mätaren i en bil: efter 999\,999 kommer 000\,000. Efter 255 kommer 0, och före
+0 kommer 255. Det kallas \textbf{aritmetisk rundgång}.
+
+\bookfigure{l08_number_circle}{De 256 värdena i en byte som en urtavla, utan tecken utanför och
+med tecken innanför.}{c8:fig:number_circle}
+
+Tänk dig talen på en urtavla. \code{inc} flyttar ett steg medurs, \code{dec} ett steg moturs. Från
+255 tar \code{inc} dig till 0, och från 0 tar \code{dec} dig till 255.
+
+\textbf{Här finns en fälla.} \code{inc} och \code{dec} ändrar \textbf{inte} carryflaggan. När
+\code{inc} slår om från 255 till 0 sätts \code{Z}, eftersom resultatet blev noll, men \code{C}
+lämnas som den var. Vill man veta om en ökning slog om måste man antingen använda \code{add} med ett
+register som innehåller 1, som sätter \code{C}, eller titta på \code{Z} efter \code{inc}.
+
+\begin{narrowtable}{@{}lcccc@{}}
+  \thead{Instruktion} & \thead{Från} & \thead{Till} & \thead{Z} & \thead{C} \\
+  \midrule
+  \code{inc r16} & 255 & 0 & 1 & oförändrad \\
+  \code{add r16, r17} med \code{r17} = 1 & 255 & 0 & 1 & 1 \\
+  \code{dec r16} & 0 & 255 & 0 & oförändrad \\
+\end{narrowtable}
+
+\noindent Varför är \code{inc} och \code{dec} gjorda så? Därför att de oftast används som räknare i
+loopar, och då vill man kunna räkna utan att förstöra \code{C}, som kanske håller något viktigt.
+Det blir tydligt i kapitel~\ref{c10:ch}, där \code{C} bär minnessiffran mellan två byte.
+
+\subsection{Subtraktion}
+\label{c8:a4}
+Subtraktion finns i tre varianter:
+
+\begin{booktable}{@{}p{6em}p{7.5em}L@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} \\
+  \midrule
+  \code{sub} & \code{sub r16, r17} & \code{r16 = r16 - r17} \\
+  \code{subi} & \code{subi r16, 5} & \code{r16 = r16 - 5}, med en konstant. Bara
+    \code{r16}--\code{r31}. \\
+  \code{dec} & \code{dec r16} & \code{r16 = r16 - 1} \\
+\end{booktable}
+
+\noindent Om det man drar ifrån är större än det man drar ifrån det från, får man \textbf{låna} från
+en tänkt nionde bit. Då sätts \textbf{\code{C = 1}}, som här betyder \emph{lån} (\emph{borrow}) i
+stället för minnessiffra:
+
+\begin{asmcode}
+    ldi r16, 20
+    ldi r17, 50
+    sub r16, r17                ; 20 - 50: r16 = 226 = 0xE2, and C = 1 (a borrow)
+\end{asmcode}
+
+\noindent 226 är $256 + 20 - 50$. Rundgången gäller åt båda hållen.
+
+\subsubsection{Att addera en konstant med \code{subi}}
+Eftersom det inte finns någon \code{addi} adderar man en konstant genom att \textbf{subtrahera dess
+negativa värde}:
+
+\begin{asmcode}
+    subi r16, -5                    ; r16 = r16 - (-5) = r16 + 5
+\end{asmcode}
+
+\noindent Det fungerar på grund av rundgången: $-5$ lagras som 251 (\secref{c8:a5}), och att dra
+ifrån 251 är detsamma som att lägga till 5 och slå om ett varv. Tänk på att flaggorna då blir en
+subtraktions flaggor: \code{C} betyder lån, inte minnessiffra, så \code{C} blir 1 när summan
+\textbf{inte} slår om, tvärtom mot \code{add}. Använd \code{subi} med negativ konstant för att
+räkna, inte för att testa carry.
+
+\subsection{Tvåkomplement: negativa tal}
+\label{c8:a5}
+En byte är bara åtta bitar. Om de betyder ett tal utan tecken, 0 till 255, eller ett tal med
+tecken, $-128$ till 127, bestämmer \textbf{programmet}, inte processorn. Samma bitar kan läsas på
+två sätt:
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{Bitar} & \thead{Hex} & \thead{Utan tecken} & \thead{Med tecken} \\
+  \midrule
+  \code{0000 0000} & 0x00 & 0 & 0 \\
+  \code{0000 0001} & 0x01 & 1 & 1 \\
+  \code{0111 1111} & 0x7F & 127 & 127 \\
+  \code{1000 0000} & 0x80 & 128 & $-128$ \\
+  \code{1111 1011} & 0xFB & 251 & $-5$ \\
+  \code{1111 1111} & 0xFF & 255 & $-1$ \\
+\end{narrowtable}
+
+\noindent Sättet att skriva negativa tal kallas \textbf{tvåkomplement}. Det har tre egenskaper som
+gör det till det alla processorer använder:
+\begin{itemize}
+  \item \textbf{Bit~7 är teckenbiten.} Är den 1 är talet negativt, när byten läses med tecken.
+  \item \textbf{$-x$ är $256 - x$.} $-1$ är 255, $-5$ är 251 och $-128$ är 128. Det är rundgången
+    igen: ett steg moturs från 0 är både 255 och $-1$.
+  \item \textbf{Addition och subtraktion fungerar likadant för båda tolkningarna.} \code{add}
+    behöver inte veta om talen har tecken: 0xFB + 0x07 = 0x02 är både $251 + 7 = 258 - 256 = 2$
+    och $-5 + 7 = 2$.
+\end{itemize}
+
+\subsubsection{Att bilda ett negativt tal}
+Så räknar du ut tvåkomplementet, det negativa talet, för hand: \textbf{invertera alla bitar och
+lägg till 1.}
+
+\begin{textdrawing}
+   5            =  0000 0101
+   invertera    =  1111 1010
+   lägg till 1  =  1111 1011  =  0xFB  =  -5
+\end{textdrawing}
+
+\noindent Instruktionen \textbf{\code{neg r16}} gör exakt detta: \code{r16 = 0 - r16}.
+
+Det är samma sak Windows miniräknare visar i läget Programmerare när den visar ett negativt tal som
+\code{FFFF FFFF FFFF FFFB}: det är $-5$ i tvåkomplement med 64 bitar i stället för 8.
+
+\subsection{Flaggorna}
+\label{c8:a6}
+Efter varje aritmetisk eller logisk instruktion skriver processorn in några fakta om resultatet i
+statusregistret \code{SREG}, en bit per faktum. Bitarna kallas \textbf{flaggor}.
+
+\bookfigure{avr_sreg}{Statusregistret SREG och dess flaggor.}{c8:fig:sreg}
+
+\begin{booktable}{@{}p{3.6em}p{5.6em}L@{}}
+  \thead{Flagga} & \thead{Namn} & \thead{Sätts till 1 när} \\
+  \midrule
+  \code{C} & carry & det blev en minnessiffra ut ur bit~7 vid addition, eller ett lån vid
+    subtraktion \\
+  \code{Z} & zero & resultatet blev noll \\
+  \code{N} & negative & bit~7 i resultatet är 1, alltså negativt om talet har tecken \\
+  \code{V} & overflow & resultatet blev fel \textbf{med tecken}: två positiva tal gav ett
+    negativt, eller tvärtom \\
+  \code{S} & sign & \code{N} xor \code{V}: det rätta tecknet, även när \code{V} säger att
+    resultatet slog om \\
+  \code{H} & half carry & det blev en minnessiffra ut ur bit~3; används sällan \\
+\end{booktable}
+
+\noindent De två sista bitarna, \code{I} och \code{T}, är inte resultatflaggor och används inte i
+boken.
+
+\textbf{\code{C} och \code{V} svarar på samma fråga för de två tolkningarna.} \code{C = 1} betyder
+att resultatet inte fick plats om talen är \textbf{utan} tecken. \code{V = 1} betyder att
+resultatet inte fick plats om talen är \textbf{med} tecken. Processorn vet inte vilken tolkning
+programmet använder, så den räknar ut båda, och programmet tittar på den flagga som passar.
+
+\textbf{Inte alla instruktioner ändrar alla flaggor.} \code{ldi}, \code{mov}, \code{out} och
+hoppen ändrar inga flaggor alls. \code{inc} och \code{dec} ändrar \code{Z}, \code{N}, \code{V} och
+\code{S}, men inte \code{C}. Vilka flaggor varje instruktion ändrar står i kolumnen \emph{Flaggor}
+på referensbladet i bilaga~\ref{app:avr}. Det är värt att titta där när ett program beter sig
+konstigt: en flagga som man trodde var satt kan ha skrivits över av instruktionen före.
+
+\subsection{Fyra genomarbetade exempel}
+\label{c8:a7}
+Programmet \code{flags_demo.asm} gör de fyra uträkningarna nedan. Stega det och jämför SREG i
+Processor Status efter varje uträkning.
+
+\asmfile{lectures/L08/examples/flags_demo.asm}
+
+\subsubsection{0x7F + 0x01 = 0x80}
+
+\begin{textdrawing}
+   0111 1111    127  eller  +127
+ + 0000 0001      1  eller    +1
+   ---------
+   1000 0000    128  eller  -128
+\end{textdrawing}
+
+\begin{itemize}
+  \item \code{C = 0}: ingen minnessiffra ut ur bit~7. Utan tecken är 128 rätt.
+  \item \code{Z = 0}: resultatet är inte noll.
+  \item \code{N = 1}: bit~7 är 1.
+  \item \code{V = 1}: två positiva tal gav ett negativt. Med tecken är svaret fel, $+127 + 1$ får
+    inte plats.
+  \item \code{S = N xor V = 0}: det rätta svaret, 128, är positivt.
+  \item \code{H = 1}: bit~3 + bit~3 gav en minnessiffra, 1111 + 0001 i den låga halvan.
+\end{itemize}
+
+\subsubsection{0xFF + 0x01 = 0x00}
+\begin{itemize}
+  \item \code{C = 1}: 255 + 1 = 256 får inte plats utan tecken.
+  \item \code{Z = 1}: resultatet är noll.
+  \item \code{N = 0}, \code{V = 0}: med tecken är det $-1 + 1 = 0$, vilket är rätt.
+  \item \code{S = 0}, \code{H = 1}.
+\end{itemize}
+
+\subsubsection{0x80 + 0x80 = 0x00}
+\begin{itemize}
+  \item \code{C = 1}: 128 + 128 = 256 får inte plats utan tecken.
+  \item \code{Z = 1}: resultatet är noll.
+  \item \code{V = 1}: med tecken är det $-128 + (-128) = -256$, som inte heller får plats. Två
+    negativa tal gav noll, och det är fel.
+  \item \code{N = 0}, \code{S = N xor V = 1}: det rätta svaret, $-256$, är negativt. \code{H = 0}.
+\end{itemize}
+
+\subsubsection{0x05 -- 0x07 = 0xFE}
+\begin{itemize}
+  \item \code{C = 1}: $5 - 7$ kräver ett lån. Utan tecken blir det 254.
+  \item \code{Z = 0}, \code{N = 1}: bit~7 är 1.
+  \item \code{V = 0}: med tecken är $5 - 7 = -2$, och 0xFE \textbf{är} $-2$. Svaret är rätt.
+  \item \code{S = 1}: resultatet är negativt. \code{H = 1}: den låga halvan, $5 - 7$, behövde
+    också låna.
+\end{itemize}
+
+Lägg märke till det sista exemplet: \code{C = 1} men \code{V = 0}. Utan tecken är svaret
+\enquote{fel} (det skulle ha varit $-2$, som inte finns bland talen 0--255), men med tecken är det
+rätt. Samma bitar, två tolkningar, två flaggor.

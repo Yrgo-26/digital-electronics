@@ -1,0 +1,54 @@
+% Section 10.4, from lectures/L10/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\needspace{12\baselineskip}
+\section{Sammanfattning}
+\label{c10:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Göra om ett värde 0--15 till sitt hexadecimala tecken och tillbaka, och en byte till två
+    tecken.
+  \item Skriva ett 16-bitars tal som två byte, och addera, subtrahera och jämföra 16-bitarstal med
+    \code{add}/\code{adc}, \code{sub}/\code{sbc} och \code{cpi}/\code{cpc}.
+  \item Räkna ut konstanterna för en fördröjning på en given tid, och kontrollera resultatet med
+    stoppuret i simulatorn.
+  \item Ställa in ett stift som ingång med pull-up, läsa det med \code{in} eller
+    \code{sbic}/\code{sbis}, och förklara varför en nedtryckt knapp läses som noll.
+  \item Skriva en subrutin, anropa den med \code{rcall}, och förklara vad som händer med stacken
+    och \code{SP} vid \code{rcall}, \code{push}, \code{pop} och \code{ret}.
+  \item Följa kursens regel: en subrutin sparar varje register den ändrar, och återställer dem i
+    omvänd ordning.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför behövs sju extra när värdet 12 ska bli tecknet \code{'C'}, men inte när 7 ska bli
+    \code{'7'}?
+  \item Ett 16-bitars resultat är exakt 256 för litet. Vilken instruktion har troligen bytts ut,
+    och mot vilken?
+  \item Varför fungerar \code{sbiw r24, 1} men inte \code{sbiw r20, 1}?
+  \item En knapp mot jord läses som 1 när den är släppt. Vad är det som håller stiftet högt?
+  \item \code{sbic PIND, 2} följt av \code{rjmp released}: vilket läge har knappen när
+    \code{rjmp} hoppas över?
+  \item \code{rcall} körs när \code{SP} är \code{0x08FF}. Var ligger returadressens två byte, och
+    vad är \code{SP} sedan?
+  \item En subrutin gör \code{push r16}, \code{push r17}, \code{pop r16}, \code{pop r17}. Vad
+    händer med registren?
+  \item Varför kan \code{delay_500ms} anropa \code{delay_ms} två gånger i rad utan att ladda om
+    \code{r24} emellan?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c11:ch} flyttar programmen från simulatorn till ett riktigt kort:
+\begin{itemize}
+  \item Styrobjekt i verkligheten: lysdioder, knappar som studsar, och ett relä som styr en lampa
+    på 24~V.
+  \item Programmet flyttas från simulatorn till ett riktigt Arduino Uno-kort.
+  \item Från flödesplan till program: ett trafikljus, steg för steg.
+  \item Labb~3 slutförs med slutuppgiften, trafikljuset och övergångsstället.
+\end{itemize}

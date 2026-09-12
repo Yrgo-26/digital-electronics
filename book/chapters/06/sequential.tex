@@ -1,0 +1,215 @@
+% Section 6.1, from lectures/L06/appendix/a_sequential_logic.md.
+
+\section{Sekvensnät och vippor}
+\label{c6:app:a}
+
+\subsection{Från kombinatoriskt till sekventiellt}
+\label{c6:a1}
+Alla nät hittills har varit \textbf{kombinatoriska}: utgången beror bara på ingångarnas värden just
+nu. Samma ingångar ger alltid samma utgång, och nätet har ingen aning om vad som hände för en
+sekund sedan. Bromsassistenten, majoritetskretsen och segmentavkodaren är alla sådana.
+
+Många verkliga uppgifter kräver mer. Ett transportband som startas med en knapp och stoppas med en
+annan måste \textbf{minnas} att startknappen har tryckts, även efter att den släppts. En räknare
+måste minnas hur långt den räknat. Ett trafikljus måste minnas vilken färg som lyser, för att veta
+vilken som kommer härnäst. En mikrodator måste minnas sitt program, sina variabler och vilken
+instruktion den är på.
+
+Ett nät som minns kallas ett \textbf{sekvensnät}: utgången beror på ingångarna \textbf{och} på vad
+som hänt tidigare, alltså på ett lagrat \textbf{tillstånd}. Det här avsnittet visar hur minne byggs
+av vanliga grindar, och vad som byggs av minnet: register, räknare och skiftregister. Det är de
+byggstenar som mikrodatorn i \secref{c6:app:b} består av.
+
+Sekvensnät ingår inte i kursplanens lärandemål för sin egen skull. De finns med för att
+mikrodatorn annars blir en svart låda: dess register, programräknare och minnen är vippor.
+
+\subsection{Minne genom återkoppling}
+\label{c6:a2}
+Du har redan byggt ett sekvensnät, i kapitel~\ref{c2:ch}: reläets \textbf{självhållning}
+(\secref{c2:b7}).
+
+\bookfigure[tbp]{l06_self_hold}{Självhållning med startknappen S1, stoppknappen S2 och reläet
+K1.}{c6:fig:self_hold}
+
+Tryck på start, \code{S1}, så får reläspolen \code{K1} ström och drar. Reläets egen kontakt
+\code{K1} sitter parallellt med \code{S1}, så när \code{S1} släpps går strömmen i stället genom
+\code{K1}:s kontakt, och reläet håller sig självt draget. Först när stopp, \code{S2}, trycks bryts
+strömmen, reläet släpper, och kretsen är tillbaka i utgångsläget.
+
+Samma knapptryckning, \code{S1} släppt och \code{S2} släppt, ger alltså olika resultat beroende på
+vad som hänt innan: lampan lyser om start senast trycktes, och är släckt om stopp senast trycktes.
+Kretsen minns.
+
+Nyckeln är \textbf{återkopplingen}: reläets utgång, kontakten, är kopplad tillbaka till dess egen
+ingång. Samma idé fungerar med grindar.
+
+\subsection{SR-låset}
+\label{c6:a3}
+Koppla två NOR-grindar så att varje grinds utgång matar den andra grindens ingång:
+
+\bookfigure{l06_sr_latch}{SR-lås av två korskopplade NOR-grindar.}{c6:fig:sr_latch}
+
+Det här är ett \textbf{SR-lås} (\emph{SR latch}), den enklaste minnescellen som finns. Den har två
+ingångar:
+\begin{itemize}
+  \item \textbf{S} (\emph{set}, ettställ): gör \code{Q = 1};
+  \item \textbf{R} (\emph{reset}, nollställ): gör \code{Q = 0}.
+\end{itemize}
+Utgången \code{Q'} är alltid inversen av \code{Q}, utom i ett fall (nedan).
+
+\begin{narrowtable}{@{}ccll@{}}
+  \thead{S} & \thead{R} & \thead{Q efteråt} & \thead{Betydelse} \\
+  \midrule
+  0 & 0 & samma som före & \textbf{minns} \\
+  1 & 0 & 1 & ettställ \\
+  0 & 1 & 0 & nollställ \\
+  1 & 1 & ogiltigt & båda utgångarna 0 \\
+\end{narrowtable}
+
+Följ signalerna en gång för att se varför det minns. Anta att \code{Q = 1}, så \code{Q' = 0}, och
+att \code{S = R = 0}. Den övre grinden får \code{R = 0} och \code{Q' = 0}, och en NOR av två nollor
+är 1: \code{Q} förblir 1. Den nedre grinden får \code{Q = 1} och \code{S = 0}, och en NOR med en
+etta in är 0: \code{Q'} förblir 0. Tillståndet håller sig självt, precis som reläet. Ett kort tryck
+på \code{R} gör \code{Q = 0}, och sedan håller sig det tillståndet lika bra.
+
+Jämför med självhållningen: \code{S1} är \textbf{S}, \code{S2} är \textbf{R}, och reläet är låset.
+Skillnaden är fallet \code{S = R = 1}. I reläkretsen vinner stopp, eftersom \code{S2} sitter i
+serie med allt; i NOR-låset blir båda utgångarna 0, och vad som händer när båda släpps samtidigt
+går inte att förutsäga. Därför är kombinationen förbjuden, och därför används SR-låset sällan
+direkt.
+
+Bygg låset i CircuitVerse (\url{https://circuitverse.org/simulator}) och prova: tryck \code{S},
+släpp, tryck \code{R}, släpp. Lägg märke till att utgången inte går att förutsäga från ingångarna
+ensamma. Du måste veta vad som hände innan.
+
+\subsection{D-låset}
+\label{c6:a4}
+\textbf{D-låset} tar bort den förbjudna kombinationen. I stället för \code{S} och \code{R} har det
+en dataingång \code{D}, värdet som ska lagras, och en ingång \code{en} (\emph{enable}) som
+bestämmer när låset lyssnar:
+
+\bookfigure{l06_d_latch}{D-lås: en inverterare och två AND-grindar framför ett
+SR-lås.}{c6:fig:d_latch}
+
+De två AND-grindarna gör \code{S = D · en} och \code{R = D' · en}. När \code{en = 0} är både
+\code{S} och \code{R} noll, och låset minns. När \code{en = 1} blir antingen \code{S} eller
+\code{R} en etta, beroende på \code{D}, men aldrig båda.
+
+\begin{narrowtable}{@{}cl@{}}
+  \thead{en} & \thead{Beteende} \\
+  \midrule
+  1 & \textbf{genomsläppligt}: \code{Q} följer \code{D} direkt \\
+  0 & \textbf{låst}: \code{Q} behåller det värde det hade när \code{en} gick till 0 \\
+\end{narrowtable}
+
+D-låset är \textbf{nivåkänsligt}: det släpper igenom allt som händer på \code{D} så länge
+\code{en} är 1. Det är också dess svaghet. En störning på \code{D} medan \code{en = 1} går rakt
+igenom till \code{Q}, och i ett system med tusentals minnesceller är det svårt att garantera att
+varje \code{D} är stabilt under hela den tid \code{en} är 1.
+
+\subsection{D-vippan och klockan}
+\label{c6:a5}
+\textbf{D-vippan} (\emph{D flip-flop}) löser problemet. Den lagrar också en bit, men den läser
+\code{D} bara i ett enda \textbf{ögonblick}: när en \textbf{klocksignal} går från 0 till 1, den
+\textbf{stigande flanken}. Resten av tiden, oavsett vad \code{D} gör, behåller \code{Q} sitt
+värde.
+
+Invändigt är en D-vippa två D-lås i rad, där det ena är öppet när klockan är låg och det andra när
+den är hög. Nettoeffekten är att bara värdet i själva ögonblicket när klockan stiger kommer
+igenom.
+
+Kör ett lås och en vippa med samma klocka och samma \code{D}, så syns skillnaden:
+
+\bookfigure[tbp]{l06_latch_vs_flipflop}{Ett D-lås och en D-vippa med samma klocka och samma
+\code{D}.}{c6:fig:latch_vs_flipflop}
+
+Låset ändrar sig flera gånger, varje gång \code{D} ändras medan klockan är hög. Vippan ändrar sig
+bara vid de stigande flankerna, och bara om \code{D} då har ett annat värde än det \code{Q} redan
+har. En störning mellan två flanker syns inte alls:
+
+\bookfigure{l06_dff_timing}{En kort störning på \code{D} mellan två stigande
+flanker.}{c6:fig:dff_timing}
+
+\textbf{Klockan} är en fyrkantvåg som alla vippor i ett system delar. Två tal beskriver den:
+\textbf{perioden} \code{T}, tiden för en hel svängning, och \textbf{frekvensen} \code{f = 1/T}. En
+Arduino Uno har en klocka på \textbf{16~MHz}, sexton miljoner svängningar i sekunden, så perioden
+är
+\[
+  T = \frac{1}{16\,000\,000\ \text{Hz}} = 62{,}5\ \text{ns}
+\]
+
+Varje vippa i mikrodatorn uppdateras vid samma flank. Det gör att allt i datorn tar ett steg i
+taget, i takt, och det är därför det går att säga att en instruktion tar ett bestämt, helt antal
+\textbf{klockcykler}. Det talet kommer tillbaka i kapitel~\ref{c9:ch}, där tidsfördröjningar
+räknas ut i klockcykler.
+
+I scheman ritas en D-vippa som en ruta med ingången \code{D}, utgången \code{Q} och en liten
+triangel vid klockingången. Triangeln betyder \enquote{flanktriggad}.
+
+\subsection{Register}
+\label{c6:a6}
+En vippa lagrar en bit. Ett \textbf{register} lagrar flera: det är N vippor sida vid sida, som delar
+samma klocka.
+
+\bookfigure[tbp]{l06_register}{Ett 4-bitars register av fyra D-vippor med gemensam
+klocka.}{c6:fig:register}
+
+Vid varje stigande flank kopieras alla ingångarna \code{D3}--\code{D0} till utgångarna
+\code{Q3}--\code{Q0} samtidigt, och resten av tiden håller registret sitt värde.
+
+Mikrodatorn i resten av boken är full av register. De 32 \textbf{arbetsregistren}
+\code{r0}--\code{r31}, där programmet räknar, är 8-bitars register: åtta vippor vardera.
+\textbf{Statusregistret} \code{SREG}, där räkneenheten sparar sina flaggor, är ett register. Och
+\textbf{utporten} \code{PORTB}, som tänder lysdioderna i Labb~3, är ett register vars utgångar är
+kopplade direkt till kretsens stift: skriv en etta i en bit, så blir stiftet 5~V.
+
+\subsection{Räknare}
+\label{c6:a7}
+Koppla en vippa så att den \textbf{växlar} vid varje flank: \code{D} får inversen av \code{Q}. Då
+blir \code{Q} en fyrkantvåg med halva klockans frekvens. Kedja flera sådana, så att varje vippa
+växlar när den föregående går från 1 till 0, så får du en \textbf{räknare}:
+
+\bookfigure{l06_counter_timing}{Tidsdiagram för en 3-bitars räknare.}{c6:fig:counter_timing}
+
+Läs \code{Q2 Q1 Q0} som ett binärt tal efter varje flank: 001, 010, 011, 100 och så vidare upp till
+111, och sedan 000 igen. Tre vippor räknar till 7; \code{n} vippor räknar från 0 till
+\code{2^n - 1} och börjar sedan om. Att räknaren slår om från 111 till 000 är ingen särskild logik;
+det är vad som händer när den fjärde biten inte finns. Samma sak kallas \textbf{rundgång} i
+kapitel~\ref{c8:ch}, när ett 8-bitars register räknar förbi 255.
+
+Två saker att lägga märke till:
+\begin{itemize}
+  \item \textbf{Varje bit har halva frekvensen av biten före.} \code{Q0} växlar vid varje flank,
+    \code{Q1} vid varannan, \code{Q2} vid var fjärde. En räknare är alltså också en
+    frekvensdelare.
+  \item \textbf{Mikrodatorns programräknare är en räknare.} Den håller adressen till nästa
+    instruktion och räknar upp ett steg för varje instruktion som hämtas (\secref{c6:app:b}).
+\end{itemize}
+
+\subsection{Skiftregister}
+\label{c6:a8}
+Koppla vipporna i en kedja, så att varje vippas \code{Q} matar nästa vippas \code{D}:
+
+\bookfigure{l06_shift_register}{Ett 4-bitars skiftregister: fyra D-vippor i
+kedja.}{c6:fig:shift_register}
+
+Vid varje flank tar varje vippa över värdet från vippan före, och den första tar in en ny bit.
+Innehållet \textbf{flyttas}, skiftas, ett steg per klockflank. Det kallas ett
+\textbf{skiftregister}.
+
+\begin{narrowtable}{@{}cccccc@{}}
+  \thead{Efter flank} & \thead{\code{in}} & \thead{Q0} & \thead{Q1} & \thead{Q2} & \thead{Q3} \\
+  \midrule
+  start & & 0 & 0 & 0 & 0 \\
+  1 & 1 & 1 & 0 & 0 & 0 \\
+  2 & 0 & 0 & 1 & 0 & 0 \\
+  3 & 0 & 0 & 0 & 1 & 0 \\
+  4 & 0 & 0 & 0 & 0 & 1 \\
+\end{narrowtable}
+
+En enda etta vandrar genom registret, som ett rinnande ljus. Skiftregister används för att skicka
+data en bit i taget över en ledning (seriell överföring), och de har en direkt motsvarighet i
+mikrodatorn: instruktionen \code{lsl} flyttar alla bitar i ett register ett steg åt vänster, vilket
+är samma sak som att multiplicera med 2. Den kommer i kapitel~\ref{c8:ch}. Att figuren flyttar åt
+höger är bara ritsättet: skrivs innehållet som ett binärt tal, \code{Q3 Q2 Q1 Q0}, flyttas varje bit
+till en mer signifikant plats, alltså åt vänster i talet, precis som med \code{lsl}.

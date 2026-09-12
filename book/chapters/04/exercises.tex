@@ -1,0 +1,220 @@
+% Section 4.4, from lectures/L04/appendix/c_exercises.md.
+%
+% Exercise 4 was titled "Över kanten", but with the course's layout (AB down, C across) its two
+% groups, 0-2 and 5-7, are neighbours in the middle of the map and neither crosses an edge; it is
+% "Från mintermer" here and now in the source too. Exercise 12 c), whose bold title runs into its
+% sentence in the source, is a titled part here, with its sentence completed ("Bygg dem ...").
+
+\section{Övningar}
+\label{c4:sec:exercises}\label{c4:app:c}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Varje uttryck du tar fram med ett Karnaughdiagram kan du
+kontrollera på två sätt, och du ska göra minst ett av dem varje gång: sätt in varje rad i
+sanningstabellen i ditt uttryck och se att det ger rätt utgång, eller bygg nätet i CircuitVerse och
+gå igenom alla kombinationer av ingångarna. Ett uttryck som inte är kontrollerat är en gissning.
+
+Lösningsförslagen finns i bilaga~\ref{app:answers}. Gör varje övning innan du läser lösningen. Där
+det finns ett vanligt felsvar visar lösningen det också, och varför det är fel.
+
+Varje övning är märkt med sin sort. Kontrolluppgiften är övning~\ref{c4:ex:12}.
+\end{aside}
+
+\exercise{Graykod och grannar}{Förståelse}
+\label{c4:ex:1}
+\begin{parts}
+  \item Varför skrivs rubrikerna i ett Karnaughdiagram i ordningen \code{00, 01, 11, 10} och inte
+    \code{00, 01, 10, 11}? Svara med en mening om vad två grannrutor måste ha gemensamt.
+  \item I ett diagram med fyra ingångar, \code{ABCD}: vilka fyra rutor är grannar till ruta 5
+    (\code{ABCD = 0101})? Ange dem som mintermnummer. Använd figuren med rutornas nummer i
+    \secref{c4:a2} (figur~\ref{c4:fig:layout4}) om du vill, men kontrollera svaret genom att se att
+    varje granne skiljer sig från 0101 i exakt en bit.
+  \item Samma fråga för ruta 0. Två av grannarna ligger på andra sidan en kant. Vilka?
+  \item Varför får en grupp inte bestå av tre rutor, ens när tre ettor ligger på rad?
+\end{parts}
+
+\exercise{Två ingångar}{Räkna för hand}
+\label{c4:ex:2}
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{A} & \thead{B} & \thead{X} \\
+  \midrule
+  0 & 0 & 0 \\
+  0 & 1 & 1 \\
+  1 & 0 & 0 \\
+  1 & 1 & 1 \\
+\end{narrowtable}
+\begin{parts}
+  \item Rita Karnaughdiagrammet och ringa in grupperna.
+  \item Läs av det minimerade uttrycket. Vad säger det om ingången \code{A}?
+  \item Läs av uttrycket direkt ur tabellen, som i \secref{c2:a6}, och förenkla det algebraiskt. Får
+    du samma svar?
+\end{parts}
+
+\exercise{Tre ingångar}{Räkna för hand}
+\label{c4:ex:3}
+\begin{narrowtable}{@{}cc@{}}
+  \thead{ABC} & \thead{X} \\
+  \midrule
+  000 & 1 \\
+  001 & 1 \\
+  010 & 0 \\
+  011 & 0 \\
+  100 & 1 \\
+  101 & 1 \\
+  110 & 0 \\
+  111 & 0 \\
+\end{narrowtable}
+\begin{parts}
+  \item Fyll i diagrammet. Två av raderna med ettor ligger inte bredvid varandra på papperet. Är de
+    grannar ändå?
+  \item Ringa in och läs av det minimerade uttrycket.
+  \item Hur många grindar behövs för det minimerade nätet, och hur många hade den direkta
+    avläsningen ur tabellen krävt?
+\end{parts}
+
+\exercise{Från mintermer}{Räkna för hand}
+\label{c4:ex:4}
+\code{X} har tre ingångar \code{A}, \code{B}, \code{C} och är \code{1} för mintermerna 0, 2, 5
+och 7.
+\begin{parts}
+  \item Skriv sanningstabellen, och fyll i diagrammet.
+  \item Ringa in och läs av det minimerade uttrycket.
+  \item Uttrycket beror bara på två av ingångarna. Vilken grind från kapitel~\ref{c2:ch} beräknar
+    det med en enda grind?
+\end{parts}
+
+\exercise{Två utgångar}{Räkna för hand}
+\label{c4:ex:5}
+En krets har fyra ingångar \code{ABCD} och två utgångar \code{X} och \code{Y}:
+
+\begin{narrowtable}{@{}cc@{\hspace{3em}}cc@{}}
+  \thead{ABCD} & \thead{XY} & \thead{ABCD} & \thead{XY} \\
+  \midrule
+  0000 & 01 & 1000 & 11 \\
+  0001 & 00 & 1001 & 10 \\
+  0010 & 00 & 1010 & 10 \\
+  0011 & 01 & 1011 & 11 \\
+  0100 & 11 & 1100 & 01 \\
+  0101 & 10 & 1101 & 00 \\
+  0110 & 10 & 1110 & 00 \\
+  0111 & 11 & 1111 & 01 \\
+\end{narrowtable}
+\begin{parts}
+  \item Rita ett diagram för \code{X} och ett för \code{Y}, och läs av båda uttrycken.
+  \item Två av ingångarna påverkar inte \code{X} alls, och två andra påverkar inte \code{Y}.
+    Vilka? Hur syns det i diagrammen?
+  \item Båda uttrycken kan skrivas med en enda grind var. Vilka grindar?
+\end{parts}
+
+\exercise{Hörnen}{Räkna för hand}
+\label{c4:ex:6}
+\code{X} har fyra ingångar och är \code{1} för mintermerna 0, 2, 8, 10 och 15.
+\begin{parts}
+  \item Fyll i diagrammet, ringa in och läs av.
+  \item Minterm 15 får ingen granne att gå ihop med. Är det ett fel i din gruppering? Motivera.
+\end{parts}
+
+\exercise{Segment e i en sifferdisplay}{Räkna för hand}
+\label{c4:ex:7}
+En 7-segmentsdisplay visar en BCD-siffra 0--9 som kommer in på fyra ledningar \code{ABCD}
+(\secref{c1:b5}). Segment \textbf{e}, det nedre vänstra, ska lysa för siffrorna 0, 2, 6 och 8, och
+vara släckt för 1, 3, 4, 5, 7 och 9. Kombinationerna 10--15 förekommer aldrig.
+\begin{parts}
+  \item Fyll i diagrammet med ettor, och med X för 10--15.
+  \item Ringa in och läs av ett minimerat uttryck för \code{e}. Använd X-rutorna där de gör
+    grupperna större.
+  \item Kontrollera ditt uttryck för alla tio siffrorna.
+  \item Vad visar segment e om kretsen ändå får \code{1010} på ingången? Är det ett problem?
+\end{parts}
+
+\exercise{Fläkten}{Konstruktion}
+\label{c4:ex:8}
+En ventilationsfläkt \code{F} styrs av fyra signaler:
+\begin{itemize}
+  \item \code{T}: temperaturen är hög;
+  \item \code{W}: fönstret är öppet;
+  \item \code{C}: koldioxidhalten är hög;
+  \item \code{B}: brandlarmet har löst ut.
+\end{itemize}
+Fläkten ska gå om temperaturen är hög och fönstret är stängt, eller om koldioxidhalten är hög. Men
+när brandlarmet har löst ut ska fläkten \textbf{aldrig} gå, eftersom den då skulle mata elden med
+luft.
+\begin{parts}
+  \item Skriv sanningstabellen, med ingångarna i ordningen \code{T W C B}.
+  \item Fyll i Karnaughdiagrammet, med \code{TW} nedåt och \code{CB} åt sidan, och läs av ett
+    minimerat uttryck.
+  \item Rita grindnätet.
+  \item Gör en grindtilldelning (\secref{c4:b7}): vilka kretsar ur 74HC08, 74HC32 och 74HC04
+    behövs, och hur många av varje?
+\end{parts}
+
+\exercise{Enbart NAND}{Konstruktion}
+\label{c4:ex:9}
+\code{X = AB' + C}.
+\begin{parts}
+  \item Rita nätet med AND, OR och NOT.
+  \item Gör om det till enbart NAND-grindar, enligt \secref{c4:a9}. Glöm inte inverteringen av
+    \code{B}, och ingången \code{C} som går direkt till OR-grinden.
+  \item Kontrollera med De Morgan att ditt NAND-uttryck är lika med \code{AB' + C}.
+  \item Hur många NAND-grindar behövs, och hur många 74HC00?
+\end{parts}
+
+\exercise{Enbart NOR}{Konstruktion}
+\label{c4:ex:10}
+\code{X = (A + B)C}.
+\begin{parts}
+  \item Vilken form är uttrycket på, SP eller PS?
+  \item Gör om det till enbart NOR-grindar. Rita nätet.
+  \item Kontrollera ditt nät för alla åtta kombinationerna av \code{A}, \code{B} och \code{C}.
+\end{parts}
+
+\exercise{Kretsar och ben}{Förståelse}
+\label{c4:ex:11}
+Använd benplaceringarna i \secref{c4:b2}.
+\begin{parts}
+  \item Vilka ben har grind 3 i en 74HC00: ingångarna och utgången? Samma fråga för en 74HC02.
+  \item Ett nät behöver sex AND-grindar och en inverterare. Hur många kretsar av vilka sorter?
+  \item En grön lysdiod har spänningsfallet 2,1~V och ska drivas med ungefär 5~mA från en utgång
+    på 5~V. Räkna ut förkopplingsmotståndet och välj ett standardvärde ur E12-serien (\dots, 330,
+    390, 470, 560, 680, 820, 1000~Ω). Vilken ström blir det?
+  \item En labbkamrat har lämnat ingångarna på de oanvända grindarna okopplade, och säger att det
+    fungerar. Förklara varför det ändå är fel, och vad som kan hända.
+\end{parts}
+
+\exercise{Kontroll: minimerat och ominimerat nät}{Kontroll}
+\label{c4:ex:12}
+\emph{Räkna för hand, bygg och jämför, förklara.}
+
+\code{X} har fyra ingångar och är \code{1} för mintermerna 1, 3, 5, 7, 9 och 11.
+
+\task{a) För hand}
+Skriv den direkta avläsningen ur tabellen: sex AND-termer med fyra ingångar var. Minimera sedan
+med ett Karnaughdiagram.
+
+\task{b) Förutsäg}
+Hur många grindar och hur många kretsar behövs för vart och ett av de två uttrycken? Skriv ned
+siffrorna innan du bygger något.
+
+\task{c) Bygg båda i CircuitVerse}
+Bygg dem med samma fyra ingångar, och varsin utgång. Gå igenom alla sexton kombinationerna och
+anteckna båda utgångarna.
+
+\task{d) Jämför}
+Utgångarna ska vara lika på varje rad. Om de skiljer sig på någon rad: vilken rad, och vad säger
+det om vilket av uttrycken som är fel?
+
+\task{e)}
+Det minimerade uttrycket kan skrivas \code{D(A' + B')}, och \code{A' + B'} är enligt De Morgan
+\code{(AB)'}. Hur få grindar och kretsar klarar du dig med då? Jämför med ditt svar på b).
+
+\exercise{Multiplexern}{Konstruktion, Fördjupning}
+\label{c4:ex:13}
+En \textbf{multiplexer} väljer vilken av två signaler som ska släppas fram. Den har två dataingångar
+\code{A} och \code{B}, en väljare \code{S} och en utgång \code{X}: när \code{S = 0} ska
+\code{X = B}, och när \code{S = 1} ska \code{X = A}.
+\begin{parts}
+  \item Skriv sanningstabellen med ingångarna i ordningen \code{S A B}.
+  \item Minimera med ett Karnaughdiagram, med \code{SA} nedåt och \code{B} åt sidan.
+  \item Rita nätet, och förklara med egna ord varför högst en av de två AND-termerna kan vara 1 åt
+    gången.
+\end{parts}

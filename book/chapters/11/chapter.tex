@@ -1,0 +1,49 @@
+% Chapter 11, typeset from lectures/L11: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix D, the
+% solutions, is in back/answers/c11.tex. The chapter goes with the final task of Labb 3 in bilaga
+% \ref{app:lab3}, and with the part of bilaga \ref{app:studio} that programs the board; the lab's
+% parts are linked with \hyperref, so the text reads "del A" whatever the label prints. The two
+% predictions from the lecture plan are kept in the opening paragraphs; the README's pointers to
+% the course's grading rules are left out.
+
+\chapter{Styrobjekt på riktig hårdvara}
+\label{c11:ch}
+
+{\large\itshape Från rutor i simulatorn till lysdioder, knappar och reläer på ett riktigt
+kort.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Styrobjekt: ingångar, beslut och utgångar, och varför mikrodatorn har tagit över efter
+    reläer.
+  \item Lysdioden och förkopplingsmotståndet, räknat med Ohms lag.
+  \item Större laster: en transistor som drar ett relä, som tänder lampan på 24~V från Labb~1.
+  \item Knappar som studsar, och avstudsning med en kort väntan.
+  \item Arduino Uno-kortet, och hur programmet förs över från Microchip Studio.
+  \item Från flödesplan till program: vägarbetsljuset som genomarbetat exempel.
+  \item \textbf{Labb~3} slutförs: slutuppgiften, trafikljuset och övergångsstället, på kortet.
+\end{itemize}
+\end{chapterbox}
+
+Hittills har programmen körts i simulatorn, där en utgång är en ruta i ett fönster. Det här
+kapitlet flyttar dem till ett riktigt Arduino Uno-kort, med riktiga lysdioder, knappar och reläer,
+och visar vad som tillkommer då: strömmar som måste begränsas, knappar som studsar och kopplingar
+som kan vara fel. Sedan går det, i ett genomarbetat exempel, från en tillståndstabell via en
+flödesplan till ett färdigt program, med samma metod som Labb~3:s slutuppgift använder.
+
+Kapitlet förutsätter att Labb~3 är klar till och med \hyperref[lab3:d22]{del~22}: slutuppgiften
+bygger på subrutiner. Läs \secref{c11:app:a} och \secref{c11:app:b} innan du börjar på
+slutuppgiften i bilaga~\ref{app:lab3}, och rita flödesplanen för dess \hyperref[lab3:a]{del~A}
+innan du skriver programmet; den ska redovisas först. Installera Arduino IDE och gör inställningen
+i \secref{studio:5} i bilaga~\ref{app:studio} innan du ska programmera kortet, så går labbtiden till
+att programmera och inte till att installera. Övningarna i \secref{c11:sec:exercises} kontrollerar
+du mot bilaga~\ref{app:answers}.
+
+Gör två förutsägelser innan något körs: hur stor strömmen genom en röd lysdiod med 220~Ω blir, och
+vad multimetern kommer att visa; och hur många tryck \code{press_counter.asm} räknar för fem tryck
+när väntan är borttagen.
+
+\input{chapters/11/control}
+\input{chapters/11/traffic}
+\input{chapters/11/summary}
+\input{chapters/11/exercises}

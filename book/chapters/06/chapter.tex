@@ -1,0 +1,40 @@
+% Chapter 6, typeset from lectures/L06: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix D, the
+% solutions, is in back/answers/c06.tex.
+
+\chapter{Sekvensnät, vippor och mikrodatorns uppbyggnad}
+\label{c6:ch}
+
+{\large\itshape Hur grindar som minns blir register och räknare, och till sist en hel dator.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Kretsar som minns: från reläets självhållning till SR-låset av två NOR-grindar.
+  \item D-låset och D-vippan: nivåkänsligt mot flanktriggat, och vad klockan gör.
+  \item Register, räknare och skiftregister, byggda av vippor.
+  \item Mikrodatorns blockschema: CPU, register, ALU, styrenhet, programräknare, minnen, bussar,
+    portar och klocka.
+  \item Instruktionscykeln: hämta, avkoda, utför, sexton miljoner gånger i sekunden.
+  \item ATmega328P på ett Arduino Uno-kort: mikrodatorn resten av boken handlar om.
+\end{itemize}
+\end{chapterbox}
+
+Alla nät hittills i boken har varit kombinatoriska: samma ingångar ger alltid samma utgång. Det
+här kapitlet visar hur ett nät kan minnas, och hur minnet byggs ut till register, räknare och
+skiftregister. Av de byggstenarna, och av de kombinatoriska näten från de tidigare kapitlen, sätts
+sedan en hel mikrodator ihop: den ATmega328P som resten av boken handlar om.
+
+Repetera självhållningen i \secref{c2:b7} innan du börjar, och läs sedan \secref{c6:app:a} om
+sekvensnät och vippor. \Secref{c6:app:b} går igenom mikrodatorns uppbyggnad block för block.
+Blockschemat där är ett lärandemål i kursplanen och kommer på provet, så öva på att rita det och
+att förklara vad varje block gör. Övningarna finns i \secref{c6:sec:exercises}, och deras
+lösningsförslag i bilaga~\ref{app:answers}.
+
+Från och med nästa kapitel programmeras mikrodatorn i Microchip Studio. \textbf{Installera
+programmet redan nu}, enligt \secref{studio:1} i bilaga~\ref{app:studio}: installationen tar tid
+och ska vara klar när du börjar på kapitel~\ref{c7:ch}.
+
+\input{chapters/06/sequential}
+\input{chapters/06/microcomputer}
+\input{chapters/06/summary}
+\input{chapters/06/exercises}

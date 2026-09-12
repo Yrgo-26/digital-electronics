@@ -1,0 +1,53 @@
+% Section 8.4, from lectures/L08/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture. The closing paragraph is from the README's reference list.
+
+\needspace{10\baselineskip}
+\section{Sammanfattning}
+\label{c8:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Addera och subtrahera binärt för hand, och säga vad ett register och \code{C} innehåller
+    efteråt.
+  \item Förklara aritmetisk rundgång, och varför \code{inc} och \code{dec} inte ändrar \code{C}.
+  \item Omvandla mellan ett negativt tal och dess tvåkomplement, och läsa samma byte med och utan
+    tecken.
+  \item Förutsäga \code{C}, \code{Z}, \code{N} och \code{V} efter en addition eller subtraktion,
+    och förklara skillnaden mellan \code{C} och \code{V}.
+  \item Välja mask och instruktion för att ettställa, nollställa, invertera eller testa enskilda
+    bitar.
+  \item Använda skift för att multiplicera och dividera med 2, och förklara skillnaden mellan
+    \code{lsr} och \code{asr}.
+  \item Göra en port till utport, och tända och släcka enskilda stift med \code{out}, \code{sbi}
+    och \code{cbi}.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item \code{r16} är 255 och \code{C} är 0. Vad är \code{r16} och \code{C} efter \code{inc r16}?
+    Och efter \code{add r16, r17} med \code{r17}~=~1?
+  \item Varför finns det ingen \code{addi}, och hur adderar man 5 till \code{r16} ändå?
+  \item Byten \code{0xF6}: vilket tal är den utan tecken, och vilket med tecken?
+  \item \code{0x80 - 0x01} ger \code{C = 0} men \code{V = 1}. Vad säger det om svaret, utan tecken
+    och med tecken?
+  \item Vilken instruktion och mask nollställer bit~7 i \code{r16} utan att röra de andra bitarna?
+  \item Varför är ett av nio steg mörkt i det rinnande ljuset med \code{rol}?
+  \item \code{out PORTB, r16} och \code{sbi PORTB, 3}: vad skiljer dem åt, när det gäller de andra
+    sju stiften?
+\end{enumerate}
+
+Referensbladet i bilaga~\ref{app:avr} visar vilka flaggor varje instruktion ändrar.
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c9:ch} handlar om programflöde, loopar och tidsfördröjningar:
+\begin{itemize}
+  \item Flödesplaner: att rita ett program innan det skrivs.
+  \item Jämförelser och villkorliga hopp: det flaggorna är till för.
+  \item Loopar som går ett bestämt antal varv.
+  \item Tidsfördröjningar, beräknade exakt från klockcykler och kontrollerade med simulatorns
+    stoppur.
+\end{itemize}

@@ -1,0 +1,199 @@
+% Preface: the README's introduction, Om kursen and Efter kursen; the prerequisites, software,
+% hardware and references from info/README.md; how a lecture is laid out and the kinds of
+% exercise from lectures/README.md; and how a lab is done, with its safety rules, from
+% labs/README.md. The course's schedule, dates and class are left out on purpose: the book is
+% meant to outlive any one run of the course.
+
+\chapter{Förord}
+\markboth{Förord}{Förord}
+
+Den här boken tar dig från ettor och nollor till en mikrodator som styr något i verkligheten.
+Först talsystem, logiska grindar och boolesk algebra, byggda både med strömkontakter på 24~V och
+med IC-kretsar på kopplingsdäck. Sedan vippan, den byggsten som ger en krets minne, och därifrån
+mikrodatorn: en ATmega328P som programmeras i assembler, först i simulatorn och till sist på ett
+riktigt kort där den styr lysdioder och läser av en knapp.
+
+Bokens text är på svenska. All kod och alla kommentarer i koden är på engelska, vilket är det du
+kommer att möta i datablad, instruktionslistor och på nätet.
+
+\section*{Bokens tre delar}
+\paragraph{Del 1: Digitala kombinatoriska nät, kapitel 1--5} Binära, hexadecimala och decimala tal
+och omvandling mellan dem. Logiska grindar, sanningstabeller och boolesk algebra, och hur ett
+uttryck förenklas, algebraiskt och med Karnaughdiagram. Samma logik realiseras på två sätt: med
+tryckknappar och en lampa på 24~V i \textbf{Labb~1}, och med IC-kretsar ur 74-serien på
+kopplingsdäck i \textbf{Labb~2}.
+
+\paragraph{Del 2: Från vippa till mikrodator, kapitel 6} Sekvensnät och vippor: hur en krets kan
+minnas. Register, räknare och minne är vippor, och mikrodatorn är register och minne kring en
+aritmetisk enhet, byggd av de grindar del~1 handlade om. Kapitlet slutar i mikrodatorns
+blockschema.
+
+\paragraph{Del 3: Mikrodatorn och assemblerprogrammering, kapitel 7--11} ATmega328P programmeras i
+assembler i Microchip Studio: talformat, aritmetik och flaggor, logiska operationer, villkorliga
+hopp, loopar och tidsfördröjningar, in- och utportar, subrutiner och stacken. \textbf{Labb~3} löper
+genom alla fem kapitlen, och avslutas med ett styrobjekt, ett trafikljus, som körs på ett Arduino
+Uno-kort.
+
+\paragraph{Repetition, kapitel 12} Hela kursen i sammandrag, med de vanligaste felen och övningar
+i provets form, inför det skriftliga provet.
+
+\section*{Det här ska du kunna efteråt}
+När du har arbetat dig igenom boken ska du kunna:
+\begin{itemize}
+  \item Förklara grindar och logiska funktioner, och beskriva logisk algebra och förenkling av
+    booleska uttryck.
+  \item Beskriva det binära, det hexadecimala och det decimala talsystemet, och omvandla tal
+    mellan dem.
+  \item Syntetisera ett digitalt kombinatoriskt nät, med IC-kretsar och med kontakter, och använda
+    Karnaughdiagram för att analysera och minimera det.
+  \item Analysera ett digitalt kombinatoriskt nät: från krets till uttryck till sanningstabell.
+  \item Redogöra för mikrodatorns uppbyggnad på blockschemanivå.
+  \item Använda assemblerspråk för att programmera en mikrodator, och programmera den att styra ett
+    styrobjekt.
+\end{itemize}
+
+\section*{Vad du behöver kunna innan}
+Inga förkunskaper i elektronik eller programmering förutsätts. Det räcker med matematik på
+gymnasienivå: potenser, och de fyra räknesätten utan miniräknare.
+
+Kursen boken är skriven för går snabbt. Tolv pass om tre timmar rymmer fyra ämnen som var och ett
+skulle kunna fylla en egen kurs, så \textbf{varje kapitel förutsätter att det föregående är läst
+och att dess övningar är gjorda.}
+
+\section*{Hur boken är upplagd}
+Boken är satt från en kurs med tolv pass om tre timmar, och varje kapitel är ett pass. Kapitlets
+avsnitt är passets appendix, i samma ordning och med samma underavsnitt, så att ett kapitel här
+och ett pass i kursmaterialet kan läsas sida vid sida:
+
+\begin{booktable}{@{}p{5.2em}p{3.4em}L@{}}
+  \thead{Kapitel} & \thead{Pass} & \thead{Ämne} \\
+  \midrule
+  1 & \file{L01} & Talsystem och binära koder \\
+  2 & \file{L02} & Logiska grindar, boolesk algebra och kontaktnät \\
+  3 & \file{L03} & Analys och felsökning av kontaktnät, med \textbf{Labb~1} \\
+  4 & \file{L04} & Karnaughdiagram och IC-kretsar \\
+  5 & \file{L05} & Felsökning av grindnät, med \textbf{Labb~2} \\
+  6 & \file{L06} & Sekvensnät, vippor och mikrodatorns uppbyggnad \\
+  7 & \file{L07} & Mikrodatorn och Microchip Studio; \textbf{Labb~3} börjar \\
+  8 & \file{L08} & Aritmetik, logik och flaggor \\
+  9 & \file{L09} & Programflöde, loopar och tidsfördröjningar \\
+  10 & \file{L10} & Inporten, subrutiner och stacken \\
+  11 & \file{L11} & Styrobjekt på riktig hårdvara; \textbf{Labb~3} slutförs \\
+  12 & \file{L12} & Repetition inför det skriftliga provet \\
+\end{booktable}
+
+Varje kapitel börjar med vad det innehåller, arbetar sig igenom materialet, sammanfattar vad du
+nu ska kunna förklara, och slutar med sina övningar. Bilagorna håller det som används vid sidan
+av kapitlen: de tre laborationshandledningarna, en guide till Microchip Studio, referensbladet med
+AVR-instruktionerna, en beskrivning av det skriftliga provet med ett övningsprov och dess
+lösningsförslag, och sist lösningsförslagen till övningarna.
+
+\section*{Övningarnas sorter}
+Varje övning är märkt med sin sort:
+
+\begin{booktable}{@{}p{9em}L@{}}
+  \thead{Sort} & \thead{Vad den ber dig göra} \\
+  \midrule
+  \kinds{Förståelse} & Förklara något från kapitlet med egna ord. Inga verktyg. \\
+  \kinds{Räkna för hand} & Räkna ut något på papper: en omvandling, en förenkling, en
+    cykelräkning. \\
+  \kinds{Konstruktion} & Ta fram en lösning: ett grindnät, ett kontaktnät, en flödesplan. \\
+  \kinds{Program} & Skriv assembler, och kör det i simulatorn. \\
+  \kinds{Kontroll} & En per kapitel. Se nedan. \\
+  \kinds{Fördjupning} & En övning för den som vill gå längre. Den kan hoppas över. \\
+\end{booktable}
+
+\textbf{Kontrolluppgiften är kursens signaturövning.} Du räknar ut ett svar för hand, du
+kontrollerar det med ett verktyg, i CircuitVerse, i simulatorn eller på labbstationen, och du
+förklarar varför de två stämmer, eller varför de inte gör det. Att förutsäga ett beteende och
+sedan kontrollera det är den färdighet resten av kursen vilar på.
+
+\section*{Lösningsförslagen}
+\textbf{Lösningsförslagen till övningarna finns i bilaga~\ref{app:answers}}, sist i boken, kapitel
+för kapitel. Där står svaret på varje övning som räknas, konstrueras eller förklaras, med
+uträkningen, och ofta med de vanligaste felaktiga svaren och varför de är fel.
+
+Två slags uppgifter har inga lösningsförslag i boken. \textbf{Programuppgifterna}, där du skriver
+assembler: ett program lär du dig skriva genom att skriva det, och simulatorn visar om det gör vad
+det ska. Delar av en programuppgift som räknas eller förklaras, en förutsägelse av vad registren
+innehåller eller en cykelräkning, har däremot sina svar i bilagan. \textbf{Laborationerna}
+redovisas för läraren vid stationen, och deras svar är det du visar där.
+
+Försök alltid själv först: ett svar du har läst är mycket mindre värt än ett du har räknat fram
+och sedan kontrollerat.
+
+\section*{Laborationerna}
+Kursen har tre laborationer, som görs i par. Labb~1 och Labb~2 görs på varsitt pass; Labb~3 löper
+över de fem mikrodatorkapitlen. Handledningarna finns i bilaga~\ref{app:lab1} till
+\ref{app:lab3}.
+\begin{itemize}
+  \item \textbf{Förbered dig hemma.} Varje handledning börjar med förberedelseuppgifter:
+    sanningstabeller, uttryck och kopplingsscheman som ska vara klara när passet börjar. Utan dem
+    hinner man inte klart, och det är den enskilt vanligaste orsaken till att en laboration inte
+    blir godkänd på passet.
+  \item \textbf{Arbeta i par}, och byt roll: den ena kopplar eller skriver, den andra kontrollerar
+    mot schemat. Båda ska kunna förklara lösningen.
+  \item \textbf{Förutsäg, sedan kontrollera.} Skriv ned vad du förväntar dig innan du slår på
+    strömmen eller kör programmet. En avvikelse mellan förutsägelse och resultat är information:
+    den säger att schemat, kopplingen eller programmet har ett fel, och att du nu vet var du ska
+    leta.
+  \item \textbf{Redovisa för läraren} varje uppgift som är markerad \kindtag[fillaccent]{Redovisa}.
+    Läraren prickar av den i redovisningslistan.
+\end{itemize}
+
+\begin{warning}
+\textbf{Säkerhet.}
+\begin{itemize}
+  \item Koppla \textbf{alltid} med spänningen frånslagen, och slå på först när kopplingen är
+    kontrollerad.
+  \item 24~V DC är ingen farlig spänning att beröra, men en kortslutning kan ge stora strömmar,
+    heta sladdar och en bränd säkring i aggregatet. En glödlampa blir dessutom varm.
+  \item Koppla aldrig 24~V till kopplingsdäcket eller till Arduino-kortet. IC-kretsarna och
+    mikrodatorn ska matas med 5~V, och 24~V förstör dem på ett ögonblick.
+  \item IC-kretsar vänds lätt fel. En krets som blir varm är felvänd eller felkopplad: bryt
+    matningen direkt.
+\end{itemize}
+\end{warning}
+
+\section*{Programvara}
+\begin{itemize}
+  \item \textbf{CircuitVerse}, \url{https://circuitverse.org/simulator}: en gratis,
+    webbläsarbaserad logiksimulator, där grindnät byggs och testas innan de kopplas upp. Inget att
+    installera.
+  \item \textbf{Microchip Studio 7}, \url{https://www.microchip.com/en-us/tools-resources/develop/microchip-studio}:
+    en gratis utvecklingsmiljö för AVR, där programmen i Labb~3 skrivs, assembleras och simuleras.
+    Den installeras före kapitel~\ref{c7:ch} enligt bilaga~\ref{app:studio}. Microchip Studio finns
+    bara för Windows; den som har en Mac använder skolans datorer eller en virtuell
+    Windowsmaskin.
+  \item \textbf{Arduino IDE}, \url{https://www.arduino.cc/en/software}: används en enda gång, i
+    kapitel~\ref{c11:ch}, för att ta fram kommandot som programmerar kortet (se
+    bilaga~\ref{app:studio}).
+\end{itemize}
+Under kursen går det bra att kontrollera omvandlingar med kalkylatorn i Windows, i läget
+\textbf{Programmerare}, men räkna alltid för hand först. På provet finns ingen miniräknare.
+
+\section*{Utrustning}
+\textbf{Labb~1} görs vid en station med ett 24~V DC-aggregat, två 4-poliga tryckknappar med både
+slutande (NO) och brytande (NC) kontakter, en glödlampa för 24~V, kopplingssladdar och en
+multimeter för felsökning.
+
+\textbf{Labb~2} görs vid ett kopplingsdäck med kringutrustning: 5~V-matning, strömbrytare eller
+knappar för ingångarna och lysdioder för utgångarna. Till det kommer IC-kretsarna 74HC08 (AND),
+74HC32 (OR) och 74HC04 (inverterare) till Labb~2-1, 74HC00 (NAND) och 74HC02 (NOR) till Labb~2-2,
+kopplingstråd och en multimeter.
+
+\textbf{Labb~3} görs med ett Arduino Uno-kort (ATmega328P) med USB-kabel, ett kopplingsdäck, tre
+lysdioder (röd, gul och grön) med förkopplingsmotstånd på 220--330~Ω, en tryckknapp och
+kopplingstråd. Det mesta av Labb~3 görs i simulatorn i Microchip Studio; kortet behövs först i
+kapitel~\ref{c11:ch}.
+
+\section*{Referenser}
+Två dokument från tillverkaren används som referens i mikrodatordelen:
+\begin{itemize}
+  \item \emph{ATmega328P datasheet}:
+    \url{https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf}
+  \item \emph{AVR Instruction Set Manual}:
+    \url{https://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf}
+\end{itemize}
+Det du behöver av dem under kursen, instruktionerna, flaggorna och cykeltiderna, finns samlat på
+referensbladet i bilaga~\ref{app:avr}.

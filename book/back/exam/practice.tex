@@ -1,0 +1,152 @@
+% Appendix: the practice exam, from exam/practice_exam.md. The questions only; the solutions are
+% the next appendix, as they are a separate file, so that the paper can be sat without them in
+% view. The source's title names the class it was first written for; the book leaves the name out.
+
+\chapter{Övningsprov}
+\label{app:practice}
+
+Övningsprovet har samma form och samma poäng som det riktiga provet, som bilaga~\ref{app:exam}
+beskriver. Gör det under två timmar, som på provet, och rätta det sedan mot lösningsförslagen i
+bilaga~\ref{app:practice:answers}.
+
+\begin{itemize}
+  \item \textbf{Tid:} 2 timmar.
+  \item \textbf{Hjälpmedel:} penna, suddgummi och linjal, och det utdelade referensbladet med
+    AVR-instruktionerna, bilaga~\ref{app:avr}. Ingen miniräknare.
+  \item \textbf{Poäng:} 40. \textbf{G} kräver 20 poäng och \textbf{VG} 30 poäng.
+\end{itemize}
+
+\noindent\textbf{Instruktioner:}
+\begin{itemize}
+  \item Börja varje fråga på ett nytt papper, och skriv ditt namn på varje papper.
+  \item Visa hur du räknar. Metoden ger poäng även när svaret blir fel.
+  \item Skriv alltid ut talsystemet: \code{0x2C}, \code{0010 1100} eller 44.
+  \item Assemblerfrågorna gäller ATmega328P med klockfrekvensen 16~MHz.
+\end{itemize}
+
+% ------------------------------------------------------------------------------------------
+\question{Talsystem och koder}{8}
+\label{practice:q:1}
+
+\qpart{a} Omvandla det binära talet \code{1101 0110} till decimalt och hexadecimalt. \worth{2}
+
+\qpart{b} Omvandla det decimala talet 173 till binärt och hexadecimalt. \worth{2}
+
+\qpart{c} Talen \code{0xB4} och \code{0x6A} adderas i ett 8-bitars register. Ställ upp additionen
+binärt, och ange resultatet i registret hexadecimalt. Blir det en minnessiffra ut ur registret?
+\worth{2}
+
+\qpart{d} Skriv talet 59 i BCD. Ange också de två ASCII-koder som texten \code{59} består av.
+\worth{2}
+
+% ------------------------------------------------------------------------------------------
+\question{Grindar och boolesk algebra}{8}
+\label{practice:q:2}
+
+\qpart{a} Gör sanningstabellen för \code{X = A'B + BC'}. \worth{2}
+
+\needspace{6\baselineskip}
+\qpart{b} Förenkla uttrycket algebraiskt så långt det går, och ange vilken lag du använder i varje
+steg. Vilken enda grind beräknar det förenklade uttrycket? \worth{3}
+
+\begin{console}
+X = AB + AB' + A'B
+\end{console}
+
+\qpart{c}\leavevmode
+\begin{enumerate}
+  \item Skriv \code{(A + B)'} utan parentes. \worth{1}
+  \item Visa hur funktionen \code{A + B} kan byggas av enbart NAND-grindar med två ingångar. Rita
+    nätet, och visa med boolesk algebra att det stämmer. \worth{2}
+\end{enumerate}
+
+% ------------------------------------------------------------------------------------------
+\question{Karnaughdiagram}{6}
+\label{practice:q:3}
+
+En funktion \code{X} av de fyra variablerna A, B, C och D är 1 för mintermerna 0, 2, 5, 7, 8, 10,
+13 och 15, och 0 för alla andra.
+
+\qpart{a} Rita Karnaughdiagrammet, med \code{AB} på raderna och \code{CD} på kolumnerna, och fyll i
+ettorna. \worth{2}
+
+\qpart{b} Gruppera ettorna minimalt, och skriv det minimerade uttrycket för \code{X} på SP-form.
+\worth{3}
+
+\qpart{c} Uttrycket beror bara på två av variablerna. Vilka två, och vilken grind med två ingångar
+är \code{X}? \worth{1}
+
+% ------------------------------------------------------------------------------------------
+\question{Analys av ett kontaktnät}{6}
+\label{practice:q:4}
+
+Kontaktnätet i figur~\ref{practice:fig:contacts} styr lampan H1 med tre tryckknappar. Tryckknappen
+S1 har två kontaktblock, som båda manövreras av samma knapp. S1 och S2 är slutande, S3 är brytande.
+
+\bookfigure{exam_practice_contacts}{Kontaktnätet som styr lampan H1.}{practice:fig:contacts}
+
+\qpart{a} Skriv det booleska uttrycket för H1. \worth{2}
+
+\qpart{b} Gör sanningstabellen för H1, med S1, S2 och S3 som ingångar. \worth{2}
+
+\qpart{c} Förenkla uttrycket, och rita ett kontaktnät som gör samma sak med färre kontakter.
+\worth{2}
+
+% ------------------------------------------------------------------------------------------
+\question{Mikrodatorns uppbyggnad}{4}
+\label{practice:q:5}
+
+\qpart{a} Rita en mikrodators blockschema, med CPU (ALU, register, styrenhet och programräknare),
+programminne, dataminne, in- och utportar och bussar. Skriv en mening om vad varje block gör.
+\worth{2}
+
+\qpart{b} Vad innehåller programräknaren, och vad händer med den när ett \code{rcall} utförs?
+\worth{1}
+
+\qpart{c} I vilket minne i ATmega328P ligger programmet, och i vilket ligger stacken? Vilket av dem
+behåller sitt innehåll när strömmen bryts? \worth{1}
+
+% ------------------------------------------------------------------------------------------
+\question{Assemblerprogrammering}{8}
+\label{practice:q:6}
+
+\qpart{a} Programmet nedan körs från början. Ange värdena i \code{r16}, \code{r17} och \code{r18}
+hexadecimalt när det har kommit till \code{end}, och värdet på flaggan \code{C} efter \code{add}.
+Förklara varför \code{r18} inte blev 300. \worth{3}
+
+\begin{asmcode}
+    ldi r16, 0xB4
+    ldi r17, 0x0F
+    and r17, r16
+    lsl r16
+    ldi r18, 200
+    ldi r19, 100
+    add r18, r19
+end:
+    rjmp end
+\end{asmcode}
+
+\qpart{b} Programmet nedan körs från början.
+
+\begin{asmcode}
+    ldi r16, 0xFF
+    out DDRB, r16
+    ldi r16, 1
+    ldi r17, 4
+loop:
+    out PORTB, r16
+    lsl r16
+    dec r17
+    brne loop
+\end{asmcode}
+
+\begin{enumerate}
+  \item Hur många gånger körs loopen, och vilket värde har \code{PORTB} när loopen är klar?
+    \worth{1}
+  \item Hur många klockcykler tar loopen, från den första \code{out} till och med den sista
+    \code{brne}, och hur lång tid är det? \worth{1}
+\end{enumerate}
+
+\qpart{c} En knapp är kopplad mellan PD3 och jord, och en lysdiod med förkopplingsmotstånd mellan
+PB0 och jord. Skriv ett komplett program, med initiering, där lysdioden lyser så länge knappen
+hålls nedtryckt och är släckt annars. Använd stiftets inbyggda pull-up-motstånd. \worth{3}

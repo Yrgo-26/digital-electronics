@@ -1,0 +1,47 @@
+% Chapter 8, typeset from lectures/L08: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix E, the
+% solutions, is in back/answers/c08.tex. The two predictions from the README's lecture plan are
+% kept in the opener, since they are how the chapter is best read; the rest of the plan is not.
+
+\chapter{Aritmetik, logik och flaggor}
+\label{c8:ch}
+
+{\large\itshape Vad processorn gör med åtta bitar, och vad den skriver upp om varje resultat.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Addition och subtraktion i registren, och varför det inte finns någon \code{addi}.
+  \item Aritmetisk rundgång: efter 255 kommer 0, och \code{inc} säger inte till.
+  \item Tvåkomplement: hur samma byte kan vara 255 eller $-1$.
+  \item Flaggorna i SREG: vad \code{C}, \code{Z}, \code{N}, \code{V}, \code{S} och \code{H}
+    betyder, och vilka instruktioner som ändrar dem.
+  \item Logiska operationer och masker: att ettställa, nollställa, invertera och testa enskilda
+    bitar.
+  \item Skift och rotation: multiplikation och division med 2, och ett rinnande ljus.
+  \item Utporten: \code{DDRB}, \code{PORTB}, \code{out}, \code{sbi} och \code{cbi}, och portarna i
+    simulatorns I/O-fönster.
+  \item Labb~3, del 3--10 (bilaga~\ref{app:lab3}).
+\end{itemize}
+\end{chapterbox}
+
+I kapitel~\ref{c7:ch} laddade programmen tal i registren. Det här kapitlet handlar om vad
+processorn gör med dem: adderar och subtraherar, ändrar enskilda bitar och flyttar dem, och vad den
+skriver upp om varje resultat i statusregistrets flaggor. Flaggorna är vad kapitel~\ref{c9:ch}
+bygger på, när programmen börjar välja väg. Kapitlet slutar med utporten, där bitarna i ett
+register blir spänningar på kretsens stift.
+
+Läs \secref{c8:app:a} först, och repetera gärna binär addition i \secref{c1:a7} och grindarnas
+sanningstabeller i \secref{c2:app:a}. Gör två förutsägelser innan du kör något i simulatorn: vad
+\code{r16} och \code{C} blir efter \code{add} när \code{r16} = 200 och \code{r17} = 100, och vilka
+flaggor som sätts av \code{0x7F + 0x01}, särskilt om \code{V} blir 0 eller 1. Läs sedan
+\secref{c8:app:b} om logik och skift och \secref{c8:app:c} om utporten.
+
+Övningarna finns i \secref{c8:sec:exercises}, och lösningsförslagen till dem i
+bilaga~\ref{app:answers}. Till kapitlet hör Labb~3, del 3--10 (\secref{lab3:sec:b}). Gör klart
+del 1.1, 1.2 och 2 från kapitel~\ref{c7:ch} först, om de inte redan är gjorda.
+
+\input{chapters/08/arithmetic}
+\input{chapters/08/logic}
+\input{chapters/08/port}
+\input{chapters/08/summary}
+\input{chapters/08/exercises}

@@ -1,0 +1,243 @@
+% Solutions to Chapter 8's exercises, from lectures/L08/appendix/e_solutions.md.
+%
+% The programs are left out, as everywhere in the book: exercise 4 keeps its prediction c), 5 its
+% table and explanations (a and c) but not the program b), 9 the remark on b) and the prediction
+% d), and 11 the results b) and c). The two-line answers of exercises 2 d) and 7 are kept, since
+% the instructions are the answer.
+
+\answerchapter{c8:ch}
+
+\answer{c8:ex:1}{Binär addition för hand}
+\pt{a}45 + 23 = 68:
+
+\begin{textdrawing}
+   minne     0 1 1 1 1 1 1 0
+             0 0 1 0 1 1 0 1     (45)
+         +   0 0 0 1 0 1 1 1     (23)
+             ---------------
+             0 1 0 0 0 1 0 0     (68 = 0x44)
+\end{textdrawing}
+
+\noindent Resultatet är \code{0x44}, och \code{C = 0}: summan får plats.
+
+\pt{b}\code{0x9C} = 156 och \code{0x7A} = 122, summan är 278:
+
+\begin{textdrawing}
+             1 0 0 1 1 1 0 0     (0x9C)
+         +   0 1 1 1 1 0 1 0     (0x7A)
+             ---------------
+         1   0 0 0 1 0 1 1 0     (0x16, och en nionde bit)
+\end{textdrawing}
+
+\noindent Registret får \code{0x16} = 22, och den nionde biten hamnar i \code{C}:
+\textbf{\code{C = 1}}. Kontroll: 22 + 256 = 278.
+
+\pt{c}\code{0x0F + 0x01 = 0x10}, \code{C = 0}, \code{Z = 0}, \code{N = 0}. Dessutom
+\textbf{\code{H = 1}}, \emph{half carry}, eftersom den låga halvan, \code{1111 + 0001}, gav en
+minnessiffra ut ur bit~3 och in i bit~4.
+
+\answer{c8:ex:2}{Mätaren slår om}
+\pt{a}254, 255, 0, 1, 2.
+
+\pt{b}Efter den \textbf{tredje} \code{inc}, när \code{r16} slår om från 255 till 0. När alla fem är
+körda är \code{Z = 0}, eftersom den sista \code{inc} gav 2. Flaggan beskriver bara den senaste
+instruktionen.
+
+\pt{c}\code{C = 0}, som före. \code{inc} ändrar aldrig \code{C}, inte ens när värdet slår om.
+
+\pt{d}Använd \code{add} i stället för \code{inc}, med ett register som innehåller 1:
+
+\begin{asmcode}
+    ldi r17, 1
+    add r16, r17                    ; Sets C = 1 when r16 wraps from 255 to 0.
+\end{asmcode}
+
+\noindent Man kan också behålla \code{inc} och titta på \code{Z} direkt efter den: \code{Z = 1}
+efter \code{inc} betyder precis att räknaren just slog om till 0.
+
+\answer{c8:ex:3}{Negativa tal}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}cc@{}}
+  \thead{Tal} & \thead{Tvåkomplement} \\
+  \midrule
+  $-1$ & \code{0xFF} \\
+  $-10$ & \code{0xF6} \\
+  $-100$ & \code{0x9C} \\
+  $-128$ & \code{0x80} \\
+\end{narrowtable}
+
+\noindent Metoden för $-10$:
+
+\begin{textdrawing}
+   10           =  0000 1010
+   invertera    =  1111 0101
+   lägg till 1  =  1111 0110  =  0xF6
+\end{textdrawing}
+
+\noindent Kontroll: $256 - 10 = 246$ = \code{0xF6}.
+
+\pt{b}\code{0xF0} = 240, och $240 - 256 = \mathbf{-16}$. \code{0x81} = 129, och $129 - 256 =
+\mathbf{-127}$. \code{0x7F} = 127 har bit~7 = 0, så talet är positivt: \textbf{127}.
+
+\needspace{4\baselineskip}
+\pt{c}\leavevmode
+\begin{itemize}
+  \item \code{neg} av \code{0x01} blir \code{0xFF}, alltså $-1$.
+  \item \code{neg} av \code{0x00} blir \code{0x00}. $-0$ är 0.
+  \item \code{neg} av \code{0x80} blir \textbf{\code{0x80}} igen. \code{0x80} är $-128$, och $+128$
+    finns inte bland talen $-128$ till 127, så resultatet slår om och blir $-128$ igen. Det är det
+    överraskande svaret, och processorn sätter \code{V = 1} för att tala om att resultatet är fel
+    med tecken.
+\end{itemize}
+
+\answer{c8:ex:4}{Addera en konstant}
+\pt{c}\code{r16} = 65 = \code{0x41}. \code{r17} = $256 + 30 - 100$ = \textbf{186} = \code{0xBA},
+och eftersom 100 är större än 30 har subtraktionen lånat: \textbf{\code{C = 1}}. Med tecken är
+\code{0xBA} = $-70$, vilket är rätt svar på $30 - 100$.
+
+Den som svarar \code{r17} = $-70$ och tänker sig att registret \enquote{innehåller ett minustecken}
+har rätt i sak men fel om vad registret innehåller: det innehåller bitarna \code{1011 1010}, och om
+de betyder 186 eller $-70$ bestämmer programmet.
+
+\answer{c8:ex:5}{Flaggorna}
+\pt{a) och c}Simulatorn visar följande.
+
+\begin{narrowtable}{@{}lcccccc@{}}
+  \thead{Operation} & \thead{Resultat} & \thead{C} & \thead{Z} & \thead{N} & \thead{V} &
+    \thead{S} \\
+  \midrule
+  \code{0x50 + 0x50} (\code{add}) & \code{0xA0} & 0 & 0 & 1 & 1 & 0 \\
+  \code{0xF0 + 0x20} (\code{add}) & \code{0x10} & 1 & 0 & 0 & 0 & 0 \\
+  \code{0x30 - 0x30} (\code{sub}) & \code{0x00} & 0 & 1 & 0 & 0 & 0 \\
+  \code{0x00 - 0x01} (\code{sub}) & \code{0xFF} & 1 & 0 & 1 & 0 & 1 \\
+  \code{0x80 - 0x01} (\code{sub}) & \code{0x7F} & 0 & 0 & 0 & 1 & 1 \\
+  \code{0xFF + 1} med \code{inc}, när \code{C} är 1 före & \code{0x00} & 1 & 1 & 0 & 0 & 0 \\
+\end{narrowtable}
+
+\noindent Rad för rad:
+\begin{itemize}
+  \item \textbf{\code{0x50 + 0x50}}: 80 + 80 = 160 får plats utan tecken, så \code{C = 0}. Med
+    tecken är det två positiva tal som gav ett negativt, \code{0xA0} = $-96$:
+    \textbf{\code{V = 1}}. \code{S = N xor V = 0}, det rätta svaret +160 är positivt.
+  \item \textbf{\code{0xF0 + 0x20}}: 240 + 32 = 272 får inte plats: \textbf{\code{C = 1}},
+    resultatet $272 - 256 = 16$. Med tecken är det $-16 + 32 = 16$, som är rätt: \code{V = 0}.
+  \item \textbf{\code{0x30 - 0x30}}: noll, \code{Z = 1}. Inget lån, \code{C = 0}.
+  \item \textbf{\code{0x00 - 0x01}}: $0 - 1$ kräver ett lån: \code{C = 1}, och resultatet är 255.
+    Med tecken är det $-1$, vilket är rätt: \code{V = 0}, \code{N = 1}, \code{S = 1}.
+  \item \textbf{\code{0x80 - 0x01}}: utan tecken $128 - 1 = 127$, inget lån, \code{C = 0}. Med
+    tecken är det $-128 - 1 = -129$, som inte finns: resultatet slår om till +127,
+    \textbf{\code{V = 1}}. \code{S = N xor V = 1}: det rätta svaret, $-129$, är negativt.
+  \item \textbf{\code{inc} från \code{0xFF}}: resultatet blir 0 och \code{Z = 1}, men
+    \textbf{\code{C} förblir 1}, eftersom \code{inc} aldrig ändrar \code{C}. Den som svarar
+    \code{C = 0} här har glömt regeln i \secref{c8:a3}.
+\end{itemize}
+
+\ptnote{Vanligaste felen}\textbf{V-kolumnen}, där man tänker \enquote{fick det plats?} utan tecken
+i stället för med tecken, och \textbf{sista raden}, där man tror att \code{inc} sätter \code{C}.
+
+\answer{c8:ex:6}{Masker}
+\pt{a}\code{0b11010000}. De fyra nedre bitarna nollställs, de övre behålls.
+
+\pt{b}\code{0b11011111}. Masken \code{0x0C} = \code{0b00001100} ettställer bit~3 och bit~2, som
+båda var 0. Övriga bitar behålls.
+
+\pt{c}\code{0b00101100}. Varje bit inverteras, eftersom masken har en etta överallt.
+
+\pt{d}\code{0b00101100}, samma som \textbf{c)}. \code{com} är detsamma som \code{eor} med
+\code{0xFF}, men behöver inget extra register.
+
+\answer{c8:ex:7}{Välj rätt mask}
+\pt{a}\code{ori r16, 0b00000011}
+
+\pt{b}\code{andi r16, 0b01111111}
+
+\pt{c}Det finns ingen \code{eori}, så masken läggs i ett register först:
+
+\begin{asmcode}
+    ldi r24, 0b11110000
+    eor r16, r24
+\end{asmcode}
+
+\pt{d}\code{andi r16, 0b00001000}
+
+\pt{e}Två instruktioner, en per sorts ändring:
+
+\begin{asmcode}
+    andi r16, 0b11110000            ; Clear bits 0-3.
+    ori r16, 0b10000000             ; Set bit 7.
+\end{asmcode}
+
+\noindent Ordningen spelar ingen roll här, eftersom de två maskerna rör olika bitar.
+
+\answer{c8:ex:8}{Skift och rotation}
+\pt{a}\code{0b00000110} = 6. Efter två \code{lsl}: \code{0b00011000} = \textbf{24}. Talet har
+multiplicerats med 4.
+
+\pt{b}\code{lsr} flyttar allt ett steg åt höger och skiftar in en nolla: \code{r17} =
+\textbf{\code{0b01000000}}, och bit~0, som var 1, hamnar i \textbf{\code{C = 1}}.
+
+\pt{c}\code{asr} behåller teckenbiten: \code{0xF8} = \code{1111 1000} blir \code{1111 1100} =
+\textbf{\code{0xFC} = $\mathbf{-4}$}, vilket är $-8 / 2$. \code{lsr} skiftar in en nolla:
+\code{0111 1100} = \code{0x7C} = 124, som är fel om talet har tecken.
+
+\needspace{8\baselineskip}
+\pt{d}\leavevmode
+
+\begin{narrowtable}{@{}lcc@{}}
+  \thead{Efter} & \thead{\code{r19}} & \thead{\code{C}} \\
+  \midrule
+  start & \code{1100 0000} & 0 \\
+  \code{rol} & \code{1000 0000} & 1 \\
+  \code{rol} & \code{0000 0001} & 1 \\
+  \code{rol} & \code{0000 0011} & 0 \\
+\end{narrowtable}
+
+\noindent Vid varje \code{rol} flyttas bit~7 till \code{C} och det gamla \code{C} in i bit~0.
+Ettorna \enquote{kommer tillbaka} in från höger ett steg efter att de lämnat vänster ände.
+
+\answer{c8:ex:9}{Lysdioder på port B}
+\pt{b}\code{sbi} behöver inget register för mönstret, men port B måste fortfarande göras till
+utport.
+
+\pt{d}\code{PORTB} = \textbf{\code{0b10010001}}: PB7, PB4 och PB0.
+
+\answer{c8:ex:10}{Läs programmet}
+
+\begin{booktable}{@{}p{2.5em}p{7em}L@{}}
+  \thead{Rad} & \thead{\code{PORTB}} & \thead{Varför} \\
+  \midrule
+  (1) & \code{0b00001111} & \code{leds} skrivs ut som den är. \\
+  (2) & \code{0b00111100} & Två \code{lsl} flyttar mönstret två steg åt vänster. \\
+  (3) & \code{0b00111101} & \code{sbi} ettställer bit~0 och lämnar resten. \\
+  (4) & \code{0b11000011} & \code{com} inverterar \code{leds}, som fortfarande är
+    \code{0b00111100}, och \code{out} skriver alla åtta bitar. \\
+  (5) & \code{0b01000011} & \code{cbi} nollställer bit~7. \\
+\end{booktable}
+
+\noindent Rad (4) är den som brukar bli fel. \code{sbi PORTB, 0} på rad (3) ändrade porten, men inte
+registret \code{leds}, så \code{com leds} utgår från \code{0b00111100}. Och \code{out} skriver hela
+byten, så ettan som \code{sbi} satte i bit~0 skrivs över och ersätts med den inverterade bitens
+värde, som råkar vara 1 också.
+
+\answer{c8:ex:11}{Multiplicera med tio}
+\pt{b}70 = \code{0x46}.
+
+\pt{c}Upp till \textbf{$\mathbf{x = 25}$}: $10 \cdot 25 = 250$ får plats i en byte, men $10 \cdot 26
+= 260$ gör det inte och slår om till 4. Redan mellanresultatet $8x$ slår om för $x = 32$ och större.
+
+\answer{c8:ex:12}{När är det overflow?}
+\pt{a}Med tecken är \code{0x40} = +64, och $+64 + 64 = +128$. Det största talet med tecken är +127,
+så resultatet \code{0x80} betyder $-128$: två positiva tal gav ett negativt, och
+\textbf{\code{V = 1}}.
+
+\code{0xC0} är $-64$, och $-64 + (-64) = -128$, som \textbf{får plats}. Resultatet \code{0x80} är
+$-128$ och är rätt, så \textbf{\code{V = 0}}.
+
+\pt{b}Utan tecken är \code{0x40 + 0x40} = $64 + 64 = 128$, som får plats: \code{C = 0}.
+\code{0xC0 + 0xC0} = $192 + 192 = 384$, som inte får plats: \code{C = 1}. Det är alltså tvärtom mot
+\code{V}, vilket visar att de två flaggorna svarar på olika frågor.
+
+\pt{c}En addition ger \code{V = 1} när \textbf{två tal med samma tecken ger ett resultat med
+motsatt tecken}: två positiva som blir negativt, eller två negativa som blir positivt. Två tal med
+olika tecken kan aldrig ge overflow, eftersom summan då alltid ligger mellan dem.

@@ -1,0 +1,312 @@
+% Section 10.3, from lectures/L10/appendix/c_subroutines_and_stack.md.
+
+\section{Subrutiner och stacken}
+\label{c10:app:c}
+
+\subsection{Samma kod på flera ställen}
+\label{c10:c1}
+Programmen har vuxit. Blinkprogrammet i \secref{c10:a10} har en fördröjning på nio rader, och ett
+trafikljus behöver fyra fördröjningar av olika längd. Att skriva av samma nio rader fyra gånger
+fungerar, men det är fyra ställen att rätta när något är fel, och fyra uppsättningar etiketter som
+måste heta olika.
+
+Hex-till-ASCII-programmet i \secref{c10:a3} har samma problem i liten skala: samma fem rader två
+gånger.
+
+Lösningen är en \textbf{subrutin}: en bit kod som skrivs en gång, får ett namn, och
+\textbf{anropas} från så många ställen som behövs. När subrutinen är klar fortsätter programmet där
+anropet gjordes. Andra programspråk kallar samma sak en funktion eller en metod.
+
+\subsection{\code{rcall} och \code{ret}}
+\label{c10:c2}
+Två instruktioner räcker:
+
+\begin{booktable}{@{}p{7.4em}Lc@{}}
+  \thead{Instruktion} & \thead{Gör} & \thead{Cykler} \\
+  \midrule
+  \code{rcall delay_ms} & Sparar adressen till instruktionen efter \code{rcall}, och hoppar till
+    \code{delay_ms}. & 3 \\
+  \code{ret} & Hoppar tillbaka till den sparade adressen. & 4 \\
+\end{booktable}
+
+Adressen som sparas kallas \textbf{returadressen}: den visar vart subrutinen ska återvända. Men var
+sparas den? Inte i något av de 32 registren, utan på \textbf{stacken}, ett område i toppen av
+dataminnet.
+
+\needspace{10\baselineskip}
+\begin{asmcode}
+loop:
+    ...
+    rcall delay_ms                  ; Save the address of rjmp loop, and jump.
+    rjmp loop                       ; ret comes back here.
+
+delay_ms:
+    ...                             ; The subroutine's work.
+    ret                             ; Jump back to the saved address.
+\end{asmcode}
+
+\noindent Ett anrop kostar alltså 3 + 4 = 7 cykler innan subrutinen har gjort något alls. Det är
+lite, men det är skälet till att en fördröjning i en subrutin blir några cykler längre än samma
+loop skriven direkt i programmet.
+
+\subsection{Stacken och stackpekaren}
+\label{c10:c3}
+\textbf{Stacken} är en del av SRAM som används som en trave: det som läggs dit sist tas bort först.
+Den börjar i toppen av dataminnet, på adress \code{RAMEND} = \code{0x08FF}, och växer
+\textbf{nedåt}, mot lägre adresser.
+
+\textbf{Stackpekaren}, \code{SP}, är ett 16-bitars register som pekar på den första lediga byten i
+stacken. Den består av två I/O-register, \code{SPH} (hög byte) och \code{SPL} (låg byte).
+
+Så här går ett anrop till, byte för byte:
+\begin{enumerate}
+  \item Före \code{rcall} pekar \code{SP} på \code{0x08FF}, och stacken är tom.
+  \item \code{rcall} skriver returadressens låga byte på \code{0x08FF} och den höga på
+    \code{0x08FE}, och flyttar \code{SP} två steg nedåt, till \code{0x08FD}. Sedan hoppar den.
+  \item \code{ret} flyttar \code{SP} två steg uppåt, läser returadressen, och hoppar dit.
+\end{enumerate}
+
+\bookfigure{avr_call_stack}{Stacken före \code{rcall}, i subrutinen och efter
+\code{ret}.}{c10:fig:call_stack}
+
+Lägg märke till det sista: \code{ret} \textbf{raderar ingenting}. Bytena ligger kvar i minnet, men
+\code{SP} pekar förbi dem, och nästa anrop skriver över dem.
+
+\subsubsection{Att initiera stackpekaren}
+Ett program som använder subrutiner börjar med att peka \code{SP} på toppen av SRAM:
+
+\needspace{7\baselineskip}
+\begin{asmcode}
+main:
+    ldi r16, high(RAMEND)           ; Point the stack pointer at the top of SRAM,
+    out SPH, r16                    ; high byte first ...
+    ldi r16, low(RAMEND)
+    out SPL, r16                    ; ... then the low byte. SP = 0x08FF.
+\end{asmcode}
+
+\noindent På ATmega328P gör hårdvaran faktiskt redan detta vid varje reset, så i våra program
+ändrar de fyra raderna ingenting. De skrivs ändå, av två skäl: många andra AVR-kretsar startar med
+\code{SP} = 0, och ett program som hoppar in i ditt program utan reset, till exempel en bootloader,
+kan ha lämnat \code{SP} var som helst. Fyra rader är billig försäkring, och de gör programmet
+begripligt för den som läser det.
+
+\subsection{En subrutin med parameter: \code{delay_ms}}
+\label{c10:c4}
+En fördröjning som alltid är lika lång är till begränsad nytta. Bättre är en subrutin som får veta
+hur länge den ska vänta. Värdet den får kallas en \textbf{parameter}, och i kursen lämnas den i
+ett register före anropet, här \code{r24}:
+
+\needspace{4\baselineskip}
+\begin{asmcode}
+    ldi r24, 250                    ; Wait 250 ms.
+    rcall delay_ms
+\end{asmcode}
+
+\noindent Hela subrutinen, från \code{blink_subroutine.asm}:
+
+\begin{asmcode}
+;--------------------------------------------------------------------------------
+; delay_ms: Waits r24 milliseconds (1-255) at 16 MHz.
+;
+; Each turn of the outer loop takes exactly 16 000 cycles, 1 ms. With the rcall, the
+; pushes, the pops and the ret, a call takes 16 000 x r24 + 18 cycles.
+;--------------------------------------------------------------------------------
+delay_ms:
+    push r24                        ; Save the registers this subroutine changes.
+    push r26
+    push r27
+delay_ms_outer:
+    ldi r26, low(3999)              ; X = r27:r26 = 3999.
+    ldi r27, high(3999)
+delay_ms_inner:
+    sbiw r26, 1                     ; 4 cycles per turn, 3 the last time.
+    brne delay_ms_inner
+    dec r24                         ; One more millisecond done.
+    brne delay_ms_outer
+    pop r27                         ; Restore them, in the opposite order.
+    pop r26
+    pop r24
+    ret                             ; Back to the instruction after the rcall.
+\end{asmcode}
+
+\noindent Uppbyggnaden är samma som sekundfördröjningen i \secref{c10:a10}: en 16-bitars inre loop
+i en yttre loop. Den yttre loopen räknar ned \code{r24}, en millisekund per varv. Ett varv tar
+\mbox{\code{4 · 3999 + 4 = 16 000}} cykler, precis 1~ms vid 16~MHz.
+
+Resten av cyklerna är subrutinens egna:
+
+\begin{narrowtable}{@{}lc@{}}
+  \thead{Del} & \thead{Cykler} \\
+  \midrule
+  \code{rcall} & 3 \\
+  tre \code{push} & 6 \\
+  \code{r24} varv om 16\,000 cykler, minus 1 för sista \code{brne} & 16\,000 · \code{r24} -- 1 \\
+  tre \code{pop} & 6 \\
+  \code{ret} & 4 \\
+\end{narrowtable}
+
+\noindent Summan är \textbf{16\,000 · \code{r24} + 18} cykler. Med \code{r24} = 250 blir det
+4\,000\,018 cykler, och det är också vad simulatorn mäter mellan \code{rcall} och instruktionen
+efter. De 18 extra cyklerna tar drygt en mikrosekund, en miljondels sekund. Ingen människa ser
+skillnad, men det är bra att veta var de kommer ifrån.
+
+Varför börjar och slutar subrutinen med \code{push} och \code{pop}? Det är ämnet för de två nästa
+avsnitten.
+
+\subsection{\code{push} och \code{pop}}
+\label{c10:c5}
+Stacken kan användas till mer än returadresser. Två instruktioner lägger dit och hämtar godtyckliga
+register:
+
+\begin{booktable}{@{}lLc@{}}
+  \thead{Instruktion} & \thead{Gör} & \thead{Cykler} \\
+  \midrule
+  \code{push r16} & Skriver \code{r16} där \code{SP} pekar, och flyttar \code{SP} ett steg nedåt. &
+    2 \\
+  \code{pop r16} & Flyttar \code{SP} ett steg uppåt, och läser byten där till \code{r16}. & 2 \\
+\end{booktable}
+
+Stacken är \textbf{sist in, först ut}. Programmet \code{push_pop.asm} visar vad det betyder:
+
+\needspace{8\baselineskip}
+\begin{asmcode}
+    ldi r16, 0x11
+    ldi r17, 0x22
+    push r16                        ; 0x08FF = 0x11, SP = 0x08FE.
+    push r17                        ; 0x08FE = 0x22, SP = 0x08FD.
+    pop r16                         ; r16 = 0x22 (the last one pushed), SP = 0x08FE.
+    pop r17                         ; r17 = 0x11, SP = 0x08FF.
+\end{asmcode}
+
+\bookfigure{l10_push_pop}{Stacken när \code{r16} och \code{r17} läggs dit och hämtas tillbaka i
+samma ordning.}{c10:fig:push_pop}
+
+Registren har bytt värden, eftersom \code{pop r16} får det som lades dit sist. Vill man ha tillbaka
+samma värden i samma register ska de hämtas i \textbf{omvänd ordning}: \code{push r16},
+\code{push r17}, sedan \code{pop r17}, \code{pop r16}.
+
+\subsection{Kursens regel: spara det du ändrar}
+\label{c10:c6}
+En subrutin använder register för sitt arbete. \code{delay_ms} räknar med \code{r24}, \code{r26}
+och \code{r27}. Men programmet som anropar den kan ha något viktigt i just de registren, och det
+vet inte subrutinen.
+
+Kursens regel är därför enkel:
+
+\begin{aside}
+\textbf{En subrutin sparar varje register den ändrar med \code{push} när den börjar, och återställer
+dem med \code{pop} i omvänd ordning innan \code{ret}.} Undantaget är ett register som subrutinen är
+till för att lämna ett svar i; det ska stå i kommentaren ovanför subrutinen.
+\end{aside}
+
+Med regeln behöver den som anropar en subrutin aldrig undra om ett register har ändrats. Efter
+\code{rcall delay_ms} innehåller \code{r24} fortfarande 250, och därför kan samma parameter
+användas igen utan att laddas om.
+
+Så här ser stacken ut mitt i \code{delay_ms}, efter anropet och de tre \code{push}-instruktionerna,
+i \code{blink_subroutine.asm}. \code{rcall} ligger på adress \code{0x000B} i programminnet, så
+returadressen är \code{0x000C}:
+
+\bookfigure{l10_stack_in_delay}{Stacken i \code{blink_subroutine.asm}: före \code{rcall}, efter
+\code{rcall}, efter tre \code{push} och efter \code{pop} och \code{ret}.}{c10:fig:stack_in_delay}
+
+Fem byte är upptagna: två för returadressen och tre för de sparade registren. \code{SP} pekar på
+\code{0x08FA}. Tre \code{pop} tar bort registren i omvänd ordning, \code{ret} tar returadressen,
+och \code{SP} är tillbaka på \code{0x08FF}.
+
+\subsubsection{Vad som händer om man slarvar}
+Anta att \code{delay_ms} gör tre \code{push} men bara två \code{pop}. Då ligger en byte kvar ovanpå
+returadressen när \code{ret} körs, och \code{ret} läser den byten som en del av adressen.
+Programmet hoppar till en adress som ingen har bestämt, någonstans i programminnet, och fortsätter
+därifrån. Ingenting varnar. Ofta hamnar programmet i tomt flashminne, kör igenom det, och börjar om
+från adress 0, så att det ser ut som om kortet startar om av sig självt.
+
+Det är därför regeln säger \textbf{varje} \code{push} har sin \code{pop}, i omvänd ordning. Ett fel
+här syns inte när man läser koden rad för rad, men det syns direkt i simulatorn: stega fram till
+\code{ret} och titta på \code{SP}. Står den inte där den stod när subrutinen började, stämmer inte
+stacken.
+
+\subsection{Subrutiner som anropar subrutiner}
+\label{c10:c7}
+En subrutin kan anropa en annan. Varje anrop lägger en ny returadress på stacken, och varje
+\code{ret} tar bort den senaste, så programmet hittar alltid tillbaka i rätt ordning.
+
+\needspace{9\baselineskip}
+\begin{asmcode}
+delay_500ms:
+    push r24                        ; Save the register this subroutine changes.
+    ldi r24, 250
+    rcall delay_ms                  ; 250 ms. delay_ms saves r24, so it is still 250 ...
+    rcall delay_ms                  ; ... and this is another 250 ms.
+    pop r24
+    ret
+\end{asmcode}
+
+\noindent När huvudprogrammet anropar \code{delay_500ms}, som anropar \code{delay_ms}, ligger det
+på stacken:
+\begin{itemize}
+  \item returadressen till huvudprogrammet, 2 byte;
+  \item \code{r24}, sparat av \code{delay_500ms}, 1 byte;
+  \item returadressen till \code{delay_500ms}, 2 byte;
+  \item \code{r24}, \code{r26} och \code{r27}, sparade av \code{delay_ms}, 3 byte.
+\end{itemize}
+
+Åtta byte, och \code{SP} står på \code{0x08FF - 8 = 0x08F7}. Det är den djupaste punkten i
+programmet.
+
+Lägg också märke till att det andra anropet av \code{delay_ms} fungerar utan att \code{r24} laddas
+om. Det är regeln i \secref{c10:c6} som gör det möjligt.
+
+\subsection{Hur mycket stack finns det?}
+\label{c10:c8}
+SRAM är 2048 byte. Programmen i kursen använder som mest ett tiotal byte stack, så det finns gott
+om plats. Men det finns ingen spärr: om stacken skulle växa ned i området där programmet har egna
+data, till exempel texten i \secref{c10:a5}, skriver den över dem utan varning.
+
+Därför är det värt att räkna efter, på samma sätt som i \secref{c10:c7}: två byte per anrop som
+pågår samtidigt, och en byte per sparat register. Summan är stackens största djup.
+
+\subsection{Hex-till-ASCII som subrutin}
+\label{c10:c9}
+Nu kan programmet i \secref{c10:a3} skrivas utan de dubbla raderna. Omvandlingen av en nibble blir
+en subrutin som tar värdet 0--15 i \code{r24} och lämnar tecknet i samma register. Det är just det
+undantag regeln i \secref{c10:c6} tillåter: \code{r24} är till för svaret, och kommentaren säger
+det.
+
+\needspace{12\baselineskip}
+\begin{asmcode}
+main:
+    ldi r16, high(RAMEND)           ; SP = RAMEND.
+    out SPH, r16
+    ldi r16, low(RAMEND)
+    out SPL, r16
+
+    ldi r16, 0x3C                   ; The byte to convert.
+    mov r24, r16
+    swap r24
+    andi r24, 0x0F                  ; The high nibble, 0x03.
+    rcall nibble_to_ascii
+    mov r20, r24                    ; r20 = '3'.
+    mov r24, r16
+    andi r24, 0x0F                  ; The low nibble, 0x0C.
+    rcall nibble_to_ascii
+    mov r21, r24                    ; r21 = 'C'.
+end:
+    rjmp end
+
+;--------------------------------------------------------------------------------
+; nibble_to_ascii: Turns the value 0-15 in r24 into its hexadecimal character.
+; Returns the character in r24; changes no other register.
+;--------------------------------------------------------------------------------
+nibble_to_ascii:
+    cpi r24, 10                     ; A digit 0-9, or a letter A-F?
+    brlo nibble_digit
+    subi r24, -7                    ; A-F: 7 more, so that 10 lands on 'A'.
+nibble_digit:
+    subi r24, -0x30                 ; Add the code for '0'.
+    ret
+\end{asmcode}
+
+\noindent Subrutinen ändrar flaggorna, med \code{cpi} och \code{subi}. Det gör nästan varje
+subrutin, och det är därför huvudprogrammet aldrig ska räkna med att flaggorna är orörda efter ett
+anrop. Ett villkorligt hopp ska alltid komma direkt efter den jämförelse det bygger på.

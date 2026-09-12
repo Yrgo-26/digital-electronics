@@ -1,0 +1,370 @@
+% Appendix: Labb 2, from labs/lab2/README.md. The guide's headings are sections, Labb 2-1 and
+% Labb 2-2 among them, and its tasks \labtask. The figures are the ones the guide shares with
+% lectures/L04 (the pin-outs, the input and output circuit, the breadboard and the XOR of four
+% NAND gates) and its own wiring drawing.
+%
+% Deliberate differences: the lecture links are chapter and section references, and the
+% simulator's link is written out.
+%
+% \labprep[title]{F1}{label}: see lab1.tex, which defines the same helper.
+
+\makeatletter
+\providecommand{\labprep}[3][]{\prep{#2\if\relax\detokenize{#1}\relax\else\ -- #1\fi}%
+  \phantomsection\def\@currentlabel{#2}\label{#3}}
+\makeatother
+
+\chapter{Labb 2: Grindnät med IC-kretsar}
+\label{app:lab2}
+
+I Labb~1 byggde du logiska funktioner av kontakter. Nu gör du samma sak med \textbf{IC-kretsar}:
+små kretsar ur 74-serien, med fyra eller sex grindar i varje, uppkopplade på ett kopplingsdäck.
+Labben hör till kapitel~\ref{c5:ch} och har två delar som görs i samma pass:
+\begin{itemize}
+  \item \textbf{Labb 2-1} (\secref{lab2:1}): grindnät med AND-, OR- och inverterarkretsar, från ett
+    minimerat uttryck till en fungerande krets.
+  \item \textbf{Labb 2-2} (\secref{lab2:2}): samma sorts nät med enbart NAND-grindar, och en titt
+    på NOR.
+\end{itemize}
+
+Teorin finns i kapitel~\ref{c4:ch}: Karnaughdiagram i \secref{c4:app:a} och IC-kretsar,
+kopplingsdäck och planering i \secref{c4:app:b}. Hur du hittar felet när något inte fungerar står
+i \secref{c5:app:a}.
+
+\section{Mål}
+\label{lab2:sec:goals}
+Efter labben ska du kunna:
+\begin{itemize}
+  \item ta fram ett minimerat uttryck med ett Karnaughdiagram och realisera det med IC-kretsar;
+  \item läsa en benplacering och koppla upp en IC-krets med matning, ingångar och utgång;
+  \item planera en uppkoppling med en grindtilldelning och en kopplingslista, och följa planen;
+  \item bygga om ett nät till enbart NAND-grindar, och förklara varför det kan spara kretsar;
+  \item verifiera ett nät mot dess sanningstabell, och felsöka det systematiskt när det inte
+    stämmer.
+\end{itemize}
+
+\section{Utrustning}
+\label{lab2:sec:equipment}
+Varje station har:
+\begin{itemize}
+  \item ett kopplingsdäck med 5~V-matning, strömbrytare för ingångarna och lysdioder för
+    utgångarna;
+  \item kretsarna \textbf{74HC08} (AND), \textbf{74HC32} (OR) och \textbf{74HC04} (inverterare) till
+    Labb~2-1;
+  \item kretsarna \textbf{74HC00} (NAND) och \textbf{74HC02} (NOR) till Labb~2-2;
+  \item kopplingstråd, och en multimeter.
+\end{itemize}
+
+Titta efter på din station hur strömbrytarna och lysdioderna är anslutna. Om stationen saknar egna
+lysdioder kopplar du en lysdiod med ett förkopplingsmotstånd på 330~Ω från utgången till jord. Om
+du använder egna tryckknappar i stället för stationens strömbrytare behöver varje ingång ett
+pull-down-motstånd. Båda beskrivs i \secref{c4:b4} och~\ref{c4:b5}, och figur~\ref{lab2:fig:io}
+visar dem.
+
+\bookfigure{l04_io_circuit}{Tryckknapp med pull-down-motstånd på en grindingång, och lysdiod med
+förkopplingsmotstånd på utgången.}{lab2:fig:io}
+
+Benplaceringarna för kretsarna, sedda ovanifrån med hacket åt vänster, finns i
+figur~\ref{lab2:fig:hc08}--\ref{lab2:fig:hc02}.
+
+\bookfigure{l04_dip_74hc08}{Benplacering för 74HC08, fyra AND-grindar.}{lab2:fig:hc08}
+
+\bookfigure{l04_dip_74hc32}{Benplacering för 74HC32, fyra OR-grindar.}{lab2:fig:hc32}
+
+\bookfigure{l04_dip_74hc04}{Benplacering för 74HC04, sex inverterare.}{lab2:fig:hc04}
+
+\bookfigure{l04_dip_74hc00}{Benplacering för 74HC00, fyra NAND-grindar.}{lab2:fig:hc00}
+
+\bookfigure{l04_dip_74hc02}{Benplacering för 74HC02, fyra NOR-grindar. Här är ben 1 en
+utgång.}{lab2:fig:hc02}
+
+Figur~\ref{lab2:fig:breadboard} visar kopplingsdäcket, med kretsen över mittspåret och matningen
+dragen.
+
+\bookfigure{l04_breadboard}{Kopplingsdäcket, med en IC-krets över mittspåret.}{lab2:fig:breadboard}
+
+\section{Säkerhet}
+\label{lab2:sec:safety}
+\begin{warning}
+\begin{itemize}
+  \item Koppla med matningen \textbf{frånslagen}, och slå på först när kopplingen är kontrollerad
+    mot din kopplingslista.
+  \item \textbf{Kontrollera kretsens riktning} innan du slår på: hacket åt vänster, ben 1 nere till
+    vänster. En felvänd krets får plus och jord omkastade.
+  \item Känn efter med ett finger på kretsen strax efter att du slagit på. \textbf{En krets som blir
+    varm är felkopplad}: bryt matningen direkt.
+  \item Koppla aldrig 24~V från Labb~1 till kopplingsdäcket. Kretsarna tål högst 7~V.
+\end{itemize}
+\end{warning}
+
+\section{Förberedelser}
+\label{lab2:sec:prep}
+Görs \textbf{före} passet, hemma eller i samband med kapitel~\ref{c4:ch}. Utan dem hinner du inte
+klart, och de ingår i redovisningen.
+
+\labprep[Sanningstabeller]{F1}{lab2:f1}Skriv den förväntade sanningstabellen för en AND-, en OR-
+och en inverterargrind, och för näten i Labb~2-1 \hyperref[lab2:1:u2]{uppgift~2}
+och~\hyperref[lab2:1:u3]{3}.
+
+\labprep[Karnaughdiagram]{F2}{lab2:f2}Ta fram ett minimerat uttryck för Labb~2-1
+\hyperref[lab2:1:u4]{uppgift~4} med ett Karnaughdiagram, och rita grindnätet.
+
+\labprep[NAND-nät]{F3}{lab2:f3}Rita NOT, AND och OR byggda av enbart NAND-grindar (Labb~2-2
+\hyperref[lab2:2:u2]{uppgift~2}), och nätet för \code{X = AB + C} med enbart NAND (Labb~2-2
+\hyperref[lab2:2:u3]{uppgift~3}). Kontrollera varje nät med De Morgans lagar eller genom att gå
+igenom alla rader.
+
+\labprep[Simulera]{F4}{lab2:f4}Bygg varje nät i CircuitVerse,
+\url{https://circuitverse.org/simulator}, och kontrollera det mot sanningstabellen, rad för rad.
+
+\labprep[Planera]{F5}{lab2:f5}Gör en \textbf{grindtilldelning} och en \textbf{kopplingslista} för
+varje uppgift där du bygger ett nät: Labb~2-1 uppgift~2, 3 och~4 och Labb~2-2 uppgift~3. Använd
+formen i \secref{c4:b7}, med bennummer på varje rad.
+
+\filbreak
+\section{Labb 2-1}
+\label{lab2:1}
+AND-, OR- och inverterarkretsar: 74HC08, 74HC32 och 74HC04.
+
+Arbetsgången är densamma i varje uppgift, och det är värt att hålla fast vid den:
+\begin{enumerate}
+  \item Koppla matningen till varje krets först, ben 14 till +5~V och ben 7 till jord.
+  \item Koppla resten enligt kopplingslistan, och bocka av varje rad.
+  \item Koppla ingångarna på oanvända grindar till jord.
+  \item Slå på, och gå igenom \textbf{alla} kombinationer av ingångarna. Fyll i tabellen:
+    förväntat värde från förberedelserna, och uppmätt värde.
+  \item Om en rad inte stämmer: felsök enligt \secref{c5:app:a}, inte genom att flytta sladdar på
+    måfå.
+\end{enumerate}
+
+\labtask{Uppgift 1}{Verifiera AND, OR och inverterare}\phantomsection\label{lab2:1:u1}
+Innan du bygger något med en krets ska du veta att den fungerar och att du läser benplaceringen
+rätt.
+\begin{parts}
+  \item Sätt 74HC08 på kopplingsdäcket och koppla matningen. Koppla grind 1 (ben 1, 2 och 3) till
+    två strömbrytare och en lysdiod. Koppla ingångarna på grind 2--4 till jord.
+  \item Gå igenom alla fyra kombinationerna och fyll i tabellen.
+  \item Byt 74HC08 mot 74HC32 \textbf{utan att flytta en enda sladd}, och upprepa. Förklara varför
+    det fungerar.
+  \item Koppla en inverterare i 74HC04 (ben 1 in, ben 2 ut) och kontrollera båda raderna.
+  \item Mät med multimetern spänningen på en utgång som är 1 och en som är 0, med lysdioden
+    ansluten. Skriv upp värdena; de används i kontrolluppgiften, övning~\ref{c5:ex:10}.
+\end{parts}
+
+\begin{filltable}{@{}ccYYYY@{}}
+  \thead{A} & \thead{B} & \thead{AND, förväntat} & \thead{AND, mätt} & \thead{OR, förväntat} &
+    \thead{OR, mätt} \\
+  \midrule
+  0 & 0 & & & & \fillrule
+  0 & 1 & & & & \fillrule
+  1 & 0 & & & & \fillrule
+  1 & 1 & & & & \\
+\end{filltable}
+
+\begin{filltable}{@{}cYY@{}}
+  \thead{A} & \thead{NOT, förväntat} & \thead{NOT, mätt} \\
+  \midrule
+  0 & & \fillrule
+  1 & & \\
+\end{filltable}
+
+\redovisa{tabellerna och de uppmätta spänningarna.}
+
+\labtask{Uppgift 2}{X = AB + C}\phantomsection\label{lab2:1:u2}
+Nätet från \secref{c4:a3}, två grindar i två kretsar. Figur~\ref{lab2:fig:wiring} visar det med
+kretsbeteckningar och bennummer, så som kopplingslistan läser det.
+
+\bookfigure{lab2_wiring_and_or}{Grindnätet \code{X = AB + C} med 74HC08 och 74HC32, och
+bennumren utskrivna.}{lab2:fig:wiring}
+
+\begin{parts}
+  \item Koppla upp nätet enligt din kopplingslista från F5.
+  \item Gå igenom alla åtta kombinationerna och fyll i tabellen.
+  \item Mät spänningen på U1 ben 3 för raden \code{ABC = 110}. Vilken logisk nivå är det, och
+    stämmer det med vad \code{AB} ska vara?
+\end{parts}
+
+\begin{filltable}{@{}cccYY@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{X, förväntat} & \thead{X, mätt} \\
+  \midrule
+  0 & 0 & 0 & & \fillrule
+  0 & 0 & 1 & & \fillrule
+  0 & 1 & 0 & & \fillrule
+  0 & 1 & 1 & & \fillrule
+  1 & 0 & 0 & & \fillrule
+  1 & 0 & 1 & & \fillrule
+  1 & 1 & 0 & & \fillrule
+  1 & 1 & 1 & & \\
+\end{filltable}
+
+\redovisa{den fungerande kretsen och tabellen.}
+
+\labtask{Uppgift 3}{Bromsassistenten}\phantomsection\label{lab2:1:u3}
+Bromsassistenten från \secref{c2:a10} har fyra ingångar och en utgång, med samma beteckningar som
+där:
+\begin{itemize}
+  \item \code{D}: föraren står på bromspedalen;
+  \item \code{S} och \code{R}: avståndssensorn respektive radarn, två detektorer som var och en kan
+    se ett hinder;
+  \item \code{F}: assistanssystemet rapporterar ett fel;
+  \item \code{B}: bilen bromsar.
+\end{itemize}
+
+Bilen ska bromsa om föraren bromsar, eller om någon av detektorerna ser ett hinder och systemet
+inte rapporterar något fel. Föraren ska alltid kunna bromsa, även när systemet är trasigt.
+\begin{parts}
+  \item Skriv uttrycket för \code{B} (du tog fram det i kapitel~\ref{c2:ch}; kontrollera det mot
+    kravet igen), och rita grindnätet med AND, OR och NOT.
+  \item Gör en grindtilldelning. Hur många grindar av varje sort behövs, och vilka kretsar?
+  \item Koppla upp nätet och gå igenom alla sexton kombinationerna.
+  \item Säkerhetskravet: kontrollera särskilt de åtta raderna där \code{D = 1}. Vad ska \code{B}
+    vara på alla dem, oavsett de andra ingångarna?
+\end{parts}
+
+\begin{filltable}{@{}ccccYY@{}}
+  \thead{D} & \thead{S} & \thead{R} & \thead{F} & \thead{B, förväntat} & \thead{B, mätt} \\
+  \midrule
+  0 & 0 & 0 & 0 & & \fillrule
+  0 & 0 & 0 & 1 & & \fillrule
+  0 & 0 & 1 & 0 & & \fillrule
+  0 & 0 & 1 & 1 & & \fillrule
+  0 & 1 & 0 & 0 & & \fillrule
+  0 & 1 & 0 & 1 & & \fillrule
+  0 & 1 & 1 & 0 & & \fillrule
+  0 & 1 & 1 & 1 & & \fillrule
+  1 & 0 & 0 & 0 & & \fillrule
+  1 & 0 & 0 & 1 & & \fillrule
+  1 & 0 & 1 & 0 & & \fillrule
+  1 & 0 & 1 & 1 & & \fillrule
+  1 & 1 & 0 & 0 & & \fillrule
+  1 & 1 & 0 & 1 & & \fillrule
+  1 & 1 & 1 & 0 & & \fillrule
+  1 & 1 & 1 & 1 & & \\
+\end{filltable}
+
+\redovisa{den fungerande kretsen, tabellen, och svaret på d).}
+
+\labtask{Uppgift 4}{Syntes med Karnaughdiagram}\phantomsection\label{lab2:1:u4}
+Ett grindnät med fyra ingångar \code{ABCD} och en utgång \code{X} har sanningstabellen nedan. Du
+har tagit fram det minimerade uttrycket i F2.
+
+\begin{narrowtable}{@{}cc@{\hspace{3em}}cc@{}}
+  \thead{ABCD} & \thead{X} & \thead{ABCD} & \thead{X} \\
+  \midrule
+  0000 & 0 & 1000 & 0 \\
+  0001 & 1 & 1001 & 1 \\
+  0010 & 0 & 1010 & 0 \\
+  0011 & 1 & 1011 & 1 \\
+  0100 & 0 & 1100 & 1 \\
+  0101 & 0 & 1101 & 0 \\
+  0110 & 0 & 1110 & 1 \\
+  0111 & 0 & 1111 & 0 \\
+\end{narrowtable}
+
+\begin{parts}
+  \item Visa ditt Karnaughdiagram och ditt minimerade uttryck.
+  \item Hur många kretsar behövs? Jämför med vad den direkta avläsningen ur tabellen hade krävt.
+  \item Koppla upp nätet och kontrollera alla sexton raderna. Skriv ned förväntat och uppmätt värde
+    för varje rad, i en tabell som ovan.
+\end{parts}
+
+\redovisa{diagrammet, uttrycket, den fungerande kretsen och tabellen.}
+
+\filbreak
+\section{Labb 2-2}
+\label{lab2:2}
+NAND och NOR: 74HC00 och 74HC02.
+
+I kapitel~\ref{c2:ch} såg du att NAND ensam räcker för att bygga vilken funktion som helst. Här
+bevisar du det med riktiga kretsar, och ser vad det kostar och vad det sparar.
+
+\labtask{Uppgift 1}{Verifiera NAND och NOR}\phantomsection\label{lab2:2:u1}
+\begin{parts}
+  \item Koppla grind 1 i 74HC00 (ingångar ben 1 och 2, utgång ben 3) och kontrollera alla fyra
+    raderna.
+  \item Byt till 74HC02. \textbf{Titta på benplaceringen först}: i 74HC02 är ben 1 en utgång, och
+    ingångarna på grind 1 är ben 2 och 3. Flytta sladdarna därefter, och kontrollera alla fyra
+    raderna.
+  \item Vad hade hänt om du bara bytt kretsen, som i Labb~2-1 \hyperref[lab2:1:u1]{uppgift~1}~c)?
+    Två utgångar hade kopplats mot varandra, eller en strömbrytare mot en utgång. Förklara varför
+    det inte är bra.
+\end{parts}
+
+\begin{filltable}{@{}ccYYYY@{}}
+  \thead{A} & \thead{B} & \thead{NAND, förväntat} & \thead{NAND, mätt} & \thead{NOR, förväntat} &
+    \thead{NOR, mätt} \\
+  \midrule
+  0 & 0 & & & & \fillrule
+  0 & 1 & & & & \fillrule
+  1 & 0 & & & & \fillrule
+  1 & 1 & & & & \\
+\end{filltable}
+
+\redovisa{tabellen.}
+
+\labtask{Uppgift 2}{NOT, AND och OR av NAND}\phantomsection\label{lab2:2:u2}
+Bygg de tre grundgrindarna av enbart NAND-grindar ur en 74HC00, en i taget, med näten från F3:
+\begin{itemize}
+  \item \textbf{NOT}: en NAND med båda ingångarna ihopkopplade.
+  \item \textbf{AND}: en NAND följd av en NOT.
+  \item \textbf{OR}: en NOT på varje ingång, följda av en NAND. Kontrollera med De Morgan:
+    \code{(A'B')' = A + B}.
+\end{itemize}
+\begin{parts}
+  \item Hur många NAND-grindar kräver var och en? Ryms alla tre i en 74HC00 samtidigt?
+  \item Koppla upp var och en och kontrollera den mot sin sanningstabell.
+\end{parts}
+
+\redovisa{varje grind när den fungerar.}
+
+\labtask{Uppgift 3}{X = AB + C med enbart NAND}\phantomsection\label{lab2:2:u3}
+Samma funktion som i Labb~2-1 \hyperref[lab2:1:u2]{uppgift~2}, nu enligt \secref{c4:a9}:
+
+\begin{textdrawing}
+X = ((AB)' · C')'
+\end{textdrawing}
+
+\begin{parts}
+  \item Koppla upp nätet i en enda 74HC00.
+  \item Gå igenom alla åtta raderna. Tabellen ska vara identisk med den i Labb~2-1
+    \hyperref[lab2:1:u2]{uppgift~2}.
+  \item Jämför de två lösningarna: antal grindar, antal kretsar och antal sladdar. Vilken hade du
+    valt om du skulle bygga hundra exemplar?
+\end{parts}
+
+\redovisa{den fungerande kretsen, tabellen och jämförelsen.}
+
+\labtask[Extra]{Uppgift 4}{Enbart NOR, och XOR av fyra NAND}\phantomsection\label{lab2:2:u4}
+Frivillig, för den som hinner. Den krävs inte för godkänt.
+\begin{parts}
+  \item Bygg \code{X = AB + C} med enbart NOR-grindar i en 74HC02, med uttrycket
+    \code{X = ((A + C)' + (B + C)')'}. Tänk på benplaceringen.
+  \item Bygg en XOR av fyra NAND-grindar i en 74HC00, som i figur~\ref{lab2:fig:xor}.
+
+    \bookfigure{l04_net_xor_nand}{XOR byggd av fyra NAND-grindar.}{lab2:fig:xor}
+
+    \noindent Kontrollera alla fyra raderna, och jämför med sanningstabellen för XOR.
+  \item Bromsassistenten från Labb~2-1 \hyperref[lab2:1:u3]{uppgift~3} med enbart NAND-grindar.
+    Hur många kretsar behövs?
+\end{parts}
+
+\redovisa{det du hunnit.}
+
+\filbreak
+\section{Redovisning}
+\label{lab2:sec:report}
+Bocka av varje uppgift när den är redovisad för läraren. Båda i paret ska kunna förklara
+lösningen.
+
+\begin{filltable}{@{}p{6.4em}Lp{5.4em}p{6.4em}@{}}
+  \thead{Del} & \thead{Uppgift} & \thead{Krävs för G} & \thead{Redovisad} \\
+  \midrule
+  Förberedelser & F1--F5 & ja & \fillrule
+  Labb 2-1 & 1 -- Verifiera AND, OR och inverterare & ja & \fillrule
+  Labb 2-1 & 2 -- X = AB + C & ja & \fillrule
+  Labb 2-1 & 3 -- Bromsassistenten & ja & \fillrule
+  Labb 2-1 & 4 -- Syntes med Karnaughdiagram & ja & \fillrule
+  Labb 2-2 & 1 -- Verifiera NAND och NOR & ja & \fillrule
+  Labb 2-2 & 2 -- NOT, AND och OR av NAND & ja & \fillrule
+  Labb 2-2 & 3 -- X = AB + C med enbart NAND & ja & \fillrule
+  Labb 2-2 & 4 -- Extra & nej & \\
+\end{filltable}

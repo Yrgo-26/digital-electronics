@@ -1,0 +1,47 @@
+% Chapter 7, typeset from lectures/L07: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix E, the
+% solutions, is in back/answers/c07.tex.
+
+\chapter{Mikrodatorn och Microchip Studio}
+\label{c7:ch}
+
+{\large\itshape ATmega328P på nära håll, och det första programmet, sexton bitar i
+taget.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item ATmega328P: mikrodatorn från blockschemat i kapitel~\ref{c6:ch}, som en verklig krets på
+    ett Arduino Uno-kort.
+  \item De 32 registren, och varför bara hälften av dem kan laddas med en konstant.
+  \item Statusregistret, programräknaren och de tre minnena.
+  \item Vad en instruktion är: \code{ldi r16, 0x2A} isärplockad till de sexton bitar den blir.
+  \item Assemblerspråkets byggstenar: instruktioner, operander, etiketter, kommentarer och
+    direktiv.
+  \item Talformat: samma tal skrivet decimalt, binärt och hexadecimalt.
+  \item Microchip Studio: projekt, assemblering, felmeddelanden och simulering.
+  \item \textbf{Labb~3 börjar}: del 1.1, 1.2 och 2.
+\end{itemize}
+\end{chapterbox}
+
+I kapitel~\ref{c6:ch} byggdes mikrodatorn upp block för block. Här blir den en verklig krets,
+ATmega328P, med namn och siffror på varje block, och här skrivs det första programmet till den. Du
+lär dig vad en instruktion är, ända ned till de sexton bitar den blir i programminnet, hur ett
+program skrivs i assembler, och hur du bygger det och stegar igenom det i simulatorn i Microchip
+Studio.
+
+\textbf{Microchip Studio ska vara installerat innan du börjar}, enligt \secref{studio:1} i
+bilaga~\ref{app:studio}. Läs sedan \secref{c7:app:a} och \secref{c7:app:b}, och repetera
+mikrodatorns blockschema i \secref{c6:app:b} och omvandlingen mellan talsystem i
+kapitel~\ref{c1:ch}. \Secref{c7:app:c} om hur simulatorn används läser du när du sätter dig vid
+Microchip Studio. Övningarna finns i \secref{c7:sec:exercises}, och lösningsförslagen till dem som
+inte är program i bilaga~\ref{app:answers}.
+
+Med det här kapitlet börjar också \textbf{Labb~3} (bilaga~\ref{app:lab3}): gör
+\hyperref[lab3:d1-1]{del~1.1}, \hyperref[lab3:d1-2]{1.2} och \hyperref[lab3:d2]{2} när du har läst
+kapitlet.
+
+\input{chapters/07/core}
+\input{chapters/07/assembly}
+\input{chapters/07/simulator}
+\input{chapters/07/summary}
+\input{chapters/07/exercises}

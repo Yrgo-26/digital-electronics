@@ -1,0 +1,49 @@
+% Section 6.3, from lectures/L06/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\section{Sammanfattning}
+\label{c6:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Förklara skillnaden mellan ett kombinatoriskt nät och ett sekvensnät, och känna igen vilket
+    en krets är.
+  \item Förklara hur återkoppling ger minne, med självhållningen och SR-låset som exempel.
+  \item Beskriva skillnaden mellan ett D-lås och en D-vippa, och rita utgången för båda i ett
+    tidsdiagram.
+  \item Räkna ut klockperioden från klockfrekvensen, och tvärtom.
+  \item Förklara vad ett register, en räknare och ett skiftregister är, och vad de är byggda av.
+  \item Rita mikrodatorns blockschema och redogöra för vad varje block gör: CPU, styrenhet,
+    register, ALU, statusregister, programräknare, programminne, dataminne, bussar, portar och
+    klocka.
+  \item Beskriva instruktionscykeln och följa ett kort program instruktion för instruktion.
+  \item Redogöra för ATmega328P:s minnen och portar, och vad som skiljer flash, SRAM och EEPROM
+    åt.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför går det inte att skriva en vanlig sanningstabell för ett SR-lås?
+  \item Vad vinner man på att en vippa bara läser \code{D} vid den stigande flanken?
+  \item Hur lång är en klockcykel vid 16~MHz?
+  \item En räknare med 8 vippor står på sitt högsta värde och får en klockflank till. Vad händer?
+  \item Vilket block i mikrodatorn räknar, och vilket bestämmer vad som ska räknas?
+  \item Vad är ett hopp i ett program, sett från programräknarens håll?
+  \item Vilket av ATmega328P:s minnen tappar sitt innehåll när strömmen bryts, och varför gör inte
+    de andra det?
+  \item Vad är en utport, sett som en byggsten av vippor?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c7:ch} handlar om mikrodatorn på nära håll och om hur den programmeras:
+\begin{itemize}
+  \item ATmega328P på nära håll: de 32 registren, statusregistret och de tre minnena.
+  \item Assemblerspråket: instruktioner, operander, direktiv och etiketter, och hur en rad blir
+    maskinkod.
+  \item Microchip Studio: skapa ett projekt, assemblera, och stega genom programmet i simulatorn.
+  \item \textbf{Labb~3} börjar, bilaga~\ref{app:lab3}.
+\end{itemize}

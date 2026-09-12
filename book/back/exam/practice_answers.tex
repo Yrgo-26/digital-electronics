@@ -1,0 +1,232 @@
+% Appendix: the solutions to the practice exam, from exam/practice_exam_solutions.md, with the
+% points of each part and what earns part of them: the source's italic notes are \credit, its
+% "Fälla:" notes \trap.
+%
+% One deliberate difference: question 6 c) asks for a complete program, and the book prints no
+% program as a solution. Its marking criteria and its trap are kept; the program is not.
+
+% The solutions' headings are labelled pans:q:N.
+\renewcommand{\answerprefix}{pans}
+
+\chapter{Lösningsförslag till övningsprovet}
+\label{app:practice:answers}
+
+Lösningarna följer övningsprovet i bilaga~\ref{app:practice}. Vid varje deluppgift står poängen och
+vad som ger delpoäng. Bedömningsprinciperna, med metod och följdfel, står i bilaga~\ref{app:exam}.
+Programmen i fråga 6 a) och b) har körts i simulatorn.
+
+% ==========================================================================================
+\answersection{1}{Talsystem och koder}{8}
+
+\answerpart{a}{2}
+Ettorna har vikterna 128, 64, 16, 4 och 2: \code{128 + 64 + 16 + 4 + 2 = 214}. Grupperna \code{1101}
+och \code{0110} är \code{D} och \code{6}: \textbf{214} och \textbf{\code{0xD6}}.
+\credit{1 p per rätt omvandling med uträkning.}
+
+\answerpart{b}{2}
+173: 128 ryms, 45 kvar; 32 ryms, 13 kvar; 8 ryms, 5 kvar; 4 ryms, 1 kvar; 1 ryms. Ettor på vikterna
+128, 32, 8, 4 och 1: \textbf{\code{1010 1101}}. Grupperna \code{1010} och \code{1101} är \code{A}
+och \code{D}: \textbf{\code{0xAD}}.
+\credit{1 p per rätt omvandling. Division med 2 och avläsning av resterna är lika bra.}
+
+\answerpart{c}{2}
+\begin{textdrawing}
+  minnessiffror: 1 11
+                   1011 0100      0xB4 = 180
+                 + 0110 1010    + 0x6A = 106
+                 -----------
+                 1 0001 1110      286
+\end{textdrawing}
+
+\noindent Bit~5 ger en minnessiffra in i bit~6, bit~6 en in i bit~7, och bit~7 en som går ut ur
+registret.
+
+Registret får de åtta låga bitarna, \textbf{\code{0x1E}}, och \textbf{en minnessiffra går ut} ur
+registret, eftersom \code{180 + 106 = 286} inte ryms i åtta bitar: \code{286 - 256 = 30 = 0x1E}.
+\credit{1 p för en korrekt uppställd addition, 1 p för \code{0x1E} och minnessiffran.}
+
+\answerpart{d}{2}
+BCD skriver varje siffra för sig med fyra bitar: \textbf{\code{0101 1001}}. ASCII-koderna för
+tecknen \code{'5'} och \code{'9'} är \textbf{\code{0x35}} och \textbf{\code{0x39}}.
+\credit{1 p för BCD, 1 p för ASCII-koderna.}
+\trap{59 binärt, \code{0011 1011}, är inte BCD och ger 0~p på BCD-delen.}
+
+% ==========================================================================================
+\answersection{2}{Grindar och boolesk algebra}{8}
+
+\answerpart{a}{2}
+\begin{narrowtable}{@{}cccccc@{}}
+  A & B & C & \code{A'B} & \code{BC'} & X \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 1 & 1 & 1 \\
+  0 & 1 & 1 & 1 & 0 & 1 \\
+  1 & 0 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 & 0 & 0 \\
+  1 & 1 & 0 & 0 & 1 & 1 \\
+  1 & 1 & 1 & 0 & 0 & 0 \\
+\end{narrowtable}
+\credit{2 p för en helt rätt tabell, 1 p för högst ett fel.}
+
+\answerpart{b}{3}
+\begin{textdrawing}
+X = AB + AB' + A'B
+  = A(B + B') + A'B        bryt ut A
+  = A · 1 + A'B            komplement: B + B' = 1
+  = A + A'B                identitet
+  = A + B                  förenklingslagen: A + A'B = A + B
+\end{textdrawing}
+
+\noindent Det förenklade uttrycket är en \textbf{OR-grind}.
+\credit{1 p för att slå ihop de två första termerna till A, 1 p för förenklingslagen, 1 p för OR.}
+
+\noindent Ett svar som stannar vid \code{A + A'B} får 1~p: det saknar förenklingslagen, och pekar
+inte ut någon enda grind.
+
+\answerpart{c}{3}
+\begin{enumerate}
+  \item \textbf{\code{A'B'}}, med De Morgan. \worth{1}
+  \item Med De Morgan är \code{A + B = (A'B')'}. Inversen av en variabel är en NAND-grind med båda
+    ingångarna kopplade till variabeln: \code{(AA)' = A'}. Nätet blir tre NAND-grindar: en som
+    bildar \code{A'}, en som bildar \code{B'}, och en tredje med \code{A'} och \code{B'} in, som
+    bildar \code{(A'B')' = A + B}. \worth{2}
+    \credit{1 p för ett korrekt nät, 1 p för att visa varför det stämmer.}
+\end{enumerate}
+
+% ==========================================================================================
+\answersection{3}{Karnaughdiagram}{6}
+
+\answerpart{a}{2}
+\begin{narrowtable}{@{}ccccc@{}}
+  \thead{AB \textbackslash{} CD} & \thead{00} & \thead{01} & \thead{11} & \thead{10} \\
+  \midrule
+  \textbf{00} & 1 & & & 1 \\
+  \textbf{01} & & 1 & 1 & \\
+  \textbf{11} & & 1 & 1 & \\
+  \textbf{10} & 1 & & & 1 \\
+\end{narrowtable}
+\credit{1 p för rätt Graykod på båda axlarna, 1 p för rätt placerade ettor.}
+\trap{axlarna i binär ordning, \code{00, 01, 10, 11}, ger 0~p på axlarna, men följdfelet bedöms i
+b).}
+
+\answerpart{b}{3}
+Två grupper om fyra:
+\begin{itemize}
+  \item \textbf{De fyra hörnen}, mintermerna 0, 2, 8 och 10. Hörnen är grannar eftersom diagrammet
+    går runt både uppifrån och ned och från vänster till höger. Där är \code{B} = 0 och \code{D} =
+    0: termen \textbf{\code{B'D'}}.
+  \item \textbf{De fyra mittrutorna}, mintermerna 5, 7, 13 och 15. Där är \code{B} = 1 och \code{D}
+    = 1: termen \textbf{\code{BD}}.
+\end{itemize}
+
+\begin{console}
+X = B'D' + BD
+\end{console}
+\credit{1 p för varje rätt grupp med rätt term, 1 p för det samlade uttrycket.}
+
+\noindent Den som missar att hörnen är en grupp och skriver hörnen som två par,
+\code{A'B'D' + AB'D' + BD}, får 1~p.
+
+\answerpart{c}{1}
+\code{X} beror bara på \textbf{B och D}, och är 1 när de är lika: en \textbf{XNOR}-grind. A och C
+påverkar inte \code{X} alls.
+
+% ==========================================================================================
+\answersection{4}{Analys av ett kontaktnät}{6}
+
+\answerpart{a}{2}
+Två parallellkopplingar i serie. Den första är \code{S1 + S2}, den andra \code{S1 + S3'}, eftersom
+S3 är brytande:
+
+\begin{console}
+H1 = (S1 + S2)(S1 + S3')
+\end{console}
+\credit{1 p per rätt parallellkoppling, inklusive \code{S3'}.}
+
+\answerpart{b}{2}
+\begin{narrowtable}{@{}cccccc@{}}
+  S1 & S2 & S3 & \code{S1 + S2} & \code{S1 + S3'} & H1 \\
+  \midrule
+  0 & 0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 1 & 1 & 1 \\
+  0 & 1 & 1 & 1 & 0 & 0 \\
+  1 & 0 & 0 & 1 & 1 & 1 \\
+  1 & 0 & 1 & 1 & 1 & 1 \\
+  1 & 1 & 0 & 1 & 1 & 1 \\
+  1 & 1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+\credit{2 p för en helt rätt tabell, 1 p för högst ett fel. Följdfel från a) bedöms här.}
+
+\answerpart{c}{2}
+Med den distributiva lagen \code{A + BC = (A + B)(A + C)}, läst baklänges:
+
+\begin{console}
+H1 = (S1 + S2)(S1 + S3') = S1 + S2S3'
+\end{console}
+
+\noindent Nätet: den slutande kontakten S1 \textbf{parallellt med} en seriekoppling av den slutande
+kontakten S2 och den brytande kontakten S3, och sedan lampan. Tre kontakter i stället för fyra, och
+bara ett kontaktblock på S1.
+\credit{1 p för det förenklade uttrycket, 1 p för ett rätt ritat nät.}
+
+\noindent Kontrollera med tabellen: \code{S1 + S2S3'} är 1 på raderna 010, 100, 101, 110 och 111,
+samma som i b).
+
+% ==========================================================================================
+\answersection{5}{Mikrodatorns uppbyggnad}{4}
+
+\answerpart{a}{2}
+CPU:n med ALU (räknar och jämför), register (håller värdena som räknas med), styrenhet (avkodar
+instruktionerna och styr resten) och programräknare (pekar på nästa instruktion). Programminnet
+håller programmet, dataminnet variablerna och stacken, och in- och utportarna förbinder
+mikrodatorn med omvärlden. Bussarna, adressbussen och databussen, förbinder CPU:n med minnena och
+portarna.
+\credit{1 p för ett blockschema med alla delar på plats, 1 p för att beskriva vad de gör.}
+
+\answerpart{b}{1}
+Programräknaren innehåller \textbf{adressen till nästa instruktion} som ska hämtas. Vid
+\code{rcall} sparas adressen till instruktionen efter \code{rcall} på stacken, och
+programräknaren får subrutinens adress, så att nästa instruktion hämtas därifrån.
+
+\answerpart{c}{1}
+Programmet ligger i \textbf{flashminnet}, som behåller sitt innehåll utan ström. Stacken ligger i
+\textbf{SRAM}, som töms när strömmen bryts.
+
+% ==========================================================================================
+\answersection{6}{Assemblerprogrammering}{8}
+
+\answerpart{a}{3}
+Uppmätt i simulatorn: \textbf{\code{r16} = \code{0x68}}, \textbf{\code{r17} = \code{0x04}},
+\textbf{\code{r18} = \code{0x2C}}, och \textbf{\code{C} = 1} efter \code{add}.
+\begin{itemize}
+  \item \code{and r17, r16}: \code{0000 1111 AND 1011 0100 = 0000 0100} = \code{0x04}.
+  \item \code{lsl r16}: \code{1011 0100} skiftas ett steg åt vänster och blir \code{0110 1000} =
+    \code{0x68}. Bit~7 hamnar i \code{C}, men \code{C} skrivs över senare av \code{add}.
+  \item \code{add r18, r19}: \code{200 + 100 = 300}, som inte ryms i åtta bitar. Registret får
+    \code{300 - 256 = 44} = \code{0x2C}, och minnessiffran hamnar i \code{C}.
+\end{itemize}
+\credit{1 p för \code{r16} och \code{r17}, 1 p för \code{r18}, 1 p för \code{C} och förklaringen:
+åtta bitar räcker till 255.}
+
+\answerpart{b}{2}
+\begin{enumerate}
+  \item Loopen körs \textbf{4 gånger}, en gång för varje värde på \code{r17}: 4, 3, 2 och 1.
+    \code{PORTB} får värdena 1, 2, 4 och 8, och är \textbf{\code{0x08}} när loopen är klar.
+    \code{r16} är då \code{0x10}, men det skrivs aldrig till porten.
+  \item Ett varv är \code{out} 1, \code{lsl} 1, \code{dec} 1 och \code{brne} 2 cykler, alltså 5;
+    det sista varvet 4. Loopen tar \code{4 · 5 - 1 = 19} cykler, och \code{19 · 62,5 ns ≈ 1,19 µs}.
+    Simulatorn mäter 19 cykler.
+\end{enumerate}
+\credit{1 p per deluppgift.}
+\trap{\code{PORTB} = \code{0x10}, genom att räkna med \code{lsl} efter den sista \code{out}, ger
+0~p på den delen.}
+
+\answerpart{c}{3}
+\noanswer{Programmet står inte i boken. Så här bedöms det:}
+\credit{1 p för initieringen (utgång, ingång och pull-up), 1 p för att läsa rätt bit och ta hänsyn
+till att knappen är aktivt låg, 1 p för en loop som tänder och släcker rätt. Ett program som läser
+hela porten med \code{in}, inverterar med \code{com} och maskar med \code{andi} är lika bra.}
+\trap{ett program som tänder lysdioden när biten är 1 lyser när knappen är släppt, och förlorar
+poängen för aktivt låg.}

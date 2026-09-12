@@ -1,0 +1,385 @@
+% Section 10.1, from lectures/L10/appendix/a_ascii_and_16bit.md.
+%
+% One correction, made in the lecture too: 10.1.2 said that AVR has no instruction that adds a
+% constant, which 10.1.8 then contradicts with adiw; it now says "to a single register".
+% The long comment in the 16-bit addition drawing of 10.1.7 is moved to a line of its own, so the
+% drawing fits the page.
+
+\section{ASCII-koder och 16-bitarstal}
+\label{c10:app:a}
+
+\subsection{Tecken är också tal}
+\label{c10:a1}
+En mikrodator känner bara till tal. Ett tecken, en bokstav eller en siffra på en display, är ett tal
+som alla har kommit överens om att tolka som ett visst tecken. Den överenskommelse som nästan all
+elektronik använder heter \textbf{ASCII}, och den gicks igenom i \secref{c1:app:b}. Här behövs
+bara en liten del av tabellen:
+
+\begin{narrowtable}{@{}cc@{\hspace{3em}}cc@{}}
+  \thead{Tecken} & \thead{ASCII-kod} & \thead{Tecken} & \thead{ASCII-kod} \\
+  \midrule
+  \code{'0'} & \code{0x30} & \code{'A'} & \code{0x41} \\
+  \code{'1'} & \code{0x31} & \code{'B'} & \code{0x42} \\
+  \code{'2'} & \code{0x32} & \code{'C'} & \code{0x43} \\
+  \dots & \dots & \code{'D'} & \code{0x44} \\
+  \code{'8'} & \code{0x38} & \code{'E'} & \code{0x45} \\
+  \code{'9'} & \code{0x39} & \code{'F'} & \code{0x46} \\
+\end{narrowtable}
+
+\noindent Två saker i tabellen gör resten av det här avsnittet möjligt:
+\begin{itemize}
+  \item \textbf{Siffrorna ligger i ordning.} Tecknet för siffran \code{n} har koden
+    \code{0x30 + n}. Tecknet \code{'7'} är alltså \code{0x37}, och siffran 7 blir ett tecken genom
+    att man adderar \code{0x30}.
+  \item \textbf{Bokstäverna ligger också i ordning, men inte direkt efter siffrorna.} Efter
+    \code{'9'} (\code{0x39}) kommer sju andra tecken (\code{:}, \code{;}, \code{<} och så vidare)
+    innan \code{'A'} (\code{0x41}). Den luckan på sju kommer att dyka upp i koden.
+\end{itemize}
+
+Assemblern känner till tecken. \code{ldi r16, 'A'} betyder precis samma sak som
+\code{ldi r16, 0x41}, och det är ofta det tydligaste sättet att skriva en konstant som är tänkt som
+ett tecken.
+
+Varför behövs det här? Så fort ett tal ska visas för en människa, på en display, i ett
+terminalfönster eller i en logg, måste det göras om till tecken. Talet \code{0x3C} i ett register
+är en byte; texten \enquote{3C} på en skärm är två byte, \code{0x33} och \code{0x43}.
+
+\subsection{En siffra blir ett tecken}
+\label{c10:a2}
+Ett värde 0--15 ska bli tecknet för sin hexadecimala siffra, \code{'0'}--\code{'9'} eller
+\code{'A'}--\code{'F'}.
+
+\textbf{Värdet 0--9:} addera \code{0x30}. Värdet 7 blir \code{0x37}, som är \code{'7'}.
+
+\textbf{Värdet 10--15:} addera \code{0x30} och sju till. Värdet 10 blir
+\code{0x0A + 0x07 + 0x30 = 0x41}, som är \code{'A'}. De sju extra är luckan mellan \code{'9'} och
+\code{'A'} från \secref{c10:a1}.
+
+AVR saknar en instruktion som adderar en konstant till ett enskilt register. Men att subtrahera ett
+negativt tal är samma sak som att addera, så \code{subi r24, -0x30} adderar \code{0x30} (se
+\secref{c8:app:a}). Hela omvandlingen blir fyra instruktioner och en etikett:
+
+\needspace{7\baselineskip}
+\begin{asmcode}
+    cpi r24, 10                     ; A digit 0-9, or a letter A-F?
+    brlo digit                      ; 0-9: skip the extra step.
+    subi r24, -7                    ; A-F: add 7 more, so that 10 lands on 'A'.
+digit:
+    subi r24, -0x30                 ; Add 0x30, the ASCII code for '0'.
+\end{asmcode}
+
+\noindent Följ två värden genom koden:
+
+\begin{booktable}{@{}p{4.4em}p{6.2em}p{6.6em}LL@{}}
+  \thead{\code{r24} före} & \thead{\code{cpi r24, 10}} & \thead{Hopp?} &
+    \thead{Efter \code{subi r24, -7}} & \thead{Efter \code{subi r24, -0x30}} \\
+  \midrule
+  \code{0x03} & 3 < 10, C = 1 & ja, \code{brlo} hoppar & (körs inte) & \code{0x33} = \code{'3'} \\
+  \code{0x0C} & 12 ≥ 10, C = 0 & nej & \code{0x13} & \code{0x43} = \code{'C'} \\
+\end{booktable}
+
+\begin{aside}
+\textbf{Flaggorna efter \code{subi} med ett negativt tal} beter sig som vid en subtraktion, inte
+som vid en addition: \code{C} blir 1 när det \emph{inte} blev någon minnessiffra i additionen. Här
+spelar det ingen roll, eftersom ingenting läser flaggorna efteråt. Men bygg aldrig ett villkorligt
+hopp på flaggorna efter ett sådant \code{subi}.
+\end{aside}
+
+\subsection{En byte blir två tecken}
+\label{c10:a3}
+En byte är två hexadecimala siffror, och varje siffra är fyra bitar, en \textbf{nibble}
+(\secref{c1:app:a}). För att skriva ut byten \code{0x3C} ska den höga nibblen \code{3} och den låga
+nibblen \code{C} göras om var för sig.
+
+\bookfigure{l10_nibbles}{Byten \code{0x3C} delas i sin höga och sin låga halva, som blir var sitt
+tecken.}{c10:fig:nibbles}
+
+\textbf{Den låga nibblen} får man genom att nollställa de fyra höga bitarna med en mask:
+\code{andi r24, 0x0F} behåller bit 0--3 och nollställer bit 4--7. \code{0x3C} blir \code{0x0C}.
+
+\textbf{Den höga nibblen} får man med en ny instruktion, \textbf{\code{swap}}, som byter plats på
+ett registers två halvor: \code{0x3C} blir \code{0xC3}. Därefter gör samma mask som nyss att
+\code{0x03} blir kvar. \code{swap} tar en cykel och påverkar inga flaggor.
+
+Hela programmet, \code{hex_to_ascii.asm}, gör om \code{0x3C} i \code{r16} till tecknen \code{'3'} i
+\code{r20} och \code{'C'} i \code{r21}:
+
+\begin{asmcode}
+main:
+    ldi r16, 0x3C                   ; The byte to convert.
+
+    ; The high nibble: 0x3C -> 0x03 -> '3'.
+    mov r24, r16                    ; Work on a copy, so r16 keeps its value.
+    swap r24                        ; Swap the two nibbles: 0x3C -> 0xC3.
+    andi r24, 0x0F                  ; Keep only the low nibble: 0xC3 -> 0x03.
+    cpi r24, 10                     ; A digit 0-9, or a letter A-F?
+    brlo high_digit                 ; 0-9: skip the extra step.
+    subi r24, -7                    ; A-F: add 7 more, so that 10 lands on 'A'.
+high_digit:
+    subi r24, -0x30                 ; Add 0x30, the ASCII code for '0'.
+    mov r20, r24                    ; r20 = '3' = 0x33.
+
+    ; The low nibble: 0x3C -> 0x0C -> 'C'.
+    mov r24, r16
+    andi r24, 0x0F                  ; Keep only the low nibble: 0x3C -> 0x0C.
+    cpi r24, 10
+    brlo low_digit
+    subi r24, -7
+low_digit:
+    subi r24, -0x30
+    mov r21, r24                    ; r21 = 'C' = 0x43.
+\end{asmcode}
+
+Lägg märke till att samma fem rader står två gånger, bara med olika etiketter. Det är ett tecken på
+att de borde vara en \textbf{subrutin}, något man skriver en gång och anropar två gånger. Det är
+ämnet för \secref{c10:app:c}, och i \secref{c10:c9} skrivs det här programmet om så.
+
+\subsection{Tillbaka från tecken till värde}
+\label{c10:a4}
+Omvänt: ett tecken \code{'0'}--\code{'9'} eller \code{'A'}--\code{'F'} ska bli sitt värde 0--15.
+Det är samma steg i omvänd ordning:
+\begin{enumerate}
+  \item Subtrahera \code{0x30}. En siffra är nu klar: \code{'7'} (\code{0x37}) blir 7.
+  \item En bokstav blev 17 eller mer: \code{'A'} (\code{0x41}) blir \code{0x11} = 17. Subtrahera
+    sju till.
+\end{enumerate}
+
+\needspace{7\baselineskip}
+\begin{asmcode}
+    subi r22, 0x30                  ; '0'-'9' -> 0-9, 'A'-'F' -> 17-22.
+    cpi r22, 10
+    brlo done                       ; A digit: done.
+    subi r22, 7                     ; A letter: 17-22 -> 10-15.
+done:
+\end{asmcode}
+
+\noindent Det är så en mikrodator tolkar ett tal som någon har skrivit in på ett tangentbord: varje
+tangent skickar ett tecken, och programmet gör om tecknen till tal.
+
+\subsection{Att lägga text i minnet}
+\label{c10:a5}
+Hittills har varje värde legat i ett register. Text brukar i stället ligga i
+\textbf{dataminnet}, SRAM, en byte per tecken efter varandra (\secref{c7:app:a}). En ny
+instruktion skriver ett register till en adress i dataminnet:
+
+\needspace{4\baselineskip}
+\begin{asmcode}
+    sts 0x0100, r20                 ; Store r20 at data address 0x0100.
+    sts 0x0101, r21                 ; ... and r21 right after it.
+\end{asmcode}
+
+\noindent\textbf{\code{sts}} (\emph{store direct to data space}) tar en adress och ett register,
+och tar två cykler. Motsatsen, \textbf{\code{lds r16, 0x0100}}, läser tillbaka byten till ett
+register. SRAM börjar på adress \code{0x0100}, så de adresserna är lediga att använda för egna
+data.
+
+Lägg till de två raderna sist i programmet i \secref{c10:a3}, så hamnar tecknen \code{'3'} och
+\code{'C'} efter varandra i minnet. I Microchip Studio syns de i fönstret \textbf{Memory} med
+\textbf{data IRAM} valt (\secref{studio:4-3} i bilaga~\ref{app:studio}). Till höger om bytena
+\code{33 43} visar fönstret samma byte tolkade som ASCII, och där står texten \code{3C}.
+
+\subsection{Tal större än 255}
+\label{c10:a6}
+Ett register är åtta bitar, och åtta bitar räcker till talen 0--255. Det räcker långt, men inte
+till allt: ett räknevärde på 1000, en fördröjning på en sekund, eller en adress i ett minne på
+2048 byte.
+
+Lösningen är att använda \textbf{två register tillsammans}, som ett 16-bitars tal. Det ena håller
+den \textbf{höga byten} (bit 15--8) och det andra den \textbf{låga byten} (bit 7--0). Ett sådant
+\textbf{registerpar} skrivs med det höga registret först, till exempel \code{r25:r24}.
+
+\bookfigure{l10_register_pair}{Registerparet \code{r25:r24} som håller talet
+1000.}{c10:fig:register_pair}
+
+Talet 1000 är \code{0x03E8}. Den höga byten är \code{0x03} och den låga \code{0xE8}, och värdet är
+\code{0x03 · 256 + 0xE8 = 768 + 232 = 1000}. En etta i den höga byten är alltså värd 256.
+
+Assemblern delar upp ett 16-bitars tal åt dig, med \code{low()} och \code{high()}:
+
+\needspace{4\baselineskip}
+\begin{asmcode}
+    ldi r24, low(1000)              ; r24 = 0xE8, the low byte.
+    ldi r25, high(1000)             ; r25 = 0x03, the high byte.
+\end{asmcode}
+
+\noindent Med 16 bitar går det att räkna till \mbox{\code{2^16 - 1 = 65 535}}. Paren \code{r25:r24},
+\code{r27:r26}, \code{r29:r28} och \code{r31:r30} används oftast, av skäl som \secref{c10:a8}
+visar.
+
+\subsection{Addition och subtraktion med 16 bitar}
+\label{c10:a7}
+Processorn räknar fortfarande åtta bitar i taget. En 16-bitars addition görs därför i två steg, på
+samma sätt som när man adderar för hand med minnessiffra (\secref{c1:a7}): först de låga bytena,
+sedan de höga bytena \textbf{plus minnessiffran} från det första steget.
+
+Minnessiffran hamnar i flaggan \code{C}, och det finns en instruktion som tar med den:
+\textbf{\code{adc}} (\emph{add with carry}) beräknar \code{Rd = Rd + Rr + C}.
+
+Exempel: 1000 + 2000 = 3000, eller \code{0x03E8 + 0x07D0}.
+
+\needspace{11\baselineskip}
+\begin{textdrawing}
+                 r25    r24
+                0x03   0xE8      1000
+             +  0x07   0xD0      2000
+             ---------------
+  add r24:             0x1B8  -> r24 = 0xB8, C = 1
+                                 (0xE8 + 0xD0 = 0x1B8 får inte plats)
+  adc r25:     0x03 + 0x07 + 1 = 0x0B
+             ---------------
+                0x0B   0xB8      3000
+\end{textdrawing}
+
+\needspace{8\baselineskip}
+\begin{asmcode}
+    ldi r24, low(1000)              ; r25:r24 = 1000 = 0x03E8.
+    ldi r25, high(1000)
+    ldi r22, low(2000)              ; r23:r22 = 2000 = 0x07D0.
+    ldi r23, high(2000)
+    add r24, r22                    ; Low bytes: 0xE8 + 0xD0 = 0x1B8. r24 = 0xB8, C = 1.
+    adc r25, r23                    ; High bytes and the carry: 0x03 + 0x07 + 1 = 0x0B.
+\end{asmcode}
+
+\noindent Utan \code{adc}, med \code{add} även för de höga bytena, hade svaret blivit \code{0x0AB8}
+= 2744: minnessiffran hade försvunnit, och felet hade varit exakt 256. Ett fel på 256 i ett
+16-bitars resultat är nästan alltid en glömd minnessiffra.
+
+Subtraktion fungerar likadant. \textbf{\code{sub}} tar de låga bytena, och \textbf{\code{sbc}}
+(\emph{subtract with carry}) tar de höga bytena minus lånet i \code{C}: \code{Rd = Rd - Rr - C}.
+
+\needspace{4\baselineskip}
+\begin{asmcode}
+    sub r20, r22                    ; Low bytes first; a borrow lands in C ...
+    sbc r21, r23                    ; ... and sbc subtracts it from the high bytes.
+\end{asmcode}
+
+\noindent\textbf{Ordningen spelar roll:} de låga bytena först, alltid. Det är den operationen som
+ger \code{C}, och den höga behöver det.
+
+\subsection{\code{adiw}, \code{sbiw} och \code{movw}}
+\label{c10:a8}
+Tre instruktioner arbetar på ett helt registerpar på en gång:
+
+\begin{booktable}{@{}p{7.4em}Lc@{}}
+  \thead{Instruktion} & \thead{Gör} & \thead{Cykler} \\
+  \midrule
+  \code{adiw r24, 1} & \code{r25:r24 = r25:r24 + 1}. Konstanten får vara 0--63. & 2 \\
+  \code{sbiw r24, 1} & \code{r25:r24 = r25:r24 - 1}. Konstanten får vara 0--63. & 2 \\
+  \code{movw r18, r24} & Kopierar paret: \code{r19:r18 = r25:r24}. & 1 \\
+\end{booktable}
+
+Man skriver bara det låga registret i paret; det höga följer med. \code{adiw} och \code{sbiw}
+fungerar bara på de fyra paren \code{r25:r24}, \code{r27:r26}, \code{r29:r28} och \code{r31:r30},
+vilket är varför de paren används mest. \code{movw} fungerar på alla par vars låga register har
+jämnt nummer.
+
+Det viktigaste med \code{sbiw} är flaggan \textbf{Z}: den blir 1 när \textbf{hela}
+16-bitarstalet blev noll, inte bara den ena byten. Därför kan \code{sbiw} följt av \code{brne}
+räkna ned ett 16-bitars tal till noll, vilket är precis vad en lång fördröjning behöver
+(\secref{c10:a10}).
+
+Programmet \code{add16.asm} visar alla tre: efter additionen i \secref{c10:a7} kopieras 3000 till
+\code{r19:r18} med \code{movw}, och \code{r25:r24} blir sedan 3001 med \code{adiw} och 2999 med
+\code{sbiw}.
+
+\subsection{Att jämföra 16-bitarstal}
+\label{c10:a9}
+En jämförelse görs också byte för byte. \code{cpi} jämför de låga bytena, och \textbf{\code{cpc}}
+(\emph{compare with carry}) jämför de höga bytena och tar hänsyn till resultatet av den första
+jämförelsen. Efter paret säger \code{Z} om talen var lika, och \code{C} om det första var mindre,
+precis som för 8-bitarstal.
+
+\needspace{8\baselineskip}
+\begin{asmcode}
+    ldi r16, high(1000)             ; cpc compares with a register, not a constant.
+count:
+    adiw r24, 1                     ; r25:r24 = r25:r24 + 1.
+    cpi r24, low(1000)              ; Compare the low bytes ...
+    cpc r25, r16                    ; ... then the high bytes.
+    brne count                      ; Not 1000 yet: again.
+\end{asmcode}
+
+\noindent\code{cpc} finns bara i en form som jämför två register. Det finns ingen \code{cpci}, så
+den höga byten av konstanten måste först laddas i ett eget register, här \code{r16}.
+
+Loopen räknar \code{r25:r24} från 0 till 1000. Varje varv tar \code{2 + 1 + 1 + 2 = 6} cykler,
+utom det sista, där \code{brne} inte hoppar och tar en cykel: \code{1000 · 6 - 1 = 5999} cykler.
+
+\subsection{En lång tidsfördröjning}
+\label{c10:a10}
+Fördröjningarna i \secref{c9:app:b} räknade med 8-bitars register. En loop med \code{dec} och
+\code{brne} kan gå högst 256 varv, och med 3 cykler per varv blir det ungefär 768 cykler, 48~µs.
+Två sådana loopar i varandra räcker till ungefär 200\,000 cykler, drygt 12~ms. För en sekund,
+16\,000\,000 cykler vid 16~MHz, behövs mer.
+
+Med en 16-bitars loop kan den inre loopen gå upp till 65\,535 varv. En sådan loop med \code{sbiw}
+och \code{brne} tar 4 cykler per varv:
+
+\needspace{7\baselineskip}
+\begin{asmcode}
+    ldi r24, low(INNER_TURNS)       ; 1 cycle.
+    ldi r25, high(INNER_TURNS)      ; 1 cycle.
+inner:
+    sbiw r24, 1                     ; 2 cycles.
+    brne inner                      ; 2 cycles while not 0, 1 the last time.
+\end{asmcode}
+
+\noindent Med \code{N} varv tar loopen \code{4N - 1} cykler: \code{N} varv om 4 cykler, minus en
+eftersom den sista \code{brne} inte hoppar. Det räcker till ungefär 262\,000 cykler, 16~ms. För en
+hel sekund läggs ytterligare en loop utanför, som kör den inre loopen \code{M} gånger. Hela
+fördröjningen i \code{one_second_delay.asm}:
+
+\needspace{16\baselineskip}
+\begin{asmcode}
+.equ OUTER_TURNS = 80               ; Outer loop: 80 turns.
+.equ INNER_TURNS = 49999            ; Inner loop: 49 999 turns of 4 cycles each.
+
+delay_begin:
+    ldi r20, OUTER_TURNS            ; 1 cycle.
+outer:
+    ldi r24, low(INNER_TURNS)       ; 1 cycle.
+    ldi r25, high(INNER_TURNS)      ; 1 cycle.
+inner:
+    sbiw r24, 1                     ; 2 cycles: r25:r24 = r25:r24 - 1.
+    brne inner                      ; 2 cycles while r25:r24 is not 0, 1 the last time.
+    dec r20                         ; 1 cycle.
+    brne outer                      ; 2 cycles while r20 is not 0, 1 the last time.
+delay_end:
+\end{asmcode}
+
+\noindent Räkna rad för rad, som i kapitel~\ref{c9:ch}:
+
+\begin{narrowtable}{@{}lccc@{}}
+  \thead{Instruktion} & \thead{Cykler} & \thead{Gånger} & \thead{Summa} \\
+  \midrule
+  \code{ldi r20} & 1 & 1 & 1 \\
+  \code{ldi r24}, \code{ldi r25} & 1 + 1 & \code{M} & \code{2M} \\
+  inre loopen & \code{4N - 1} & \code{M} & \code{M(4N - 1)} \\
+  \code{dec r20} & 1 & \code{M} & \code{M} \\
+  \code{brne outer}, hoppar & 2 & \code{M - 1} & \code{2M - 2} \\
+  \code{brne outer}, hoppar inte & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent Summan är \code{M(4N + 4)}. Ett varv i den yttre loopen tar alltså \code{4N + 4} cykler,
+och med \mbox{\code{N = 49 999}} blir det exakt 200\,000 cykler, 12,5~ms. Då behövs
+\mbox{\code{M = 16 000 000}} \mbox{\code{/ 200 000}} \mbox{\code{= 80}} varv för en sekund:
+
+\needspace{3\baselineskip}
+\begin{textdrawing}
+M(4N + 4) = 80 · (4 · 49 999 + 4) = 80 · 200 000 = 16 000 000 cykler = 1,000000 s
+\end{textdrawing}
+
+\noindent Simulatorn mäter också 16\,000\,000 cykler mellan \code{delay_begin} och
+\code{delay_end}. Så väljer man konstanterna för en önskad tid:
+\begin{enumerate}
+  \item Räkna om tiden till cykler: tid · 16\,000\,000.
+  \item Välj ett jämnt varv för den yttre loopen, till exempel 200\,000 cykler, och räkna ut
+    \code{N} ur \mbox{\code{4N + 4 = 200 000}}.
+  \item Dela antalet cykler med varvtiden, så får du \code{M}. \code{M} måste vara 1--255.
+\end{enumerate}
+
+\begin{aside}
+\textbf{Namnen på konstanter och etiketter får inte krocka.} Assemblern skiljer inte på stora och
+små bokstäver, så \code{.equ OUTER = 80} och etiketten \code{outer:} är samma namn, och programmet
+assembleras inte. Därför heter konstanterna \code{OUTER_TURNS} och \code{INNER_TURNS}.
+\end{aside}

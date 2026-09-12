@@ -1,0 +1,223 @@
+% Labb 3, the final task, parts A and B, from labs/lab3/e_final_task.md. The wiring and the
+% ready-made subroutines, headings of their own in the guide, are subsections; parts A and B are
+% \labtask, with their Mål, Bakgrund, Specifikation, Uppgifter, Frågor and Extra as \task
+% headings. The subroutines delay_s and delay_ms are the handout's, and are printed as the guide
+% prints them.
+
+\section{Slutuppgift: trafikljuset och övergångsstället}
+\label{lab3:sec:e}
+Slutuppgiften hör till kapitel~\ref{c11:ch}, och är den del av Labb~3 där programmet till sist
+lämnar simulatorn och styr något på riktigt: tre lysdioder och en knapp på ett Arduino Uno-kort.
+Del~A krävs för godkänt, och del~B för VG.
+
+Läs \secref{c11:app:a} om lysdioder, knappar och kopplingen, och \secref{c11:app:b}, där ett
+enklare ljus, ett vägarbetsljus, tas hela vägen från flödesplan till program. Hur programmet förs
+över till kortet står i \secref{studio:5}.
+
+\subsection{Kopplingen}
+\label{lab3:sec:wiring}
+Samma koppling används i båda delarna. Varje lysdiod har ett eget förkopplingsmotstånd, och knappen
+kopplas mellan stift 2 och jord.
+
+\begin{narrowtable}{@{}lcc@{}}
+  \thead{Funktion} & \thead{Arduino-stift} & \thead{Port och bit} \\
+  \midrule
+  Röd lysdiod & 8 & PB0 \\
+  Gul lysdiod & 9 & PB1 \\
+  Grön lysdiod & 10 & PB2 \\
+  Knapp, till jord & 2 & PD2 \\
+  Jord & GND & -- \\
+\end{narrowtable}
+
+\bookfigure{l11_traffic_wiring}{Kopplingsschemat: tre lysdioder med förkopplingsmotstånd på stift
+8, 9 och 10, och en knapp från stift 2 till jord.}{lab3:fig:wiring}
+
+Lysdiodens långa ben, anoden, ska vara vänt mot motståndet och stiftet, och det korta, katoden, mot
+jord. Koppla med USB-kabeln urkopplad, och kontrollera kopplingen mot tabellen innan kabeln sätts
+i.
+
+\subsection{De färdiga subrutinerna}
+\label{lab3:sec:subroutines}
+Båda delarna använder fördröjningar på hela sekunder. Ni behöver inte skriva dem själva: kopiera in
+de två subrutinerna nedan sist i programmet, och konstanten \code{QUARTER_MS} överst. De förklaras
+i \secref{c11:b4}, och \code{delay_ms} är samma subrutin som i del~22.
+
+\begin{asmcode}
+.equ QUARTER_MS = 250               ; 250 ms. Set it to 1 to run about 250 times
+                                    ; faster in the simulator; set it back before
+                                    ; flashing.
+\end{asmcode}
+
+\begin{asmcode}
+;--------------------------------------------------------------------------------
+; delay_s: Waits r24 seconds (1-63), as 4 x r24 calls of delay_ms with 250 ms each.
+; A call takes 16 000 084 x r24 + 18 cycles: about 5 microseconds too long per second.
+;--------------------------------------------------------------------------------
+delay_s:
+    push r24                        ; Save the registers this subroutine changes.
+    push r25
+    mov r25, r24
+    lsl r25                         ; r25 = 2 x r24 ...
+    lsl r25                         ; ... = 4 x r24: the number of quarter seconds.
+    ldi r24, QUARTER_MS             ; A quarter of a second is 250 ms.
+delay_s_loop:
+    rcall delay_ms
+    dec r25
+    brne delay_s_loop
+    pop r25                         ; Restore them, in the opposite order.
+    pop r24
+    ret
+
+;--------------------------------------------------------------------------------
+; delay_ms: Waits r24 milliseconds (1-255) at 16 MHz.
+; A call takes 16 000 x r24 + 18 cycles, the rcall and the ret included.
+;--------------------------------------------------------------------------------
+delay_ms:
+    push r24                        ; Save the registers this subroutine changes.
+    push r26
+    push r27
+delay_ms_outer:
+    ldi r26, low(3999)              ; X = r27:r26 = 3999.
+    ldi r27, high(3999)
+delay_ms_inner:
+    sbiw r26, 1                     ; 4 cycles per turn, 3 the last time.
+    brne delay_ms_inner
+    dec r24                         ; One more millisecond done.
+    brne delay_ms_outer
+    pop r27                         ; Restore them, in the opposite order.
+    pop r26
+    pop r24
+    ret
+\end{asmcode}
+
+Så används de: ladda \code{r24} med antalet sekunder och anropa \code{delay_s}. \code{ldi r24, 3}
+följt av \code{rcall delay_s} väntar tre sekunder, och \code{r24} är fortfarande 3 efteråt.
+
+\begin{aside}
+\textbf{I simulatorn} tar varje simulerad sekund lång tid att köra. Sätt \code{QUARTER_MS} till 1
+medan ni testar programmet där: då går varje \enquote{sekund} på ungefär 4~ms, och hela ljuscykeln
+syns på några ögonblick. \textbf{Sätt tillbaka den till 250 innan programmet förs över till
+kortet.}
+\end{aside}
+
+\labtask{Del A}{Trafikljuset}\phantomsection\label{lab3:a}
+\task{Mål}
+Styra ett trafikljus med tre lysdioder genom en fast ljuscykel, i simulatorn och på kortet.
+
+\task{Bakgrund}
+Vägarbetsljuset i \secref{c11:app:b} har två tillstånd; trafikljuset har fyra. Metoden är
+densamma: skriv upp tillstånden och deras tider, rita flödesplanen, och skriv sedan programmet ett
+tillstånd i taget.
+
+\task{Specifikation}
+Trafikljuset går igenom fyra tillstånd, i den här ordningen, och börjar sedan om:
+
+\begin{narrowtable}{@{}lcccc@{}}
+  \thead{Tillstånd} & \thead{Röd (PB0)} & \thead{Gul (PB1)} & \thead{Grön (PB2)} & \thead{Tid} \\
+  \midrule
+  Stopp & tänd & släckt & släckt & 3~s \\
+  Klart att köra & tänd & tänd & släckt & 1~s \\
+  Kör & släckt & släckt & tänd & 3~s \\
+  Stopp strax & släckt & tänd & släckt & 1~s \\
+\end{narrowtable}
+
+\bookfigure{l11_traffic_timing}{Tidsdiagram för trafikljuset: en ljuscykel är 8~s.}%
+{lab3:fig:timing}
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Flödesplan.} Rita flödesplanen för programmet, med ett symbolpar per tillstånd:
+    tänd rätt lampor, vänta rätt tid. \kindtag[fillaccent]{Redovisa} den innan ni börjar skriva kod.
+  \item \textbf{Bitmönstren.} Skriv upp vilket värde \code{PORTB} ska ha i vart och ett av de fyra
+    tillstånden, binärt och hexadecimalt. Använd gärna \code{.equ RED = 0} och skrivsättet
+    \code{(1 << RED)}, så att programmet säger vad det gör.
+  \item \textbf{Programmet.} Skriv programmet utifrån programmallen, med initiering av \code{SP},
+    \code{DDRB}, och de färdiga subrutinerna.
+  \item \textbf{Simulera.} Sätt \code{QUARTER_MS} till 1 och kör i simulatorn. Sätt en brytpunkt på
+    varje \code{out PORTB, r16} och kontrollera i I/O-fönstret att rätt lampor tänds, i rätt
+    ordning. Kontrollera också med stoppuret att tiderna står i rätt förhållande till varandra: 3,
+    1, 3, 1.
+  \item \textbf{På kortet.} Sätt tillbaka \code{QUARTER_MS} till 250, bygg, och för över programmet
+    till kortet enligt \secref{studio:5}.
+  \item \textbf{Mät.} Ta tid på tio hela cykler med stoppuret i en mobiltelefon. \emph{Förutsäg}
+    tiden först, med formeln för \code{delay_s}. Hur nära kommer ni? Vad begränsar noggrannheten i
+    er mätning, och vad begränsar noggrannheten i programmet?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vad händer om \code{delay_s} inte sparade \code{r24}? Hade programmet märkt det?
+  \item Varför tänds röd och gul samtidigt i det andra tillståndet? Vad säger det till en bilist?
+\end{itemize}
+
+\redovisa{flödesplanen, simuleringen och trafikljuset på kortet.}
+
+\labtask{Del B}{Övergångsstället}\phantomsection\label{lab3:b}
+\task{Mål}
+Låta en knapp styra när ljuscykeln körs: ett övergångsställe där bilarna har grönt tills en
+fotgängare trycker på knappen.
+
+\task{Bakgrund}
+Att vänta på en knapp med \code{sbic} finns i \secref{c10:b5}, och varför en knapp studsar i
+\secref{c11:a4}. Subrutiner och kursens regel om register finns i \secref{c10:app:c}.
+
+\task{Specifikation}
+\begin{itemize}
+  \item Bilarna har \textbf{grönt}, så länge ingen trycker på knappen.
+  \item När knappen trycks går ljuset igenom:
+
+    \begin{narrowtable}{@{}lcccc@{}}
+      \thead{Tillstånd} & \thead{Röd (PB0)} & \thead{Gul (PB1)} & \thead{Grön (PB2)} &
+        \thead{Tid} \\
+      \midrule
+      Stopp strax & släckt & tänd & släckt & 1~s \\
+      Stopp: fotgängarna går & tänd & släckt & släckt & 4~s \\
+      Klart att köra & tänd & tänd & släckt & 1~s \\
+    \end{narrowtable}
+  \item Därefter blir det grönt igen, och programmet väntar på nästa tryck.
+  \item Knappen är aktivt låg, med den inbyggda pull-upen: PD2 som ingång, med pull-up.
+  \item Programmet ska använda minst en egen subrutin utöver de färdiga, och varje subrutin ska
+    följa kursens regel: spara varje register den ändrar.
+\end{itemize}
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item \textbf{Flödesplan.} Rita flödesplanen, med beslutet \enquote{knappen nedtryckt?} och de
+    tre tillstånden. \kindtag[fillaccent]{Redovisa} den innan ni skriver kod.
+  \item \textbf{En egen subrutin.} De tre tillstånden gör samma sak med olika värden: tänd vissa
+    lampor, vänta en viss tid. Skriv en subrutin \code{show} som tänder lamporna i \code{r16} och
+    väntar det antal sekunder som står i \code{r24}. Vilka register ändrar den? Måste något av dem
+    sparas?
+  \item \textbf{Programmet.} Skriv programmet. Initiera \code{SP}, \code{DDRB}, \code{DDRD} och
+    pull-upen på PD2.
+  \item \textbf{Simulera.} Sätt \code{QUARTER_MS} till 1. Kör programmet, stoppa det medan det
+    väntar på knappen, och \enquote{tryck} genom att tömma rutan för bit~2 i \code{PIND}.
+    \emph{Förutsäg} vilka lampor som ska tändas i vilken ordning, och kontrollera med
+    brytpunkter.
+  \item \textbf{På kortet.} Sätt tillbaka \code{QUARTER_MS} till 250 och för över programmet till
+    kortet. Prova ett kort tryck, ett långt tryck, och ett tryck medan ljuset redan är rött.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Knappen studsar när den trycks. Varför ställer det inte till något här, när det gjorde det
+    för knapptryckräknaren i \secref{c11:a4}?
+  \item Vad händer om någon håller knappen nedtryckt hela tiden? Är det ett problem för bilarna?
+  \item Ett tryck medan ljuset är rött gör ingenting. Varför inte? Hur skulle programmet behöva
+    ändras för att komma ihåg ett sådant tryck?
+\end{itemize}
+
+\task{Extra}
+Frivilliga utökningar, för den som vill vidare:
+\begin{itemize}
+  \item \textbf{Minsta tid på grönt.} Riktiga övergångsställen ger bilarna grönt i minst några
+    sekunder innan ett nytt tryck får verkan. Låt bilarna alltid ha grönt i minst 5~s efter varje
+    fotgängarfas.
+  \item \textbf{Fotgängarnas ljus.} Lägg till en röd och en grön lysdiod för fotgängarna på PB3 och
+    PB4 (stift 11 och 12). Fotgängarnas gröna ska lysa bara under de 4 sekunderna med rött för
+    bilarna.
+  \item \textbf{Vänta-lampan.} Tänd en lampa, till exempel PB5 (stift 13, lysdioden på kortet), när
+    knappen har tryckts, och släck den när fotgängarna får grönt.
+\end{itemize}
+
+\redovisa{flödesplanen, simuleringen och övergångsstället på kortet.}

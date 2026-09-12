@@ -1,0 +1,272 @@
+% Solutions to Chapter 12's exercises, from lectures/L12/appendix/c_solutions.md. Exercise 12 asks
+% for a program: the program is left out, as the book leaves out every program, and its flow
+% chart, its choice of branch and its test are answered, since those are worked on paper. Every
+% other exercise is answered in full. The table in exercise 10 and the cycle counts in exercise 11
+% are the simulator's.
+
+\answerchapter{c12:ch}
+
+\answer{c12:ex:1}{Talomvandlingar}
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{Binärt} & \thead{Decimalt} & \thead{Hexadecimalt} \\
+  \midrule
+  \code{1011 0101} & 181 & \code{0xB5} \\
+  \code{1100 1000} & 200 & \code{0xC8} \\
+  \code{0111 1110} & 126 & \code{0x7E} \\
+  \code{0100 0000} & 64 & \code{0x40} \\
+\end{narrowtable}
+
+\begin{itemize}
+  \item \code{1011 0101}: ettorna har vikterna 128, 32, 16, 4 och 1, och
+    \code{128 + 32 + 16 + 4 + 1 = 181}. Grupperna \code{1011} och \code{0101} är \code{B} och
+    \code{5}.
+  \item 200: 128 ryms, 72 kvar; 64 ryms, 8 kvar; 8 ryms, 0 kvar. Ettor på vikterna 128, 64 och 8
+    ger \code{1100 1000}, och grupperna \code{1100} och \code{1000} är \code{C} och \code{8}.
+  \item \code{0x7E}: \code{7} är \code{0111} och \code{E} är \code{1110}. Vikterna 64, 32, 16, 8, 4
+    och 2 ger 126.
+  \item 64 är en enda etta, på vikten 64: \code{0100 0000} = \code{0x40}.
+\end{itemize}
+
+\answer{c12:ex:2}{Binär addition och flaggor}
+\needspace{8\baselineskip}
+\pt{a}\leavevmode
+
+\begin{textdrawing}
+  minnessiffror: 1111 111
+                 0110 1101     109
+               + 0101 1011   +  91
+               -----------   -----
+                 1100 1000     200
+\end{textdrawing}
+
+\pt{b}Summan 200 får plats i åtta bitar, så det blir ingen minnessiffra ut ur bit~7:
+\textbf{\code{C} = 0}. Bit~7 i resultatet är 1, så \textbf{\code{N} = 1}.
+
+\pt{c}Med tecken är \code{1100 1000} lika med \code{200 - 256 = -56}. Två positiva tal har gett ett
+negativt resultat, eftersom den riktiga summan, 200, är större än 127, det största tal med tecken
+som ryms i en byte. Det kallas \emph{overflow}, och det är det flaggan \code{V} visar: här är
+\code{V} = 1. Utan tecken är svaret rätt, 200; med tecken är det fel. Samma bitar, två tolkningar.
+
+\answer{c12:ex:3}{Koder}
+\pt{a}4 är \code{0100} och 7 är \code{0111}: 47 i BCD är \textbf{\code{0100 0111}}. Binärt är 47
+\code{0010 1111}, ett helt annat bitmönster.
+
+\pt{b}\code{000}, \code{001}, \code{011}, \code{010}, \code{110}, \code{111}, \code{101},
+\code{100}. Mellan två grannar ändras \textbf{exakt en bit}, även från den sista, \code{100},
+tillbaka till den första, \code{000}.
+
+\pt{c}\code{O} är den femtonde bokstaven: \code{0x41 + 14 = 0x4F}. \code{K} är den elfte:
+\code{0x41 + 10 = 0x4B}. Texten \code{OK} är alltså de två bytena \textbf{\code{0x4F 0x4B}}.
+
+\answer{c12:ex:4}{Vilken grind är det?}
+\pt{a}NOR-grinden ger \code{(A + B)'}, AND-grinden ger \code{AB}, och OR-grinden slår ihop dem:
+
+\begin{console}
+X = (A + B)' + AB
+\end{console}
+
+\noindent Med De Morgan är \code{(A + B)' = A'B'}, så \code{X = A'B' + AB}.
+
+\needspace{8\baselineskip}
+\pt{b}\leavevmode
+
+\begin{narrowtable}{@{}ccccc@{}}
+  A & B & \code{(A + B)'} & \code{AB} & X \\
+  \midrule
+  0 & 0 & 1 & 0 & 1 \\
+  0 & 1 & 0 & 0 & 0 \\
+  1 & 0 & 0 & 0 & 0 \\
+  1 & 1 & 0 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{c}X är 1 när A och B är lika: det är en \textbf{XNOR}-grind. Tre grindar gör det en enda grind
+hade klarat.
+
+\answer{c12:ex:5}{Förenkla}
+\needspace{9\baselineskip}
+\pt{a}\leavevmode
+
+\begin{textdrawing}
+X = ABC + ABC' + AB'C
+  = AB(C + C') + AB'C       bryt ut AB
+  = AB + AB'C               komplement: C + C' = 1
+  = A(B + B'C)              bryt ut A
+  = A(B + C)                förenklingslagen: B + B'C = B + C
+  = AB + AC
+\end{textdrawing}
+
+\noindent Kontroll: X ska vara 1 på raderna 111, 110 och 101 och 0 på de andra. \code{AB + AC} är 1
+precis när \code{A} = 1 och minst en av \code{B} och \code{C} är 1, alltså just de tre raderna.
+
+\needspace{7\baselineskip}
+\pt{b}\leavevmode
+
+\begin{textdrawing}
+X = (A + B)(A + B')
+  = A + BB'                 distributiva lagen: (A + B)(A + C) = A + BC
+  = A + 0                   komplement: BB' = 0
+  = A
+\end{textdrawing}
+
+\noindent Det går också att multiplicera ut: \code{AA + AB' + AB + BB' = A + AB' + AB + 0}, och
+absorption ger \code{A}. Båda vägarna ger samma svar, och en tabell med fyra rader bekräftar det.
+
+\answer{c12:ex:6}{Två NAND-grindar}
+\pt{a}De Morgan på hela uttrycket:
+
+\begin{textdrawing}
+((AB)' · C)' = ((AB)')' + C'      De Morgan: (PQ)' = P' + Q'
+             = AB + C'            dubbel invertering
+\end{textdrawing}
+
+\pt{b}Den inre parentesen \code{(AB)'} är en NAND-grind med A och B. Den yttre är en NAND-grind
+med den första grindens utgång och C. \textbf{Två NAND-grindar} räcker, trots att uttrycket
+innehåller en AND, en OR och en NOT.
+
+\pt{c}En 74HC00 har fyra NAND-grindar, så \textbf{en kapsel} räcker, och \textbf{två grindar} blir
+över. Deras ingångar ska kopplas till jord eller matning, inte lämnas flytande.
+
+\answer{c12:ex:7}{Ett kontaktnät}
+\pt{a}Från +24~V: den slutande kontakten S1 i serie med en parallellkoppling av den slutande
+kontakten S2 och den \textbf{brytande} kontakten S3, och sedan lampan H1 till 0~V. S3 är brytande
+eftersom uttrycket innehåller \code{S3'}.
+
+\needspace{12\baselineskip}
+\pt{b}\leavevmode
+
+\begin{narrowtable}{@{}ccccc@{}}
+  S1 & S2 & S3 & \code{S2 + S3'} & H1 \\
+  \midrule
+  0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & 1 & 0 & 0 \\
+  0 & 1 & 0 & 1 & 0 \\
+  0 & 1 & 1 & 1 & 0 \\
+  1 & 0 & 0 & 1 & 1 \\
+  1 & 0 & 1 & 0 & 0 \\
+  1 & 1 & 0 & 1 & 1 \\
+  1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent Lampan lyser när S1 är nedtryckt och S3 inte är det (S2 spelar då ingen roll), och när S1
+och S2 är nedtryckta (S3 spelar då ingen roll).
+
+\answer{c12:ex:8}{Karnaughdiagram}
+\needspace{8\baselineskip}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}ccccc@{}}
+  \thead{AB \textbackslash{} CD} & \thead{00} & \thead{01} & \thead{11} & \thead{10} \\
+  \midrule
+  \textbf{00} & 1 & 1 & & \\
+  \textbf{01} & 1 & 1 & & \\
+  \textbf{11} & & & 1 & 1 \\
+  \textbf{10} & & & 1 & 1 \\
+\end{narrowtable}
+
+\pt{b}Två grupper om fyra, två block om 2 × 2:
+\begin{itemize}
+  \item Uppe till vänster, raderna \code{00} och \code{01} och kolumnerna \code{00} och \code{01}:
+    där är \code{A} = 0 och \code{C} = 0 hela tiden, medan \code{B} och \code{D} varierar. Termen
+    är \code{A'C'}.
+  \item Nere till höger, raderna \code{11} och \code{10} och kolumnerna \code{11} och \code{10}:
+    \code{A} = 1 och \code{C} = 1. Termen är \code{AC}.
+\end{itemize}
+
+\begin{console}
+X = A'C' + AC
+\end{console}
+
+\pt{c}X är 1 när A och C är lika: en \textbf{XNOR} av A och C. B och D påverkar inte X alls.
+
+\ptnote{Vanligt fel}Att skriva axlarna i binär ordning, \code{00, 01, 10, 11}. Här råkar det inte
+ändra svaret, eftersom ettorna ligger i paren \code{00}--\code{01} och \code{10}--\code{11}, som är
+grannar i båda ordningarna. Men en grupp över kolumnerna \code{01} och \code{11} hamnar då i två
+kolumner som inte ligger bredvid varandra, och uttrycket får fler termer än det behöver. Graykoden
+är rätt även när det råkar gå bra utan den.
+
+\answer{c12:ex:9}{Mikrodatorn}
+\pt{a}CPU:n i mitten, med ALU, register, styrenhet och programräknare. Programminnet (flash),
+dataminnet (SRAM) och in- och utportarna runt om, kopplade till CPU:n med adressbuss och databuss.
+En klocka som driver alltihop.
+
+\pt{b}Programräknaren innehåller adressen till nästa instruktion. I \textbf{hämta} läses
+instruktionen på den adressen ur programminnet, och programräknaren räknas upp till nästa
+instruktion. I \textbf{avkoda} tolkar styrenheten instruktionen. I \textbf{utföra} görs arbetet,
+till exempel en addition i ALU:n. Ett hopp utförs genom att ett nytt värde skrivs till
+programräknaren.
+
+\pt{c}Programmet i \textbf{flash} finns kvar; det är därför programmet startar igen. Innehållet i
+\textbf{SRAM} och i \textbf{registren} är borta: de har okända värden tills programmet skriver dem.
+Därför börjar varje program med att ställa in det det behöver, som stackpekaren och portarnas
+riktning.
+
+\answer{c12:ex:10}{Kontroll: följ programmet}
+\needspace{8\baselineskip}
+\pt{a}\textbf{och b)}\enspace Simulatorn visar:
+
+\begin{narrowtable}{@{}lccccccc@{}}
+  \thead{Instruktion} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{\code{r18}} &
+    \thead{\code{r19}} & \thead{\code{C}} & \thead{\code{Z}} & \thead{\code{N}} \\
+  \midrule
+  \code{add r16, r17} & \code{0x00} & \code{0x64} & & & 1 & 1 & 0 \\
+  \code{sub r18, r17} & & & \code{0xA1} & & 1 & 0 & 1 \\
+  \code{lsr r19} & & & & \code{0x50} & 1 & 0 & 0 \\
+  \code{andi r19, 0x0F} & & & & \code{0x00} & 1 & 1 & 0 \\
+\end{narrowtable}
+
+\noindent Så räknas raderna ut:
+\begin{itemize}
+  \item \code{0x9C + 0x64 = 0x100}, som inte får plats: \code{r16} = \code{0x00}, \code{C} = 1, och
+    resultatet är noll, så \code{Z} = 1.
+  \item \code{5 - 100 = -95}. Det kräver ett lån, så \code{C} = 1, och resultatet är
+    \code{256 - 95 = 161} = \code{0xA1}, med bit~7 satt, så \code{N} = 1.
+  \item \code{mov} kopierar \code{0xA1} till \code{r19}. \code{lsr} skiftar åt höger:
+    \code{1010 0001} blir \code{0101 0000} = \code{0x50}, och biten som skiftas ut, bit~0, var 1:
+    \code{C} = 1.
+  \item \code{andi r19, 0x0F} behåller den låga halvan av \code{0x50}, som är 0: \code{r19} =
+    \code{0x00} och \code{Z} = 1.
+\end{itemize}
+
+\pt{c}Den vanligaste avvikelsen är att \code{C} förutsägs bli 0 efter \code{andi}. Men \code{andi}
+ändrar inte \code{C} alls (referensbladet i bilaga~\ref{app:avr} visar vilka flaggor varje
+instruktion påverkar), så \code{C} behåller värdet från \code{lsr}, alltså 1. En flagga som en
+instruktion inte skriver ligger kvar från den förra som gjorde det.
+
+\answer{c12:ex:11}{En loop}
+\pt{a}Ett varv är \code{nop} 1, \code{dec} 1 och \code{brne} 2 cykler, alltså 4. Det sista varvet
+tar 3, eftersom \code{brne} inte hoppar. Med \code{ldi} först:
+
+\begin{textdrawing}
+1 + 50 · 4 - 1 = 200 cykler
+\end{textdrawing}
+
+\noindent Simulatorn mäter också 200 cykler.
+
+\pt{b}\code{200 · 62,5 ns = 12 500 ns = 12,5 µs}.
+
+\pt{c}25~µs är \code{25 / 0,0625 = 400} cykler. Koden tar \code{1 + 4n - 1 = 4n} cykler, så
+\code{n} = \textbf{100}.
+
+\answer{c12:ex:12}{Om, annars}
+\pt{a}Start; initiering av PB0 och PB1 som utgångar; beslutet \enquote{\code{r16} ≥ 100?};
+\textbf{ja}: tänd PB0; \textbf{nej}: tänd PB1; slut.
+
+\pt{b}Hoppet är \code{brsh}, \emph{branch if same or higher}, efter \code{cpi r16, 100}. Det
+hoppar när \code{r16 - 100} inte behövde låna, alltså när \code{r16} är 100 eller mer, räknat utan
+tecken. \code{brlo} hade gett det omvända villkoret, och \code{brge} hade räknat med tecken, så att
+till exempel 150 hade tolkats som ett negativt tal.
+\noanswer{Programmet självt står inte i boken.}
+
+\pt{c}I simulatorn tänds PB0 för 150 och för 100, och PB1 för 99. \textbf{100} är viktigast att
+testa: det är gränsen, och det är där ett fel villkor, till exempel \enquote{större än} i stället
+för \enquote{minst}, syns. Värden långt från gränsen fungerar med båda.
+
+\answer{c12:ex:13}{Stacken}
+\pt{a}\code{rcall} lägger två byte, och varje \code{push} en: \code{0x08FF - 4 = 0x08FB}.
+
+\pt{b}\code{0x08FF}: returadressens låga byte. \code{0x08FE}: returadressens höga byte.
+\code{0x08FD}: \code{r16}. \code{0x08FC}: \code{r17}.
+
+\pt{c}Registren hämtas i samma ordning som de lades dit, inte i omvänd ordning. \code{pop r16} får
+\code{r17}:s gamla värde och \code{pop r17} får \code{r16}:s, så programmet som anropade
+\code{work} finner \code{r16} och \code{r17} med bytta värden.

@@ -1,0 +1,228 @@
+% Section 10.5, from lectures/L10/appendix/d_exercises.md.
+
+\section{Övningar}
+\label{c10:sec:exercises}\label{c10:app:d}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Övningarna märkta \textbf{Program} skrivs i Microchip
+Studio och kontrolleras i simulatorn: förutsäg vad som ska hända, stega, och jämför. Knappar
+simuleras genom att biten i \code{PIND} ändras för hand i fönstret I/O (\secref{studio:4-5} i
+bilaga~\ref{app:studio}).
+
+Övningarna märkta \textbf{Räkna för hand} och \textbf{Förståelse} görs på papper, utan
+miniräknare, och kontrolleras mot bilaga~\ref{app:answers}. Gör varje övning innan du läser
+lösningen. Där en övning har ett troligt felsvar tar lösningen upp det också, och säger varför det
+är fel.
+
+Instruktionerna finns på referensbladet i bilaga~\ref{app:avr}.
+
+Varje övning är märkt med sin sort. Exakt en övning är en \textbf{Kontroll}, och i det här kapitlet
+är det övning~\ref{c10:ex:11}.
+\end{aside}
+
+\exercise{Tecken och koder}{Räkna för hand}
+\label{c10:ex:1}
+Använd tabellen i \secref{c10:a1}.
+\begin{parts}
+  \item Vilka ASCII-koder har tecknen \code{'5'}, \code{'9'}, \code{'E'} och \code{'F'}? Svara
+    hexadecimalt.
+  \item Vilket tal blir kvar när ASCII-koden för \code{'8'} minskas med ASCII-koden för
+    \code{'0'}?
+  \item Förklara med en mening varför omvandlingen av värdena 10--15 behöver sju extra, men inte
+    omvandlingen av 0--9.
+  \item Raden \code{ldi r16, 'E'} och raden \code{ldi r16, 0x45} assembleras till exakt samma
+    maskinkod. Varför skriver man ändå ibland den första?
+\end{parts}
+
+\exercise{En byte blir text}{Räkna för hand}
+\label{c10:ex:2}
+Programmet i \secref{c10:a3} körs med \code{ldi r16, 0x9E} i stället för \code{0x3C}.
+\begin{parts}
+  \item Fyll i värdet i \code{r24} efter varje instruktion för den höga nibblen: \code{mov},
+    \code{swap}, \code{andi}, och sedan det som \code{cpi}/\code{brlo} bestämmer. Vilket värde får
+    \code{r20}?
+  \item Gör samma sak för den låga nibblen. Vilket värde får \code{r21}?
+  \item Vilken text står i minnet om programmet avslutas med \code{sts 0x0100, r20} och
+    \code{sts 0x0101, r21}?
+  \item Gör om a)--c) för \code{ldi r16, 0x5A}.
+\end{parts}
+
+\exercise{Från tecken till värde}{Räkna för hand}
+\label{c10:ex:3}
+Använd koden i \secref{c10:a4}.
+\begin{parts}
+  \item Följ tecknet \code{'B'} (\code{0x42}) genom koden. Vilket värde får \code{r22}?
+  \item Följ tecknet \code{'4'}.
+  \item \emph{(fördjupning)} Någon skriver ett litet \code{b} på tangentbordet, ASCII \code{0x62}.
+    Vilket värde lämnar koden i \code{r22}, och varför är det fel? Föreslå en ändring som hanterar
+    små bokstäver.
+\end{parts}
+
+\exercise{Registerpar}{Räkna för hand}
+\label{c10:ex:4}
+\begin{parts}
+  \item Skriv talen 2500, 256, 255 och 40\,000 som 16-bitars tal i hexadecimal form, och ange vad
+    \code{low()} och \code{high()} blir för vart och ett.
+  \item \code{r25} innehåller \code{0x12} och \code{r24} innehåller \code{0x34}. Vilket decimalt
+    tal är \code{r25:r24}?
+  \item Vilket är det största tal ett registerpar kan hålla? Varför just det?
+\end{parts}
+
+\exercise{Addition och subtraktion med 16 bitar}{Räkna för hand}
+\label{c10:ex:5}
+\begin{parts}
+  \item \code{r25:r24} = \code{0x12F0} och \code{r23:r22} = \code{0x0A20}. Följ
+    \code{add r24, r22} och \code{adc r25, r23} steg för steg, som i \secref{c10:a7}: vad blir
+    \code{r24}, \code{C} och \code{r25}? Kontrollera svaret genom att räkna om båda talen och
+    summan decimalt.
+  \item Någon skriver \code{add r25, r23} i stället för \code{adc r25, r23}. Vilket svar blir det
+    då, och med hur mycket är det fel?
+  \item \code{r21:r20} = \code{0x0100}, alltså 256. Följ \code{ldi r22, 1}, \code{ldi r23, 0},
+    \code{sub r20, r22} och \code{sbc r21, r23}. Vad blir \code{r20}, \code{C} och \code{r21}, och
+    vilket tal är resultatet?
+  \item Någon vill göra samma sak kortare, med \code{sbiw r20, 1}. Varför går det inte att
+    assemblera, och vilket registerpar hade fungerat?
+\end{parts}
+
+\exercise{En fördröjning på 10 ms}{Räkna för hand}
+\label{c10:ex:6}
+\begin{parts}
+  \item Hur många klockcykler är 10~ms vid 16~MHz?
+  \item En enda 16-bitars loop med \code{sbiw} och \code{brne}, som i \secref{c10:a10}, plus de två
+    \code{ldi} före den. Hur många varv \code{N} ska loopen gå för att hela fördröjningen ska bli så
+    nära 10~ms som möjligt, och hur många cykler blir det exakt?
+  \item Samma fördröjning med subrutinen \code{delay_ms} från \secref{c10:c4}: vilket värde ska
+    \code{r24} ha, och hur många cykler tar anropet?
+  \item Vilken av de två är närmast 10~ms? Vilken skulle du välja i ett program, och varför?
+\end{parts}
+
+\exercise{Knappen som läses baklänges}{Förståelse}
+\label{c10:ex:7}
+En knapp är kopplad mellan PD2 och jord, som i \secref{c10:b2}.
+\begin{parts}
+  \item Förklara, med pull-up-motståndet, varför \code{PIND} bit~2 läses som 0 när knappen är
+    nedtryckt.
+  \item Programmet glömmer att slå på pull-upen (\code{sbi PORTD, 2}). Vad läser programmet när
+    knappen är släppt? Varför är det svårt att hitta det felet genom att prova?
+  \item Varför innehåller \code{buttons_to_leds.asm} instruktionen \code{com}? Vad hade lysdioderna
+    visat utan den, när ingen knapp är nedtryckt?
+\end{parts}
+
+\exercise{Följ programmet}{Räkna för hand}
+\label{c10:ex:8}
+Programmet i \secref{c10:b3} läser \code{PIND} och visar det inverterade värdet på \code{PORTB}.
+\begin{parts}
+  \item \code{PIND} läses som \code{0b11111011}. Vilka knappar är nedtryckta, och vad blir
+    \code{PORTB}?
+  \item Programmet ändras så att \code{andi r16, 0xF0} läggs in mellan \code{com} och \code{out}.
+    Vad blir \code{PORTB} nu för samma \code{PIND}? Och för \code{PIND} = \code{0b01101111}?
+  \item Hur många gånger per sekund ungefär läser loopen porten vid 16~MHz? Räkna cyklerna för de
+    fyra instruktionerna i loopen.
+\end{parts}
+
+\exercise{Start och stopp med självhållning}{Program}
+\label{c10:ex:9}
+I kapitel~\ref{c2:ch} byggdes en start/stopp-krets med ett relä som håller sig självt: ett tryck på
+startknappen drar reläet, och det förblir draget när knappen släpps, tills stoppknappen trycks.
+Samma funktion ska nu skrivas som ett program.
+\begin{itemize}
+  \item Startknappen sitter på PD2 och stoppknappen på PD3, båda mot jord med pull-up.
+  \item En \enquote{motor}, en lysdiod på PB0, startar när startknappen trycks, och fortsätter gå
+    när knappen släpps.
+  \item Motorn stannar när stoppknappen trycks.
+  \item Om båda knapparna hålls nedtryckta samtidigt ska motorn \textbf{stå still}: stopp går före
+    start, av säkerhetsskäl.
+\end{itemize}
+\begin{parts}
+  \item Rita en flödesplan innan du skriver någon kod.
+  \item Skriv programmet, med \code{sbic} eller \code{sbis}.
+  \item Testa i simulatorn alla fyra fallen: start, släpp start, stopp, och båda samtidigt.
+  \item Var i programmet finns \enquote{minnet}, det som motsvarar reläets självhållning?
+\end{parts}
+
+\exercise{\code{rcall}, \code{ret} och stacken}{Förståelse}
+\label{c10:ex:10}
+\begin{parts}
+  \item Beskriv de två saker \code{rcall} gör, i den ordning den gör dem.
+  \item Varför behöver \code{ret} stacken? Kunde returadressen ha sparats i ett av de 32 registren i
+    stället?
+  \item \code{SP} är \code{0x08FF} när ett \code{rcall} körs. Vad är \code{SP} när subrutinen
+    börjar? Och efter \code{ret}?
+  \item Efter \code{ret} ligger returadressen kvar i minnet. Varför är det inget problem?
+\end{parts}
+
+\exercise{Kontroll: förutsäg stacken}{Kontroll}
+\label{c10:ex:11}
+\emph{Förutsäg för hand, kontrollera i simulatorn, förklara skillnaden.}
+
+Programmet nedan anropar en subrutin som lägger två register på stacken. Adresserna i
+programminnet kommer från listfilen och står i kommentarerna.
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.org 0x0000
+    rjmp main                       ; 0x0000
+
+main:
+    ldi r16, high(RAMEND)           ; 0x0001
+    out SPH, r16                    ; 0x0002
+    ldi r16, low(RAMEND)            ; 0x0003
+    out SPL, r16                    ; 0x0004
+    ldi r16, 0xA5                   ; 0x0005
+    ldi r17, 0x3C                   ; 0x0006
+    rcall save_two                  ; 0x0007
+end:
+    rjmp end                        ; 0x0008
+
+save_two:
+    push r16                        ; 0x0009
+    push r17                        ; 0x000A
+here:
+    pop r17                         ; 0x000B
+    pop r16
+    ret
+\end{asmcode}
+
+\task{a) För hand}
+När programmet står på etiketten \code{here}, alltså efter de två \code{push}: vilket värde har
+\code{SP}, och vilka byte ligger på adresserna \code{0x08FF}, \code{0x08FE}, \code{0x08FD} och
+\code{0x08FC}? Skriv upp svaret innan du går vidare.
+
+\task{b) I simulatorn}
+Skriv in programmet, sätt en brytpunkt på \code{pop r17} och kör dit. Läs \code{SP} i Processor
+Status och bytena i fönstret Memory med \textbf{data IRAM} valt.
+
+\task{c) Jämför}
+Stämmer din förutsägelse? Den vanligaste avvikelsen är att returadressens två byte står i fel
+ordning, eller att \code{SP} är en byte fel. Om ditt svar skiljer sig: vilket av de två felen var
+det, och varför?
+
+\task{d)}
+Stega vidare till instruktionen efter \code{ret}. Vilket värde har \code{SP} nu, och vilka av de
+fyra bytena har ändrats?
+
+\exercise{Hitta felet}{Förståelse, Fördjupning}
+\label{c10:ex:12}
+\begin{parts}
+  \item En subrutin börjar med \code{push r16} och \code{push r17}, och slutar med \code{pop r16},
+    \code{pop r17} och \code{ret}. Den assembleras utan fel och återvänder rätt. Vad är fel, och hur
+    märks det i programmet som anropar den?
+  \item En annan subrutin börjar med \code{push r16} och \code{push r17}, men slutar med bara
+    \code{pop r17} och \code{ret}. Vad händer när \code{ret} körs? Varför märks felet mycket
+    tydligare än i a)?
+  \item Hur kan du i simulatorn, med ett enda värde, se att en subrutin inte lämnar stacken som den
+    fann den?
+\end{parts}
+
+\exercise{Hela byten som text}{Program, Fördjupning}
+\label{c10:ex:13}
+Skriv en subrutin \code{byte_to_ascii} som gör om byten i \code{r24} till två tecken: det för den
+höga nibblen i \code{r24} och det för den låga i \code{r25}. Den ska använda \code{nibble_to_ascii}
+från \secref{c10:c9} och följa kursens regel om register.
+\begin{parts}
+  \item Vilka register ändrar \code{byte_to_ascii}, och vilka av dem måste sparas?
+  \item Skriv subrutinen och ett huvudprogram som anropar den med \code{0xB7} och lägger tecknen på
+    adress \code{0x0100} och \code{0x0101}.
+  \item Kontrollera i fönstret Memory att texten \code{B7} står där. Hur djup blir stacken som mest?
+\end{parts}

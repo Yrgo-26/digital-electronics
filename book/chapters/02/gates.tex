@@ -1,0 +1,533 @@
+% Section 2.1, from lectures/L02/appendix/a_logic_gates.md.
+%
+% A.10 is headed "Kapitlets krets" here, where the lecture has "Föreläsningens krets". Two
+% corrections, made in the source too: A.4 marks every law that does not hold in ordinary algebra
+% (the lecture said so but left Dominans and Absorption unmarked), and A.8 no longer promises the
+% multiplexer in L06, which never mentions it. A.5's laws for three variables are set as a display
+% rather than inline, where they would not fit on a line.
+
+\section{Logiska grindar och boolesk algebra}
+\label{c2:app:a}
+
+\subsection{Digitala signaler och logiska nivåer}
+\label{c2:a1}
+\Secref{c1:a1} konstaterade att en digital signal bara har två värden, \code{0} och \code{1}. I en
+verklig krets är de två värdena två spänningsintervall:
+\begin{itemize}
+  \item I en krets som matas med 5~V, som IC-kretsarna i Labb~2 (bilaga~\ref{app:lab2}) och
+    mikrodatorn i Labb~3, läses en spänning nära 0~V som \code{0} och en spänning nära 5~V som
+    \code{1}. Exakt var gränserna går står i kretsens datablad (kapitel~\ref{c4:ch}).
+  \item I ett kontaktnät på 24~V, som i Labb~1 (bilaga~\ref{app:lab1}), är en tryckknapp \code{1}
+    när den är nedtryckt och \code{0} när den är släppt, och lampan är \code{1} när den lyser.
+\end{itemize}
+
+Det är en överenskommelse att hög spänning betyder \code{1}. Den kallas \textbf{positiv logik} och
+är den som används i hela boken.
+
+En \textbf{logisk grind} är en krets med en eller flera ingångar och en utgång, där utgången är en
+fast funktion av ingångarna. Ett nät av grindar, där utgångarna bara beror på vad ingångarna är
+just nu, kallas ett \textbf{kombinatoriskt nät}. Det är ämnet för det här kapitlet och de tre
+följande. En krets som också minns vad som har hänt tidigare kallas ett \textbf{sekvensnät}; den
+typen får du en glimt av i \secref{c2:b7}, och den är ämnet för kapitel~\ref{c6:ch}.
+
+\subsection{Grindarna}
+\label{c2:a2}
+Det finns sju grundgrindar. NOT har en ingång; de andra har två eller fler.
+
+\begin{booktable}{@{}p{8.6em}Lp{7.4em}@{}}
+  \thead{Grind} & \thead{Utgången är \code{1} när \dots} & \thead{Uttryck} \\
+  \midrule
+  NOT (inverterare) & ingången är \code{0} & \code{X = A'} \\
+  AND & \textbf{alla} ingångar är \code{1} & \code{X = AB} \\
+  OR & \textbf{minst en} ingång är \code{1} & \code{X = A + B} \\
+  NAND & inte alla ingångar är \code{1} (inverterad AND) & \code{X = (AB)'} \\
+  NOR & ingen ingång är \code{1} (inverterad OR) & \code{X = (A + B)'} \\
+  XOR & ingångarna är \textbf{olika} & \code{X = A ⊕ B} \\
+  XNOR & ingångarna är \textbf{lika} & \code{X = (A ⊕ B)'} \\
+\end{booktable}
+
+\noindent Sanningstabellerna för alla grindar med två ingångar, sida vid sida:
+
+\begin{narrowtable}{@{}cc@{\hspace{1.5em}}cccccc@{}}
+  \thead{A} & \thead{B} & \thead{AND} & \thead{OR} & \thead{NAND} & \thead{NOR} & \thead{XOR} &
+    \thead{XNOR} \\
+  \midrule
+  0 & 0 & 0 & 0 & 1 & 1 & 0 & 1 \\
+  0 & 1 & 0 & 1 & 1 & 0 & 1 & 0 \\
+  1 & 0 & 0 & 1 & 1 & 0 & 1 & 0 \\
+  1 & 1 & 1 & 1 & 0 & 0 & 0 & 1 \\
+\end{narrowtable}
+
+\begin{narrowtable}{@{}cc@{}}
+  \thead{A} & \thead{NOT A} \\
+  \midrule
+  0 & 1 \\
+  1 & 0 \\
+\end{narrowtable}
+
+\noindent Värt att lägga på minnet direkt ur tabellerna:
+\begin{itemize}
+  \item NAND, NOR och XNOR är inverserna av AND, OR och XOR: varje kolumn är den andras med ettor
+    och nollor bytta.
+  \item AND och OR går att utvidga till fler ingångar. En AND med tre ingångar är \code{1} bara om
+    alla tre är \code{1}; en OR med tre ingångar är \code{1} om minst en är \code{1}.
+  \item XOR med fler än två ingångar är \code{1} när ett \textbf{udda} antal ingångar är \code{1}.
+    Det är samma sak som paritetsbiten i \secref{c1:b6}.
+\end{itemize}
+
+\subsubsection{Två sätt att rita samma grind}
+Grindarna ritas med två olika symbolstandarder, och du kommer att möta båda:
+\begin{itemize}
+  \item \textbf{ANSI} (amerikansk standard) har en egen form för varje grind: AND är D-formad, OR
+    har en böjd ingångssida. Den används i CircuitVerse och i de flesta datablad.
+  \item \textbf{IEC} (internationell standard) ritar varje grind som en rektangel med en symbol i:
+    \code{&} för AND, \code{≥1} för OR (minst en ingång ska vara 1), \code{=1} för XOR (exakt en
+    ingång ska vara 1) och \code{1} för NOT. Den förekommer ofta i svenska läroböcker och
+    kopplingsscheman.
+\end{itemize}
+I båda standarderna betyder en liten ring på utgången att utsignalen är inverterad
+(figur~\ref{c2:fig:gate_symbols}).
+
+\bookfigure[tbp]{l02_gate_symbols}{De sju grundgrindarna med ANSI-symbol, IEC-symbol och booleskt
+uttryck.}{c2:fig:gate_symbols}
+
+\subsection{Boolesk algebra som notation}
+\label{c2:a3}
+Att skriva \enquote{A AND (NOT B) OR C} blir snabbt otympligt. \textbf{Boolesk algebra}, efter
+matematikern George Boole, ger en kort notation som ser ut som vanlig algebra:
+
+\begin{narrowtable}{@{}lll@{}}
+  \thead{Operation} & \thead{Skrivs} & \thead{Utläses} \\
+  \midrule
+  NOT & \code{A'} & \enquote{A inverterad}, \enquote{icke A} \\
+  AND & \code{AB} eller \code{A·B} & \enquote{A och B} \\
+  OR & \code{A + B} & \enquote{A eller B} \\
+  XOR & \code{A ⊕ B} & \enquote{A exklusivt eller B} \\
+\end{narrowtable}
+
+\noindent Du kommer att se NOT skrivet på andra sätt också, framför allt som ett streck över
+bokstaven, $\overline{A}$. Boken använder primtecknet, \code{A'}, eftersom det går att skriva på ett
+tangentbord.
+
+\textbf{Prioritetsordningen} är NOT först, sedan AND, sist OR, precis som potenser, multiplikation
+och addition i vanlig algebra:
+\begin{itemize}
+  \item \mbox{\code{AB + C}} betyder \mbox{\code{(AB) + C}}.
+  \item \mbox{\code{A + BC}} betyder \mbox{\code{A + (BC)}}, och det är \textbf{inte} samma sak som
+    \mbox{\code{(A + B)C}}.
+  \item \code{AB'} betyder \code{A(B')}: bara B är inverterad. \code{(AB)'} inverterar hela
+    produkten.
+\end{itemize}
+Sätt ut parenteser när du är osäker. De kostar ingenting.
+
+Ett uttryck som är en OR av AND-termer, till exempel \mbox{\code{X = AB' + CD}}, sägs stå på
+\textbf{SP-form}, summa av produkter. Det är den form nästan alla uttryck i boken skrivs på,
+eftersom den läses av direkt ur en sanningstabell (\secref{c2:a6}) och översätts direkt till ett
+grindnät: en AND-grind per term, och en OR-grind som samlar dem.
+
+\subsection{Räknelagarna}
+\label{c2:a4}
+Lagarna nedan gäller för alla värden på A, B och C, och varje lag går att kontrollera genom att
+skriva ut sanningstabellen för båda sidorna. Många av dem ser ut som vanlig algebra; några gör det
+inte, och de är markerade.
+
+\begin{booktable}{@{}>{\raggedright\arraybackslash}p{8.4em}LL@{}}
+  \thead{Lag} & \thead{Med OR} & \thead{Med AND} \\
+  \midrule
+  Identitet & \code{A + 0 = A} & \code{A · 1 = A} \\
+  Dominans & \code{A + 1 = 1} \emph{(inte som vanlig algebra)} & \code{A · 0 = 0} \\
+  Idempotens \emph{(inte som vanlig algebra)} & \code{A + A = A} & \code{A · A = A} \\
+  Komplement & \code{A + A' = 1} & \code{A · A' = 0} \\
+  Dubbel invertering & \code{(A')' = A} & \\
+  Kommutativ & \code{A + B = B + A} & \code{AB = BA} \\
+  Associativ & \code{A + (B + C) = (A + B) + C} & \code{A(BC) = (AB)C} \\
+  Distributiv & \code{A(B + C) = AB + AC} & \code{A + BC = (A + B)(A + C)} \emph{(inte som vanlig
+    algebra)} \\
+  Absorption \emph{(inte som vanlig algebra)} & \code{A + AB = A} & \code{A(A + B) = A} \\
+  Förenkling & \code{A + A'B = A + B} & \code{A(A' + B) = AB} \\
+\end{booktable}
+
+\noindent Några av lagarna blir självklara när man tänker på vad de betyder:
+\begin{itemize}
+  \item \mbox{\code{A + 1 = 1}}: \enquote{A eller sant} är alltid sant.
+  \item \mbox{\code{A + A' = 1}}: en signal är alltid antingen \code{1} eller \code{0}, så
+    \enquote{A eller icke A} är alltid sant.
+  \item \mbox{\code{A + AB = A}}: om A är \code{1} är uttrycket \code{1} oavsett B, och om A är
+    \code{0} är båda termerna \code{0}. Termen \code{AB} tillför alltså ingenting.
+\end{itemize}
+
+Den sista raden, \textbf{förenklingslagen} \mbox{\code{A + A'B = A + B}}, är den som oftast behövs
+och oftast missas. Den går att härleda ur den andra distributiva lagen:
+
+\begin{textdrawing}
+A + A'B = (A + A')(A + B) = 1 · (A + B) = A + B
+\end{textdrawing}
+
+\noindent Med ord: i termen \code{A'B} behövs inte villkoret \code{A'}, för när A är \code{1} är
+uttrycket redan \code{1}.
+
+\subsubsection{Att bevisa en lag med en sanningstabell}
+Varje lag kan kontrolleras genom att räkna ut båda sidorna för alla kombinationer.
+Förenklingslagen:
+
+\begin{narrowtable}{@{}cccccc@{}}
+  \thead{A} & \thead{B} & \thead{A'} & \thead{A'B} & \thead{A + A'B} & \thead{A + B} \\
+  \midrule
+  0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 1 & 1 \\
+  1 & 0 & 0 & 0 & 1 & 1 \\
+  1 & 1 & 0 & 0 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent De två sista kolumnerna är lika på varje rad, så lagen gäller. Med två variabler är det
+fyra rader och med tre är det åtta, så det finns ingen ursäkt för att inte kontrollera en förenkling
+man är osäker på.
+
+\subsection{De Morgans lagar}
+\label{c2:a5}
+Två lagar är så viktiga att de har ett eget namn, efter matematikern Augustus De Morgan:
+
+\begin{console}
+(A + B)' = A'B'
+(AB)'    = A' + B'
+\end{console}
+
+\noindent Med ord: \textbf{invertera hela uttrycket genom att invertera varje variabel och byta AND
+mot OR} (och tvärtom). En minnesregel är \enquote{bryt strecket, byt tecknet}.
+
+Kontrollera den första med en tabell:
+
+\begin{narrowtable}{@{}ccccccc@{}}
+  \thead{A} & \thead{B} & \thead{A + B} & \thead{(A + B)'} & \thead{A'} & \thead{B'} &
+    \thead{A'B'} \\
+  \midrule
+  0 & 0 & 0 & 1 & 1 & 1 & 1 \\
+  0 & 1 & 1 & 0 & 1 & 0 & 0 \\
+  1 & 0 & 1 & 0 & 0 & 1 & 0 \\
+  1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+\end{narrowtable}
+
+\noindent Kolumnerna \mbox{\code{(A + B)'}} och \code{A'B'} är lika. Med ord:
+\enquote{inte (A eller B)} är samma sak som \enquote{varken A eller B}, alltså
+\enquote{inte A och inte B}.
+
+Lagarna gäller för fler variabler också:
+
+\begin{console}
+(A + B + C)' = A'B'C'
+(ABC)'       = A' + B' + C'
+\end{console}
+
+\subsubsection{Vad De Morgan betyder för grindarna}
+De Morgan är mer än en räkneregel. Den säger att en grind kan bytas mot en annan grind med
+inverterade in- och utgångar:
+\begin{itemize}
+  \item En \textbf{NAND}, \code{(AB)'}, är samma sak som en \textbf{OR med båda ingångarna
+    inverterade}, \mbox{\code{A' + B'}}.
+  \item En \textbf{NOR}, \mbox{\code{(A + B)'}}, är samma sak som en \textbf{AND med båda ingångarna
+    inverterade}, \code{A'B'}.
+\end{itemize}
+
+Det har två viktiga följder. Den första är att \textbf{varje funktion går att bygga med enbart
+NAND-grindar}, eller med enbart NOR-grindar. En NAND med båda ingångarna ihopkopplade är en NOT,
+eftersom \mbox{\code{(AA)' = A'}}; en NAND följd av en NOT är en AND; och en OR är en NAND med
+inverterade ingångar. Det är därför NAND-kretsen är den vanligaste IC-kretsen av alla, och det är
+vad Labb~2-2 (\secref{lab2:2}) går ut på.
+
+Den andra följden syns i kontaktnät: en NAND är två brytande kontakter parallellt, och en NOR två
+brytande kontakter i serie (\secref{c2:b5}).
+
+\subsection{Från sanningstabell till uttryck}
+\label{c2:a6}
+Ofta börjar ett konstruktionsarbete med en beskrivning av vad kretsen ska göra, och den
+beskrivningen blir en sanningstabell. Varje sanningstabell kan läsas av direkt som ett uttryck på
+SP-form:
+\begin{enumerate}
+  \item Leta upp varje rad där utgången är \code{1}.
+  \item Skriv för varje sådan rad en AND-term med \textbf{alla} ingångar: ingången som den är om
+    den är \code{1} på raden, inverterad om den är \code{0}.
+  \item Sätt ihop termerna med OR.
+\end{enumerate}
+En sådan AND-term, med alla ingångar och som är \code{1} på exakt en rad, kallas en
+\textbf{minterm}.
+
+\textbf{Exempel:}
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{A} & \thead{B} & \thead{X} \\
+  \midrule
+  0 & 0 & 0 \\
+  0 & 1 & 1 \\
+  1 & 0 & 1 \\
+  1 & 1 & 0 \\
+\end{narrowtable}
+
+\noindent Raden \mbox{\code{AB = 01}} ger mintermen \code{A'B}, och raden \mbox{\code{AB = 10}} ger
+\code{AB'}. Alltså:
+
+\begin{console}
+X = A'B + AB'
+\end{console}
+
+\noindent Det är XOR-funktionen. Samma nät går alltså att bygga av en enda XOR-grind, i stället för
+två AND, två NOT och en OR.
+
+\textbf{Exempel med tre ingångar}, en \textbf{majoritetsgrind}: utgången är \code{1} när minst två
+av de tre ingångarna är \code{1}. Den används där tre givare mäter samma sak och systemet ska lita
+på det två av dem är överens om, så att en enstaka trasig givare inte kan bestämma något på egen
+hand.
+
+\begin{narrowtable}{@{}ccccl@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{X} & \thead{Minterm} \\
+  \midrule
+  0 & 0 & 0 & 0 & \\
+  0 & 0 & 1 & 0 & \\
+  0 & 1 & 0 & 0 & \\
+  0 & 1 & 1 & 1 & \code{A'BC} \\
+  1 & 0 & 0 & 0 & \\
+  1 & 0 & 1 & 1 & \code{AB'C} \\
+  1 & 1 & 0 & 1 & \code{ABC'} \\
+  1 & 1 & 1 & 1 & \code{ABC} \\
+\end{narrowtable}
+
+\begin{console}
+X = A'BC + AB'C + ABC' + ABC
+\end{console}
+
+\noindent Uttrycket är \textbf{korrekt}, men det är inte det \textbf{minsta}: fyra AND-grindar med
+tre ingångar och en OR-grind med fyra. Att förenkla det är nästa avsnitts ämne.
+
+\subsection{Algebraisk förenkling}
+\label{c2:a7}
+Ett uttryck som läses av rakt ur en sanningstabell har en term per etta. Ofta delar flera termer
+det mesta av sina variabler, och då går de att slå ihop. Verktyget är nästan alltid samma:
+\textbf{bryt ut det gemensamma, och använd \mbox{\code{A + A' = 1}}}.
+
+\textbf{Exempel 1:}
+
+\begin{textdrawing}
+X = AB + AB' = A(B + B') = A · 1 = A
+\end{textdrawing}
+
+\noindent Värdet på B spelar ingen roll, så B försvinner.
+
+\textbf{Exempel 2:} en sanningstabell där X är \code{1} på raderna 001, 011, 101 och 111.
+
+\begin{textdrawing}
+X = A'B'C + A'BC + AB'C + ABC
+  = A'C(B' + B) + AC(B' + B)
+  = A'C + AC
+  = C(A' + A)
+  = C
+\end{textdrawing}
+
+\noindent Fyra termer blev en enda variabel. Titta på tabellen igen: X är \code{1} precis när C är
+\code{1}. Det hade gått att se direkt, men uträkningen visar varför.
+
+\textbf{Exempel 3:} majoritetsgrinden från \secref{c2:a6}. Här behövs ett knep: termen \code{ABC}
+kan användas flera gånger, eftersom \mbox{\code{ABC + ABC = ABC}} (idempotens). Skriv den tre
+gånger, och para ihop den med var och en av de andra termerna:
+
+\begin{textdrawing}
+X = A'BC + AB'C + ABC' + ABC
+  = (A'BC + ABC) + (AB'C + ABC) + (ABC' + ABC)
+  = BC(A' + A)  + AC(B' + B)  + AB(C' + C)
+  = BC + AC + AB
+\end{textdrawing}
+
+\noindent Tre AND-grindar med två ingångar och en OR-grind med tre, i stället för fyra AND-grindar
+med tre ingångar.
+
+\textbf{Exempel 4:} inte allt går att förenkla. \mbox{\code{X = A'B + AB'}} har inga gemensamma
+variabler att bryta ut. Uttrycket är redan minimalt på SP-form, och det bästa man kan göra är att
+känna igen det som en XOR.
+
+Algebraisk förenkling kräver att man ser vilka termer som går att para ihop, och det är lätt att
+missa ett par, eller att inte veta när man är klar. Kapitel~\ref{c4:ch} introducerar
+\textbf{Karnaughdiagram}, som gör samma sak med en ritning, systematiskt, och med ett tydligt svar
+på när man är klar.
+
+\subsection{Analys: från grindnät till sanningstabell}
+\label{c2:a8}
+Åt andra hållet: du har ett färdigt grindnät och ska ta reda på vad det gör. Metoden är att ge
+varje grinds utgång ett namn, en \textbf{mellansignal}, och räkna fram dem en i taget, rad för rad.
+
+\bookfigure{l02_analysis_network}{Ett grindnät att analysera, med mellansignalerna A', P och
+Q.}{c2:fig:analysis_network}
+
+\noindent Mellansignalerna är \code{A'}, \mbox{\code{P = AB}} och \mbox{\code{Q = A'C}}, och
+utgången är \mbox{\code{X = P + Q}}. Uttrycket för hela nätet blir alltså
+
+\begin{console}
+X = AB + A'C
+\end{console}
+
+\noindent och sanningstabellen räknas fram kolumn för kolumn:
+
+\begin{narrowtable}{@{}ccccccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{A'} & \thead{P = AB} & \thead{Q = A'C} &
+    \thead{X = P + Q} \\
+  \midrule
+  0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 1 & 1 & 1 & 0 & 1 & 1 \\
+  1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  1 & 1 & 0 & 0 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 0 & 1 & 0 & 1 \\
+\end{narrowtable}
+
+\noindent Läs tabellen i två halvor. När A är \code{0} är X samma som C; när A är \code{1} är X
+samma som B. Nätet är alltså en \textbf{väljare}: A väljer vilken av B och C som ska släppas fram
+till utgången. En sådan krets kallas en \textbf{multiplexer}, och den är ett av de viktigaste
+byggblocken i en dator. Den återkommer i övning~\ref{c4:ex:13}.
+
+Två råd som gäller för all analys:
+\begin{itemize}
+  \item \textbf{Skriv ut mellansignalerna som egna kolumner.} Att räkna fram X direkt ur A, B och
+    C i huvudet fungerar för små nät och ger fel i större.
+  \item \textbf{Sammanfatta sedan tabellen med ord.} En tabell säger vad kretsen gör rad för rad;
+    en mening som \enquote{A väljer mellan B och C} säger vad den är till för.
+\end{itemize}
+
+\subsection{CircuitVerse}
+\label{c2:a9}
+CircuitVerse, \url{https://circuitverse.org/simulator}, är en gratis logiksimulator som körs i
+webbläsaren. Varje grindnät i boken byggs och testas där innan det byggs med riktiga kretsar:
+\begin{enumerate}
+  \item Öppna simulatorn och starta ett nytt projekt.
+  \item Placera ett \textbf{Input}-element per insignal och ett \textbf{Output}-element per
+    utsignal, och döp om dem så att de heter som dina variabler.
+  \item Placera de grindar ditt uttryck kräver, från panelen \textbf{Gates}.
+  \item Koppla ihop nätet en grind i taget, enligt uttrycket. Du ska redan veta exakt vilka grindar
+    du behöver innan du öppnar simulatorn, och det är därför \secref{c2:a6} och \ref{c2:a7} kommer
+    först.
+  \item Klicka på varje ingång för att växla den mellan \code{0} och \code{1}, och kontrollera att
+    utgången stämmer med din sanningstabell på \textbf{varje} rad.
+  \item Spara under menyn \textbf{Project}, antingen online med ett konto eller som en fil på
+    datorn.
+\end{enumerate}
+
+\textbf{Steg 5 är inte valfritt, och ingenting annat gör det åt dig.} Tre regler gör det till en
+kontroll snarare än en formalitet:
+\begin{itemize}
+  \item \textbf{Alla rader, inte ett urval.} Två ingångar är fyra rader och tre är åtta. Vid de
+    storlekarna finns ingen ursäkt för att bara prova några.
+  \item \textbf{Förutsäg först, simulera sedan.} Skriv sanningstabellen innan du bygger. Annars
+    läser du av simuleringen och tror att du har kontrollerat den, när du bara har skrivit av den.
+  \item \textbf{En avvikelse är information.} Den säger att ritningen och uttrycket är oense, och
+    att en av dem har ett fel.
+\end{itemize}
+
+Den vanan, att förutsäga ett beteende och sedan kontrollera det, är den du kommer att använda vid
+varje laboration i boken, med kontakter, med IC-kretsar och med mikrodatorn.
+
+\subsection{Kapitlets krets: bromsassistenten}
+\label{c2:a10}
+Kapitlet bygger en krets från ett krav till ett simulerat grindnät, och i \secref{c2:b6} samma krets
+som kontaktnät.
+
+Kravet: \textbf{bilen bromsar om föraren bromsar, eller om assistanssystemet bestämmer sig för
+det.} Assistanssystemet bestämmer sig för det när endera av två detektorer ser ett hinder, om det
+inte samtidigt rapporterar ett fel, i vilket fall det inte anförtros att bromsa alls.
+
+\begin{booktable}{@{}p{5em}L@{}}
+  \thead{Signal} & \thead{Betydelse} \\
+  \midrule
+  \code{D} & Föraren står på bromspedalen. \\
+  \code{S} & Avståndssensorn ser ett hinder. \\
+  \code{R} & Radarn ser ett hinder. \\
+  \code{F} & Assistanssystemet rapporterar ett fel. \\
+  \code{B} & Utgång: lägg an bromsarna. \\
+\end{booktable}
+
+\noindent Tre meningar i kravet bestämmer tillsammans hela strukturen:
+\begin{itemize}
+  \item Endera detektorn räcker på egen hand, och ingen av dem väger tyngre än den andra.
+  \item Ett fel utlöser inget larm; det \emph{hindrar} assistanssystemet från att bromsa.
+  \item Föraren kan alltid bromsa, även när assistanssystemet är trasigt.
+\end{itemize}
+Den sista är ett säkerhetskrav, och det är den att hålla fast vid: pedalen är inte en ingång till
+assistanslogiken, den går förbi den.
+
+\subsubsection{Sanningstabellen}
+Sexton rader, i den ordning en fyrabitars räknare skulle producera dem. Kolumnen \code{P} är ingen
+utgång; den är assistanssystemets eget beslut, visad för att det ska synas var strukturen kommer
+ifrån.
+
+\begin{narrowtable}{@{}cccc@{\hspace{1.5em}}cc@{}}
+  \thead{D} & \thead{S} & \thead{R} & \thead{F} & \thead{P} & \thead{B} \\
+  \midrule
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 1 & 1 \\
+  0 & 0 & 1 & 1 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 1 & 1 \\
+  0 & 1 & 0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 0 & 1 & 1 \\
+  0 & 1 & 1 & 1 & 0 & 0 \\
+  1 & 0 & 0 & 0 & 0 & 1 \\
+  1 & 0 & 0 & 1 & 0 & 1 \\
+  1 & 0 & 1 & 0 & 1 & 1 \\
+  1 & 0 & 1 & 1 & 0 & 1 \\
+  1 & 1 & 0 & 0 & 1 & 1 \\
+  1 & 1 & 0 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 0 & 1 & 1 \\
+  1 & 1 & 1 & 1 & 0 & 1 \\
+\end{narrowtable}
+
+\noindent Den nedre halvan är genomgående \code{1}: så snart D är \code{1} ändrar ingenting annat
+svaret. Det är hur \enquote{åsidosätter allt} ser ut i en tabell.
+
+\begin{aside}
+\textbf{Försök själv först.} Innan du läser vidare: läs av uttrycket på SP-form, förenkla det, och
+räkna grindarna. Det raka uttrycket har elva termer; det förenklade får plats på en rad.
+\end{aside}
+
+\subsubsection{Härledningen}
+Att läsa av tabellen rakt av ger elva mintermer, en per etta, var och en med fyra variabler.
+Korrekt, men ohanterligt. Dela i stället upp tabellen efter D.
+
+\textbf{Den nedre halvan (D = 1)} är \code{1} på alla åtta raderna. De åtta mintermerna tillsammans
+täcker alla kombinationer av S, R och F, så de förenklas till bara \code{D}, precis som i exempel 2
+i \secref{c2:a7}.
+
+\textbf{Den övre halvan (D = 0)} är \code{1} på tre rader: SRF = 010, 100 och 110, alltså när F är
+\code{0} och minst en av S och R är \code{1}:
+
+\begin{console}
+D'S'RF' + D'SR'F' + D'SRF' = D'F'(S'R + SR' + SR) = D'F'(S + R)
+\end{console}
+
+\noindent (\mbox{\code{S'R + SR' + SR}} är \code{1} när minst en av S och R är \code{1}, alltså
+\mbox{\code{S + R}}; övning~\ref{c2:ex:6} c) låter dig visa det algebraiskt.)
+
+Tillsammans:
+
+\begin{console}
+B = D + D'(S + R)F'
+\end{console}
+
+\noindent och förenklingslagen \mbox{\code{A + A'X = A + X}} från \secref{c2:a4} tar bort \code{D'}:
+
+\begin{console}
+B = D + (S + R)F'
+\end{console}
+
+\noindent Uttrycket läses som kravet: bromsa om föraren bromsar, eller om (sensorn eller radarn)
+ser något och det inte finns något fel.
+
+\subsubsection{Grindnätet}
+Fyra grindar: en OR för \mbox{\code{S + R}}, en NOT för \code{F'}, en AND för assistanssystemets
+beslut, och en OR som lägger till förarens pedal.
+
+\bookfigure{l02_adas_network}{Bromsassistentens grindnät.}{c2:fig:adas_network}
+
+\textbf{Säkerhetsargumentet vilar på den sista OR-grinden.} Förarens pedal går direkt in där, förbi
+allt som har med felet att göra. Ett nät som i stället matar in pedalen före fellogiken,
+\mbox{\code{B = (D + S + R)F'}}, är en grind enklare och ser rimligt ut, men det bromsar inte när
+föraren trampar på pedalen samtidigt som assistanssystemet rapporterar fel. Övning~\ref{c2:ex:13}
+låter dig hitta exakt vilka rader som går fel.
+
+Bygg nätet i CircuitVerse och kontrollera det mot alla sexton raderna i tabellen.

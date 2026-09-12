@@ -1,0 +1,52 @@
+% Section 9.3, from lectures/L09/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture. The closing paragraph is from the README's reference list.
+
+\needspace{10\baselineskip}
+\section{Sammanfattning}
+\label{c9:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Rita en flödesplan för ett program med beslut och loopar, och översätta den till
+    assembler.
+  \item Förklara vad \code{cp} och \code{cpi} gör med flaggorna, och välja rätt villkorligt hopp
+    för ett villkor.
+  \item Skriva om-annars, och förklara varför den första grenen slutar med ett \code{rjmp}.
+  \item Välja mellan hopp för tal utan tecken och tal med tecken.
+  \item Skriva en loop som går ett bestämt antal varv, och säga hur många varv den går för
+    startvärdet 0.
+  \item Räkna ut hur många klockcykler en fördröjning tar, och välja konstanter för en önskad tid.
+  \item Mäta en tid i simulatorn med brytpunkter och stoppuret, och förklara en skillnad mot
+    räkningen.
+  \item Skriva ett flerval med en gemensam utgång.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item \code{cp r16, r17} följt av \code{brlo}: hoppar programmet om \code{r16} är mindre än
+    \code{r17}, eller tvärtom?
+  \item Varför behövs ingen \code{cpi} före \code{brne} i en loop som räknar ned med \code{dec}?
+  \item Vad händer om \code{rjmp} efter den första grenen i ett om-annars saknas?
+  \item En loop räknar ned från startvärdet 0. Hur många varv går den?
+  \item Fördröjningen \code{ldi r18, 200} / \code{dec r18} / \code{brne} tar 600 cykler, inte 599
+    och inte 800. Varför?
+  \item Varför går det inte att göra en fördröjning på en sekund med två loopar i varandra?
+  \item Hur mäter du i simulatorn hur lång tid en del av programmet tar?
+\end{enumerate}
+
+Referensbladet i bilaga~\ref{app:avr} har alla hopp och varje instruktions antal klockcykler, och
+\secref{studio:4-4} visar hur brytpunkterna och stoppuret används i Microchip Studio.
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c10:ch} handlar om inporten, subrutiner och stacken:
+\begin{itemize}
+  \item ASCII-koder: att göra om ett tal till tecken.
+  \item Tal med 16 bitar, och en fördröjning på en hel sekund.
+  \item Inporten: att läsa knappar med \code{PIND}, och varför en nedtryckt knapp läses som noll.
+  \item Subrutiner: att skriva fördröjningen en gång och anropa den många gånger.
+  \item Stacken: var returadressen hamnar, och hur register sparas med \code{push} och \code{pop}.
+\end{itemize}

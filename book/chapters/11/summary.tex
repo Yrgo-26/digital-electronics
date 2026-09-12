@@ -1,0 +1,45 @@
+% Section 11.3, from lectures/L11/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture, with the README's advice to prepare for the exam with the
+% practice exam.
+
+\needspace{12\baselineskip}
+\section{Sammanfattning}
+\label{c11:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Beskriva ett styrsystem som ingångar, beslut och utgångar, och peka ut dem i ett exempel.
+  \item Räkna ut förkopplingsmotståndet för en lysdiod, och förklara varför det behövs.
+  \item Förklara hur en transistor och ett relä låter mikrodatorn styra en last på 24~V, och vad
+    dioden över spolen gör.
+  \item Förklara varför en knapp studsar, när det spelar roll, och hur en kort väntan löser det.
+  \item Gå från en tillståndstabell till en flödesplan och ett program, och testa programmet först
+    i simulatorn och sedan på ett riktigt kort.
+  \item Felsöka ett program på kortet: skilja ett programfel från ett kopplingsfel.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför får en lysdiod aldrig kopplas direkt mellan ett stift och jord?
+  \item Ett stift tål 40~mA. Varför styrs ett relä ändå genom en transistor?
+  \item Ett program som räknar knapptryck räknar för många, men bara på kortet, aldrig i
+    simulatorn. Varför?
+  \item Vad händer om \code{QUARTER_MS} står kvar på 1 när programmet förs över till kortet?
+  \item Programmet räknar en sekund exakt på cykeln. Varför kan trafikljuset ändå gå fel med en
+    halv procent?
+  \item Varför skriver \code{out PORTB, r16} hela porten på en gång, och varför är det en fördel i
+    ett trafikljus?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c12:ch} förbereder det skriftliga provet:
+\begin{itemize}
+  \item Repetition av hela kursen, lärandemål för lärandemål.
+  \item Det skriftliga provet: två timmar, utan miniräknare, med referensbladet för
+    AVR-instruktionerna (bilaga~\ref{app:avr}).
+\end{itemize}
+Förbered provet med övningsprovet i bilaga~\ref{app:practice}.

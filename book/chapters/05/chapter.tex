@@ -1,0 +1,44 @@
+% Chapter 5, typeset from lectures/L05: the README is the opener and the closing summary, and
+% appendix A is a section; the exercises follow the summary. Appendix C, the solutions, is in
+% back/answers/c05.tex. The lab guide the chapter goes with, labs/lab2/README.md, is bilaga
+% \ref{app:lab2}; its tasks are linked with \hyperref, so the text reads "Labb 2-1 uppgift 1"
+% whatever the label prints.
+%
+% The lecture is titled after its lab, "Labb 2: Grindnät med IC-kretsar"; the chapter is titled
+% after its own content instead, since the lab guide is an appendix of that very name (B).
+
+\chapter{Felsökning av grindnät}
+\label{c5:ch}
+
+{\large\itshape Förutsäg, mät, jämför: från uttryck till fungerande krets på kopplingsdäcket.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Kopplingsdäcket, kretsens riktning och matningen.
+  \item \textbf{Labb~2-1}: grindnät med AND-, OR- och inverterarkretsar, från minimerat uttryck till
+    fungerande krets.
+  \item \textbf{Labb~2-2}: samma sorts nät med enbart NAND, och en titt på NOR.
+  \item Felsökning: förutsäg, mät, jämför, i stället för att flytta sladdar på måfå.
+\end{itemize}
+\end{chapterbox}
+
+I kapitel~\ref{c4:ch} minimerade du grindnät med Karnaughdiagram och lärde dig läsa en
+benplacering. Det här kapitlet hör ihop med Labb~2, vars handledning finns i
+bilaga~\ref{app:lab2}: där kopplar du upp näten med 74HC-kretsar på ett kopplingsdäck, först med
+AND, OR och inverterare i Labb~2-1 och sedan med enbart NAND i Labb~2-2. Kapitlets eget ämne är
+vad du gör när ett nät inte fungerar: hur du hittar felet systematiskt, med sanningstabellen och en
+multimeter, i stället för att flytta sladdar på måfå.
+
+Förbered dig innan labben. Gör alla förberedelser F1--F5 i labbhandledningen: sanningstabeller,
+Karnaughdiagram, NAND-nät, simulering i CircuitVerse och en kopplingslista för varje uppgift. De är
+en del av redovisningen, och utan dem hinner du inte klart. Repetera \secref{c4:app:b} om
+benplaceringen, logiknivåerna och kopplingsdäcket, och läs \secref{c5:app:a} om felsökning.
+
+I labben gör du uppgift 1--4 i Labb~2-1 och uppgift 1--3 i Labb~2-2, och redovisar varje uppgift
+när den är klar; uppgift~4 i Labb~2-2 är frivillig. Övningarna i \secref{c5:sec:exercises} är till
+största delen felsökningsfall. Kontrolluppgiften, övning~\ref{c5:ex:10}, bygger på mätningen i
+\hyperref[lab2:1:u1]{Labb~2-1 uppgift~1}. Lösningsförslagen finns i bilaga~\ref{app:answers}.
+
+\input{chapters/05/troubleshooting}
+\input{chapters/05/summary}
+\input{chapters/05/exercises}

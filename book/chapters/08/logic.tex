@@ -1,0 +1,197 @@
+% Section 8.2, from lectures/L08/appendix/b_logic_and_shifts.md. The program masks.asm, which the
+% lecture links to, is printed in full at the end of 8.2.2.
+
+\section{Logiska operationer, skift och rotation}
+\label{c8:app:b}
+
+\subsection{Logiska operationer, bit för bit}
+\label{c8:b1}
+Grindarna från kapitel~\ref{c2:ch} finns som instruktioner. De arbetar på alla åtta bitar i ett
+register samtidigt, men varje bit för sig: bit~0 i resultatet beror bara på bit~0 i de två
+operanderna, bit~1 bara på bit~1, och så vidare. Det är åtta grindar bredvid varandra.
+
+\begin{booktable}{@{}p{6em}p{8em}L@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör, för varje bit} \\
+  \midrule
+  \code{and} & \code{and r16, r17} & 1 om båda bitarna är 1 \\
+  \code{andi} & \code{andi r16, 0x0F} & samma, med en konstant \\
+  \code{or} & \code{or r16, r17} & 1 om minst en av bitarna är 1 \\
+  \code{ori} & \code{ori r16, 0x80} & samma, med en konstant \\
+  \code{eor} & \code{eor r16, r17} & 1 om bitarna är olika (XOR) \\
+  \code{com} & \code{com r16} & inverterar, NOT \\
+\end{booktable}
+
+\noindent Ett exempel med \code{and}:
+
+\begin{textdrawing}
+   r16  =  1011 0110
+   r17  =  0110 0011
+   ----------------- and
+   r16  =  0010 0010
+\end{textdrawing}
+
+\noindent Bara i bit~5 och bit~1 är båda operanderna 1, så bara de bitarna blir 1 i resultatet.
+
+\textbf{Det finns ingen \code{eori}.} Vill man göra XOR med en konstant laddar man först konstanten
+i ett register och använder \code{eor}:
+
+\begin{asmcode}
+    ldi r24, 0b11000000
+    eor r16, r24                    ; Toggle bits 7 and 6 of r16.
+\end{asmcode}
+
+\subsection{Masker}
+\label{c8:b2}
+Den vanligaste användningen av de logiska instruktionerna är att ändra \textbf{vissa} bitar i ett
+register och lämna de andra i fred. Konstanten som väljer vilka bitar kallas en \textbf{mask}. Det
+behövs hela tiden när man styr en port: en port har åtta stift, och man vill ofta ändra ett av dem
+utan att röra de andra sju.
+
+\needspace{14\baselineskip}
+\subsubsection{Nollställa bitar: \code{andi}}
+En nolla i masken tvingar biten till 0, en etta låter den vara som den var.
+
+\bookfigure{l08_mask_and}{Att nollställa bitar med \code{andi}.}{c8:fig:mask_and}
+
+\needspace{14\baselineskip}
+\subsubsection{Ettställa bitar: \code{ori}}
+En etta i masken tvingar biten till 1, en nolla låter den vara.
+
+\bookfigure{l08_mask_or}{Att ettställa bitar med \code{ori}.}{c8:fig:mask_or}
+
+\needspace{14\baselineskip}
+\subsubsection{Invertera bitar: \code{eor}}
+En etta i masken vänder på biten, en nolla låter den vara.
+
+\bookfigure{l08_mask_eor}{Att invertera bitar med \code{eor}.}{c8:fig:mask_eor}
+
+\needspace{7\baselineskip}
+\subsubsection{Testa en bit: \code{andi} och \code{Z}}
+Vill man veta om en viss bit är 1 kan man göra AND med en mask som bara har den biten satt. Blir
+resultatet noll var biten 0, annars 1, och flaggan \code{Z} säger vilket:
+
+\begin{asmcode}
+    andi r16, 0b00000100            ; Keep only bit 2. Z = 1 if bit 2 was 0.
+\end{asmcode}
+
+\noindent Nackdelen är att \code{r16} ändras. Hur man testar en bit utan att förstöra registret,
+och vad man gör med \code{Z} efteråt, kommer i kapitel~\ref{c9:ch}.
+
+\subsubsection{Sammanfattning}
+
+\begin{booktable}{@{}p{8.5em}p{7.5em}L@{}}
+  \thead{Vill du} & \thead{Använd} & \thead{Masken har} \\
+  \midrule
+  nollställa bitar & \code{andi} & 0 i de bitar som ska bli 0, 1 i resten \\
+  ettställa bitar & \code{ori} & 1 i de bitar som ska bli 1, 0 i resten \\
+  invertera bitar & \code{eor} & 1 i de bitar som ska vändas, 0 i resten \\
+  testa en bit & \code{andi}, sedan \code{Z} & 1 i den bit som testas, 0 i resten \\
+\end{booktable}
+
+\noindent Alla exemplen finns i programmet \code{masks.asm}:
+
+\asmfile{lectures/L08/examples/masks.asm}
+
+\subsection{Skift}
+\label{c8:b3}
+Ett \textbf{skift} flyttar alla bitar ett steg åt vänster eller höger. Biten som ramlar ut i ena
+änden hamnar i carryflaggan \code{C}, och i andra änden kommer en ny bit in.
+
+\bookfigure{l08_shifts}{Skiften och rotationerna \code{lsl}, \code{rol}, \code{lsr}, \code{asr}
+och \code{ror}.}{c8:fig:shifts}
+
+\textbf{\code{lsl}}, \emph{logical shift left}: alla bitar ett steg åt vänster, en nolla in i
+bit~0, bit~7 till \code{C}. Att flytta ett binärt tal ett steg åt vänster är att
+\textbf{multiplicera med 2}, precis som att lägga till en nolla sist i ett decimalt tal
+multiplicerar med 10:
+
+\begin{textdrawing}
+   3    =  0000 0011
+   lsl  =  0000 0110  =  6
+   lsl  =  0000 1100  =  12
+\end{textdrawing}
+
+\noindent \textbf{\code{lsr}}, \emph{logical shift right}: alla bitar ett steg åt höger, en nolla in
+i bit~7, bit~0 till \code{C}. Det är att \textbf{dividera med 2}, och biten i \code{C} är resten:
+\code{lsr} på 7 ger 3 och \code{C = 1}.
+
+\textbf{\code{asr}}, \emph{arithmetic shift right}: som \code{lsr}, men bit~7 behåller sitt värde i
+stället för att bli 0. Det gör att division med 2 blir rätt även för negativa tal med tecken:
+
+\begin{textdrawing}
+   -16  =  1111 0000
+   asr  =  1111 1000  =  -8     (rätt, med tecken)
+   lsr  =  0111 1000  =  120    (fel, med tecken: teckenbiten försvann)
+\end{textdrawing}
+
+\noindent Använd \code{lsr} för tal utan tecken och \code{asr} för tal med tecken. Processorn kan
+inte dividera på något annat sätt (\secref{c7:a8}), så division med 2, 4, 8 och så vidare görs
+alltid med skift.
+
+\subsection{Rotation}
+\label{c8:b4}
+En \textbf{rotation} är ett skift där biten som skiftas in inte är en nolla, utan carryflaggans
+gamla värde. Biten som skiftas ut hamnar som vanligt i \code{C}. Man kan tänka sig att de åtta
+bitarna och \code{C} sitter i en ring om nio platser.
+
+\begin{itemize}
+  \item \textbf{\code{rol}}, \emph{rotate left}: bit~7 till \code{C}, och \code{C} in i bit~0.
+  \item \textbf{\code{ror}}, \emph{rotate right}: bit~0 till \code{C}, och \code{C} in i bit~7.
+\end{itemize}
+
+Ett exempel med \code{rol}, som börjar med \code{C = 0}:
+
+\begin{textdrawing}
+   r16 = 1001 0011, C = 0
+   rol   0010 0110, C = 1     (bit 7 till C, gamla C = 0 in i bit 0)
+   rol   0100 1101, C = 0     (bit 7 till C, gamla C = 1 in i bit 0)
+\end{textdrawing}
+
+\noindent Ettan som ramlade ut ur bit~7 kom tillbaka in i bit~0 ett steg senare. Inget försvinner i
+en rotation.
+
+\subsubsection{Ett rinnande ljus}
+Programmet \code{running_light.asm} visar en etta som vandrar över port B med \code{rol}:
+
+\begin{asmcode}
+    clc                             ; C = 0, so no stray one is rotated in.
+    ldi r16, 0b00000001             ; Start with one LED lit.
+
+loop:
+    out PORTB, r16                  ; Show the pattern.
+    rol r16                         ; Move it one place to the left, through C.
+    rjmp loop
+\end{asmcode}
+
+\noindent\code{clc} (\emph{clear carry}) nollställer \code{C} innan första rotationen. Stega
+programmet och titta på PORTB i I/O-fönstret: ettan går från bit~0 till bit~7, sedan är
+\textbf{alla} lysdioder släckta ett steg, och sedan börjar ettan om i bit~0. Förklaringen är ringen
+om nio platser: det steg då alla är släckta ligger ettan i \code{C}.
+
+\subsection{swap}
+\label{c8:b5}
+\textbf{\code{swap r16}} byter plats på de två halvorna av en byte, de fyra övre och de fyra nedre
+bitarna. En halv byte kallas en \textbf{nibble}, och motsvarar en hexadecimal siffra:
+
+\begin{textdrawing}
+   r16  =  0x3A  =  0011 1010
+   swap =  0xA3  =  1010 0011
+\end{textdrawing}
+
+\noindent Den används när man vill arbeta med en hexadecimal siffra i taget, till exempel för att
+visa en byte som två tecken. Det gör du i Labb~3 \hyperref[lab3:d18]{del~18}.
+
+\subsection{Flaggorna efter logik och skift}
+\label{c8:b6}
+De logiska instruktionerna och skiften ändrar också flaggorna, men inte på samma sätt som
+aritmetiken:
+\begin{itemize}
+  \item \textbf{\code{and}, \code{andi}, \code{or}, \code{ori}, \code{eor}} sätter \code{Z} och
+    \code{N} efter resultatet, nollställer alltid \code{V}, och rör inte \code{C}.
+  \item \textbf{\code{com}} gör samma sak och sätter dessutom alltid \code{C = 1}.
+  \item \textbf{Skiften och rotationerna} lägger den utskiftade biten i \code{C}, och sätter
+    \code{Z} och \code{N} efter resultatet.
+\end{itemize}
+
+Att \code{and} lämnar \code{C} orörd kommer till nytta i kapitel~\ref{c9:ch}: man kan testa en bit
+med \code{andi} och sedan hoppa på \code{Z} utan att förstöra en carry man vill spara.

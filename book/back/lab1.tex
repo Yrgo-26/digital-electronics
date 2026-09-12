@@ -1,0 +1,372 @@
+% Appendix: Labb 1, from labs/lab1/README.md. The guide's headings are sections, and its tasks,
+% which are headings of their own in the guide, are collected under the section Uppgifterna.
+%
+% Deliberate differences: the lecture links are chapter and section references, the common
+% safety rules the guide points to in labs/README.md are in the preface, and the table in task 1
+% has two empty rows more than the guide's, for a station with more than two contact elements
+% per button (the guide says to add rows).
+%
+% \labprep[title]{F1}{label} is a local helper: dtbook.sty's \prep sets no link target, and the
+% preparations are referred to as lab1:f1 to lab1:f4, with \ref printing "F1". It is
+% \providecommand, since lab2.tex defines the same one.
+
+\makeatletter
+\providecommand{\labprep}[3][]{\prep{#2\if\relax\detokenize{#1}\relax\else\ -- #1\fi}%
+  \phantomsection\def\@currentlabel{#2}\label{#3}}
+\makeatother
+
+\chapter{Labb 1: Kopplingsnät}
+\label{app:lab1}
+
+I den här laborationen bygger du logiska funktioner av strömkontakter: två tryckknappar, en lampa
+och ett aggregat på 24~V. Samma funktioner som i kapitel~\ref{c2:ch} byggdes av grindar blir här
+serie- och parallellkopplingar av slutande och brytande kontakter, och lampans läge är utgången.
+
+Laborationen görs i par, och hör till kapitel~\ref{c3:ch}. Teorin finns i \secref{c2:app:b} och,
+för analys och felsökning, i \secref{c3:app:a}.
+
+\section{Mål}
+\label{lab1:sec:goals}
+Efter laborationen ska du kunna:
+\begin{itemize}
+  \item avgöra vilka anslutningar på en tryckknapp som är slutande och vilka som är brytande;
+  \item koppla upp ett kontaktnät efter ett strömvägsschema;
+  \item realisera AND, OR, NOT, NAND, NOR, XOR och XNOR med kontakter;
+  \item syntetisera ett kontaktnät ur en sanningstabell, via ett förenklat uttryck;
+  \item analysera ett kontaktnät och ersätta det med ett mindre, likvärdigt nät;
+  \item kontrollera ett nät genom att jämföra förutsagda och uppmätta sanningstabeller.
+\end{itemize}
+
+\section{Utrustning}
+\label{lab1:sec:equipment}
+Varje station har:
+\begin{itemize}
+  \item ett \textbf{DC-aggregat} inställt på 24~V;
+  \item två \textbf{tryckknappar}, S1 och S2, med både slutande (NO) och brytande (NC)
+    kontaktelement;
+  \item en \textbf{glödlampa} för 24~V, H1;
+  \item \textbf{kopplingssladdar};
+  \item en \textbf{multimeter}, för felsökning.
+\end{itemize}
+
+Varje kontaktelement har två anslutningar, märkta med ett nummer. Enligt standarden slutar numret
+på \textbf{3 och 4 för ett slutande element} och på \textbf{1 och 2 för ett brytande}, medan den
+första siffran anger elementets plats i knappen. Figur~\ref{lab1:fig:station} visar ett exempel;
+märkningen kan skilja sig mellan stationerna, och \hyperref[lab1:u1]{uppgift~1} går ut på att ta
+reda på hur just din station ser ut.
+
+\bookfigure{lab1_station}{Stationens delar: tryckknapparna S1 och S2, lampan H1 och
+aggregatet.}{lab1:fig:station}
+
+Alla uppgifter i laborationen går att göra med \textbf{ett slutande och ett brytande element per
+knapp}. Har din station fler, använd dem du behöver.
+
+\section{Säkerhet}
+\label{lab1:sec:safety}
+\begin{warning}
+\begin{itemize}
+  \item \textbf{Koppla alltid med aggregatet frånslaget}, och slå på det först när kopplingen är
+    kontrollerad mot schemat. 24~V är inte farligt att röra, men en kortslutning ger stora
+    strömmar, varma sladdar och ett aggregat som slår ifrån.
+  \item \textbf{Varje strömväg ska gå genom lampan.} Koppla aldrig en kontakt direkt mellan
+    +24~V och 0~V: när kontakten sluts blir det en kortslutning.
+  \item Glödlampan blir varm när den har lyst en stund. Rör inte glaset.
+  \item Se också de gemensamma säkerhetsreglerna för laborationerna i förordet.
+\end{itemize}
+\end{warning}
+
+\section{Förberedelser}
+\label{lab1:sec:prep}
+Förberedelseuppgifterna ska vara gjorda \textbf{före} passet. Läraren tittar på dem innan ni börjar
+koppla, och utan dem hinner man inte klart.
+
+\labprep{F1}{lab1:f1}Skriv sanningstabellen för H1 med ingångarna S1 och S2 för var och en av
+funktionerna AND, OR, NAND, NOR, XOR och XNOR, och tabellen för NOT med S1 som enda ingång. En
+nedtryckt knapp är \code{1} och en tänd lampa är \code{1}.
+
+\labprep{F2}{lab1:f2}Rita ett strömvägsschema mellan +24~V och 0~V för var och en av funktionerna
+i F1, med tryckknappar och lampan H1. Ange för varje kontakt om den är slutande eller brytande.
+Lämna plats att fylla i anslutningarnas nummer när du har gjort \hyperref[lab1:u1]{uppgift~1}.
+
+\labprep{F3}{lab1:f3}Läs \hyperref[lab1:u7]{uppgift~7}. Ta fram uttrycket för H1 på SP-form ur
+sanningstabellen, förenkla det, och rita det minsta kontaktnätet.
+
+\labprep{F4}{lab1:f4}Läs \hyperref[lab1:u8]{uppgift~8}. Skriv uttrycket för nätet i figuren, ta
+fram dess sanningstabell, förenkla uttrycket, och rita det minsta likvärdiga nätet.
+
+\section{Arbetsgång}
+\label{lab1:sec:procedure}
+Varje uppgift görs på samma sätt, enligt \secref{c3:a4}:
+\begin{enumerate}
+  \item Ta fram schemat från förberedelserna, och fyll i anslutningarnas nummer.
+  \item Fyll i kolumnen \textbf{förutsagt} i uppgiftens tabell.
+  \item Koppla med aggregatet frånslaget. Den ena i paret kopplar, den andra kontrollerar mot
+    schemat.
+  \item Slå på aggregatet, pröva varje kombination av knapparna, och fyll i kolumnen
+    \textbf{uppmätt}.
+  \item Stämmer kolumnerna? Om inte: felsök enligt \secref{c3:a5}.
+  \item \kindtag[fillaccent]{Redovisa} för läraren: schemat, tabellen och ett prov med knapparna.
+\end{enumerate}
+
+Byt roll mellan uppgifterna, så att båda i paret har kopplat.
+
+\filbreak
+\section{Uppgifterna}
+\label{lab1:sec:tasks}
+
+\labtask{Uppgift 1}{Identifiera kontakterna}\phantomsection\label{lab1:u1}
+Innan något kan kopplas måste du veta vilka anslutningar som hör till vilket kontaktelement, och om
+elementet är slutande eller brytande. Märkningen berättar det, men den ska kontrolleras, eftersom
+en felaktigt kopplad kontakt ger en krets som gör precis tvärtom.
+
+Använd lampan som provare: koppla +24~V till en anslutning a, och lampan mellan en annan
+anslutning b och 0~V. Om det som sitter mellan a och b leder, lyser lampan.
+
+\bookfigure{lab1_continuity}{Provkopplingen: lampan lyser om det som sitter mellan a och b
+leder.}{lab1:fig:continuity}
+
+\begin{parts}
+  \item Koppla in ett kontaktelement i taget mellan a och b. Pröva med knappen släppt och nedtryckt,
+    och fyll i tabellen, med en rad per element. Har knapparna fler än två element, lägg till rader:
+
+\begin{filltable}{@{}p{3.2em}YYYY@{}}
+  \thead{Knapp} & \thead{Anslutningar} & \thead{Lampan, knappen släppt} &
+    \thead{Lampan, knappen nedtryckt} & \thead{Slutande eller brytande?} \\
+  \midrule
+  S1 & & & & \fillrule
+  S1 & & & & \fillrule
+  S2 & & & & \fillrule
+  S2 & & & & \fillrule
+  & & & & \fillrule
+  & & & & \\
+\end{filltable}
+
+  \item Stämmer resultatet med märkningen, enligt regeln att 3--4 är slutande och 1--2 brytande?
+
+  \item Rita av din station som i figur~\ref{lab1:fig:station}, med rätt nummer, och fyll i numren i
+    dina scheman från F2.
+\end{parts}
+
+\redovisa{tabellen och ritningen.}
+
+\labtask{Uppgift 2}{AND}\phantomsection\label{lab1:u2}
+Bygg AND-funktionen, \code{H1 = S1 · S2}, efter ditt schema från F2.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+Nämn ett ställe där en AND-funktion med två knappar används i verkligheten, och förklara varför.
+
+\redovisa{schemat, tabellen och kopplingen.}
+
+\labtask{Uppgift 3}{OR}\phantomsection\label{lab1:u3}
+Bygg OR-funktionen, \code{H1 = S1 + S2}.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+\redovisa{schemat, tabellen och kopplingen.}
+
+\labtask{Uppgift 4}{NOT}\phantomsection\label{lab1:u4}
+Bygg NOT-funktionen, \code{H1 = S1'}, med S1 som enda knapp.
+
+\begin{filltable}{@{}cYY@{}}
+  \thead{S1} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & & \fillrule
+  1 & & \\
+\end{filltable}
+
+Förklara varför en nödstoppsknapp alltid kopplas med sitt brytande element.
+
+\redovisa{schemat, tabellen och kopplingen.}
+
+\labtask{Uppgift 5}{NAND och NOR}\phantomsection\label{lab1:u5}
+\begin{parts}
+  \item Bygg NAND-funktionen, \code{H1 = (S1 · S2)'}. Använd De Morgans lag för att skriva om
+    uttrycket så att det bara innehåller enskilda, eventuellt inverterade, variabler, och bygg det
+    uttrycket.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item Bygg NOR-funktionen, \code{H1 = (S1 + S2)'}, på samma sätt.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item Jämför dina NAND- och NOR-kopplingar med AND- och OR-kopplingarna i uppgift 2 och 3. Vad har
+    ändrats, och hur hänger det ihop med De Morgans lagar?
+\end{parts}
+
+\redovisa{båda kopplingarna och svaret på c).}
+
+\labtask{Uppgift 6}{XOR och XNOR}\phantomsection\label{lab1:u6}
+\begin{parts}
+  \item Bygg XOR-funktionen, \code{H1 = S1 · S2' + S1' · S2}. Varje knapp används med både sitt
+    slutande och sitt brytande element.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item Gör om kopplingen till XNOR, \code{H1 = S1 · S2 + S1' · S2'}, genom att \textbf{flytta så få
+    sladdar som möjligt}. Vilka flyttade du, och varför räcker det?
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item XOR-kopplingen kallas ibland trappkoppling. Förklara varför, och vad som skiljer den från en
+    riktig trappbelysning med två vippströmbrytare.
+\end{parts}
+
+\redovisa{båda kopplingarna och svaren på b) och c).}
+
+\labtask{Uppgift 7}{Syntes från sanningstabell}\phantomsection\label{lab1:u7}
+H1 är driftlampan till en maskin. Den ska lysa när maskinens skyddslucka är stängd, eller när
+servicenyckeln är vriden, oavsett luckan. I laborationen motsvaras servicenyckeln av S1
+(nedtryckt betyder vriden) och luckans givare av S2, som påverkas, alltså är nedtryckt, när luckan
+är \textbf{öppen}.
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{S1} & \thead{S2} & \thead{H1} \\
+  \midrule
+  0 & 0 & 1 \\
+  0 & 1 & 0 \\
+  1 & 0 & 1 \\
+  1 & 1 & 1 \\
+\end{narrowtable}
+
+\begin{parts}
+  \item Ta fram uttrycket för H1 på SP-form ur tabellen, och förenkla det (F3). Vilken räknelag
+    använder du?
+
+  \item Bygg det minsta kontaktnätet för det förenklade uttrycket, och kontrollera det mot tabellen.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item Hur många kontakter hade nätet behövt om du hade byggt det oförenklade uttrycket, med en
+    strömväg per minterm?
+\end{parts}
+
+\redovisa{härledningen, kopplingen och svaret på c).}
+
+\labtask{Uppgift 8}{Analys av ett kontaktnät}\phantomsection\label{lab1:u8}
+Nätet i figur~\ref{lab1:fig:task8} har konstruerats av någon annan. Din uppgift är att ta reda på
+vad det gör, och om det går att göra enklare.
+
+\bookfigure{lab1_task8}{Nätet i uppgift 8.}{lab1:fig:task8}
+
+\begin{parts}
+  \item Skriv uttrycket för H1 (F4).
+
+  \item Förutsäg sanningstabellen, bygg nätet precis som det är ritat, och mät.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item Förenkla uttrycket, och bygg det minsta likvärdiga nätet. Mät igen, och kontrollera att
+    tabellen är densamma.
+
+\begin{filltable}{@{}ccYY@{}}
+  \thead{S1} & \thead{S2} & \thead{H1 förutsagt} & \thead{H1 uppmätt} \\
+  \midrule
+  0 & 0 & & \fillrule
+  0 & 1 & & \fillrule
+  1 & 0 & & \fillrule
+  1 & 1 & & \\
+\end{filltable}
+
+  \item En av kontakterna i det ursprungliga nätet gick att ta bort. Förklara med ord, utan
+    räknelagar, varför den aldrig påverkar lampan fast den påverkar strömmen.
+\end{parts}
+
+\redovisa{båda näten, tabellerna och förklaringen i d).}
+
+\labtask[Extra]{Uppgift 9}{Fler funktioner}\phantomsection\label{lab1:u9}
+\emph{Frivillig uppgift, för den som blir klar i tid.}
+
+Med två knappar finns det 16 olika funktioner, eftersom varje rad i en tabell med fyra rader kan
+vara \code{0} eller \code{1}.
+
+\begin{parts}
+  \item Skriv upp alla 16 sanningstabellerna, och ange för var och en ett så enkelt uttryck som
+    möjligt. Två av dem behöver inga kontakter alls.
+
+  \item Välj fyra funktioner som du inte redan har byggt, bygg dem, och kontrollera dem mot
+    tabellerna.
+
+  \item Vilka av de 16 funktionerna behöver både det slutande och det brytande elementet i båda
+    knapparna? Vilka klarar sig med ett element per knapp?
+\end{parts}
+
+\filbreak
+\section{Redovisning}
+\label{lab1:sec:report}
+Läraren prickar av varje uppgift när den är redovisad. För godkänd laboration krävs uppgift 1--8;
+uppgift 9 är frivillig. Båda i paret ska kunna förklara varje koppling.
+
+\begin{filltable}{@{}p{4.6em}Lp{8em}@{}}
+  \thead{Uppgift} & \thead{Innehåll} & \thead{Redovisad} \\
+  \midrule
+  F1--F4 & Förberedelser & \fillrule
+  1 & Identifiera kontakterna & \fillrule
+  2 & AND & \fillrule
+  3 & OR & \fillrule
+  4 & NOT & \fillrule
+  5 & NAND och NOR & \fillrule
+  6 & XOR och XNOR & \fillrule
+  7 & Syntes från sanningstabell & \fillrule
+  8 & Analys av ett kontaktnät & \fillrule
+  9 & Extra (frivillig) & \\
+\end{filltable}
+
+Återställ stationen när ni är klara: aggregatet av, sladdarna tillbaka på sin plats.

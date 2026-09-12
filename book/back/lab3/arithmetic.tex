@@ -1,0 +1,301 @@
+% Labb 3, parts 3 to 10, from labs/lab3/b_arithmetic_and_logic.md. Each part is a \labtask, and
+% its Mål, Bakgrund, Programmet, Uppgifter and Frågor are \task headings. The program given in
+% part 6 is the handout's.
+
+\section{Del 3--10: Aritmetik, logik och flaggor}
+\label{lab3:sec:b}
+Delarna hör till kapitel~\ref{c8:ch}. Varje del är ett eget projekt som utgår från mallen
+(\secref{lab3:template}). Ha referensbladet i bilaga~\ref{app:avr} till hands.
+
+\textbf{Förutsäg alltid först.} Varje del har uppgifter som börjar med \emph{Förutsäg}. Skriv svaret
+på papper eller som en kommentar i programmet innan ni stegar, och jämför sedan.
+
+\labtask{Del 3}{Addition}\phantomsection\label{lab3:d3}
+\task{Mål}
+Addera med \code{add} och \code{inc}, och se vad som händer när summan inte får plats i en byte.
+
+\task{Bakgrund}
+\Secref{c8:a1} och~\ref{c8:a2}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Skriv ett program som laddar 25 i \code{r16} och 17 i \code{r17}, och adderar dem med
+    \code{add r16, r17}. \textbf{Förutsäg} \code{r16} decimalt, hexadecimalt och binärt. Simulera
+    och kontrollera.
+  \item Gör samma addition för hand på papper, binärt, kolumn för kolumn med minnessiffror.
+  \item Lägg till en addition av två hexadecimala tal: \code{0x3A} i \code{r18} plus \code{0x15} i
+    \code{r19}. \textbf{Förutsäg} \code{r18}, både hexadecimalt och decimalt.
+  \item Lägg till instruktioner som räknar ut 10 + 20 + 30 i \code{r20}. Hur många \code{add}
+    behövs?
+  \item Lägg till en addition av 200 i \code{r23} och 100 i \code{r24}. \textbf{Förutsäg}
+    \code{r23}. Titta sedan på flaggan \code{C} i Processor Status efter additionen. Vad betyder den
+    här?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vilket av de två registren i \code{add r16, r17} ändras?
+  \item Summan 200 + 100 = 300 får inte plats. Var finns \enquote{resten} av svaret efter
+    additionen?
+\end{itemize}
+
+\redovisa{programmet, uträkningen från uppgift~2 och svaret på frågorna.}
+
+\labtask{Del 4}{Subtraktion}\phantomsection\label{lab3:d4}
+\task{Mål}
+Subtrahera med \code{sub}, \code{subi} och \code{dec}, och addera en konstant utan en
+\code{addi}.
+
+\task{Bakgrund}
+\Secref{c8:a4}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Räkna ut 50 -- 20 med \code{sub}, med 50 i \code{r16} och 20 i \code{r17}.
+    \textbf{Förutsäg} resultatet.
+  \item Ladda \code{0x20} i \code{r18} och dra ifrån \code{0x05} med \code{subi}. \textbf{Förutsäg}
+    \code{r18} hexadecimalt och decimalt.
+  \item Ladda 3 i \code{r19} och kör \code{dec r19} tre gånger. \textbf{Förutsäg} \code{r19} och
+    flaggan \code{Z} efter varje \code{dec}. Sätt en etikett efter den tredje, så kan ni köra dit
+    med \textbf{Run To Cursor}.
+  \item Det finns ingen \code{addi}. Ladda 100 i \code{r20} och addera 28 med en \code{subi}.
+    Vilken konstant ska \code{subi} ha? \textbf{Förutsäg} \code{r20}.
+  \item Räkna ut 20 -- 50 med \code{sub}, med 20 i \code{r21} och 50 i \code{r22}.
+    \textbf{Förutsäg} \code{r21} och \code{C}.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vad betyder \code{C = 1} efter en subtraktion?
+  \item \code{r21} blev 226 i uppgift~5. Vilket tal är det om man läser det med tecken? Jämför med
+    \secref{c8:a5}.
+\end{itemize}
+
+\redovisa{programmet och förutsägelserna.}
+
+\labtask{Del 5}{Addition och subtraktion decimalt, binärt och hexadecimalt}%
+\phantomsection\label{lab3:d5}
+\task{Mål}
+Räkna med tal som är skrivna i olika talsystem i samma uttryck.
+
+\task{Bakgrund}
+\Secref{c7:b4} och kapitel~\ref{c1:ch}.
+
+\task{Uppgifter}
+Skriv ett program som räknar ut de tre uttrycken, med talen skrivna \textbf{precis som i
+uttrycket}. \textbf{Förutsäg} först varje resultat decimalt, hexadecimalt och binärt, i en tabell.
+\begin{enumerate}
+  \item \code{r20} = \code{0x3C} + \code{0b00001010} -- 25
+  \item \code{r21} = \code{0b11110000} -- \code{0x0F} + 1, där den sista additionen görs med
+    \code{inc}
+  \item \code{r22} = \code{0b10101010} + \code{0x55}
+\end{enumerate}
+
+\begin{filltable}{@{}p{5em}YYY@{}}
+  \thead{Register} & \thead{Decimalt} & \thead{Hexadecimalt} & \thead{Binärt} \\
+  \midrule
+  \code{r20} & & & \fillrule
+  \code{r21} & & & \fillrule
+  \code{r22} & & & \\
+\end{filltable}
+
+Simulera och jämför med tabellen.
+
+\task{Frågor}
+\begin{itemize}
+  \item Uttryck~3 ger ett särskilt bitmönster. Vilket, och varför blev det så? Titta på de två
+    talen binärt.
+\end{itemize}
+
+\redovisa{tabellen och simuleringen.}
+
+\labtask{Del 6}{Utporten PORTB, inc, I/O-simulering och .def}\phantomsection\label{lab3:d6}
+\task{Mål}
+Göra port B till utport, räkna på den, och följa bitarna i simulatorns I/O-fönster.
+
+\task{Bakgrund}
+\Secref{c8:app:c}, särskilt \ref{c8:c3}, \ref{c8:c6} och~\ref{c8:c7}.
+
+\task{Programmet}
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.def counter = r16                  ; The value shown on port B.
+.def temp = r17                     ; A scratch register.
+
+.org 0x0000
+    rjmp main
+
+main:
+    ser temp                        ; temp = 0xFF
+    out DDRB, temp                  ; All eight pins of port B are outputs.
+    clr counter                     ; Start counting at zero.
+
+loop:
+    out PORTB, counter              ; Show the count on port B.
+    inc counter                     ; Count up.
+    rjmp loop                       ; And again, forever.
+\end{asmcode}
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Skriv av programmet, bygg och starta simuleringen. Öppna fönstret \textbf{I/O}
+    (\textbf{Debug $\rightarrow$ Windows $\rightarrow$ I/O}) och välj port B.
+  \item Stega och följ rutorna i \code{DDRB} och \code{PORTB}. När blir alla rutor i \code{DDRB}
+    fyllda?
+  \item \textbf{Förutsäg} hur rutorna i \code{PORTB} ser ut efter fem varv i loopen. Stega och
+    kontrollera.
+  \item Varför ändras även \code{PINB}, fast programmet aldrig skriver dit?
+  \item Ändra programmet så att det räknar \textbf{nedåt}. \textbf{Förutsäg} vilket värde som
+    visas direkt efter 0.
+  \item Ändra programmet så att det räknar uppåt i steg om \textbf{två}, med en enda instruktion i
+    stället för \code{inc}.
+  \item Kör programmet fritt med \textbf{F5}, vänta några sekunder och stoppa med \textbf{Break
+    All}. Går det att förutsäga värdet i \code{PORTB}? Hur lång tid tar ett varv i loopen, vid
+    16~MHz?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vad gör \code{.def}, och blir det någon skillnad i maskinkoden?
+  \item Hur skulle lysdioderna se ut på ett riktigt kort om programmet kördes fritt?
+\end{itemize}
+
+\redovisa{programmet med nedräkning och med steg om två, och svaren på frågorna.}
+
+\labtask{Del 7}{Logiska operationer}\phantomsection\label{lab3:d7}
+\task{Mål}
+Använda \code{andi}, \code{ori}, \code{eor} och \code{com} med masker för att ändra enskilda
+bitar.
+
+\task{Bakgrund}
+\Secref{c8:b1} och~\ref{c8:b2}.
+
+\task{Uppgifter}
+Gör port B till utport först i programmet, och skriv varje resultat till \code{PORTB} med
+\code{out}, så att det syns bit för bit i I/O-fönstret. \textbf{Förutsäg} varje resultat binärt
+innan ni stegar.
+\begin{enumerate}
+  \item Ladda \code{0b10101010} i \code{r16} och behåll bara de fyra nedre bitarna.
+  \item Ladda \code{0b00110000} i \code{r17} och ettställ bit~7 och bit~0.
+  \item Ladda \code{0b00001111} i \code{r18} och invertera de fyra övre bitarna. Det finns ingen
+    \code{eori}: hur gör ni?
+  \item Ladda \code{0b00110011} i \code{r19} och invertera alla bitar med en enda instruktion.
+  \item Ladda \code{0b01010101} i \code{r20}. Ettställ bit~1, nollställ bit~6 och invertera bit~7,
+    med en instruktion per ändring. Vilket värde får \code{r20}, och vilka stift på port B lyser?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vilken instruktion och vilken sorts mask använder man för att nollställa bitar? För att
+    ettställa?
+  \item Varför ger \code{com} och \code{eor} med \code{0xFF} samma resultat?
+\end{itemize}
+
+\redovisa{programmet och förutsägelserna.}
+
+\labtask{Del 8}{Rotationer och skift}\phantomsection\label{lab3:d8}
+\task{Mål}
+Skifta och rotera bitar, och använda skift för att multiplicera och dividera med 2.
+
+\task{Bakgrund}
+\Secref{c8:b3} och~\ref{c8:b4}.
+
+\task{Uppgifter}
+\textbf{Förutsäg} varje resultat, och \code{C}, innan ni stegar.
+\begin{enumerate}
+  \item Ladda 3 i \code{r16} och skifta vänster två gånger med \code{lsl}. Vilket tal har
+    \code{r16} multiplicerats med?
+  \item Ladda 200 i \code{r17} och skifta höger två gånger med \code{lsr}.
+  \item Ladda \code{0b11110000} i \code{r18}, som är $-16$ med tecken, och kopiera det till
+    \code{r19}. Skifta \code{r18} med \code{asr} och \code{r19} med \code{lsr}. Vilket av
+    resultaten är $-16 / 2$?
+  \item Ladda \code{0b10010011} i \code{r20}, nollställ \code{C} med \code{clc}, och rotera vänster
+    två gånger med \code{rol}. \textbf{Förutsäg} \code{r20} och \code{C} efter varje \code{rol}.
+  \item Skriv ett rinnande ljus på port B med \code{rol r21}, som i \secref{c8:b4}. Stega igenom
+    ett helt varv, och följ \code{PORTB} och \code{C}. Hur många steg går det på ett varv, och
+    varför är ett av dem mörkt?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför används \code{asr} och inte \code{lsr} för att dividera ett tal med tecken med 2?
+  \item \emph{(Fördjupning)} Byt ut \code{rol r21} mot de två instruktionerna \code{lsl r21} och
+    \code{adc r21, r25}, där \code{r25} har nollställts med \code{clr} före loopen. Hur många steg
+    går ljuset nu på ett varv, och varför?
+\end{itemize}
+
+\redovisa{det rinnande ljuset och förutsägelserna.}
+
+\labtask{Del 9}{Aritmetisk rundgång}\phantomsection\label{lab3:d9}
+\task{Mål}
+Se vad som händer när ett register räknas förbi 255 eller under 0, och vilka flaggor som visar
+det.
+
+\task{Bakgrund}
+\Secref{c8:a3}.
+
+\task{Uppgifter}
+Sätt en etikett efter varje uppgift, så att ni kan köra fram till den och läsa SREG.
+\textbf{Förutsäg} registret och flaggorna \code{Z} och \code{C} innan ni kör.
+\begin{enumerate}
+  \item Nollställ \code{C} med \code{clc}. Ladda 250 i \code{r16} och kör \code{inc r16} sex
+    gånger.
+  \item Ladda 255 i \code{r17} och 1 i \code{r18}, och addera dem med \code{add}.
+  \item Ladda 0 i \code{r19} och kör \code{dec r19}. Titta även på \code{N}.
+  \item Ladda 3 i \code{r20} och 5 i \code{r21}, och räkna ut \code{r20 - r21} med \code{sub}.
+  \item Ladda 200 i \code{r22} och 100 i \code{r23}, och addera dem.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Efter uppgift~1 är \code{r16} = 0 och \code{Z} = 1. Vad är \code{C}, och varför?
+  \item Efter uppgift~3 är \code{C} = 1. Är det \code{dec} som har satt den? Vilken instruktion
+    satte den?
+  \item Vilket tal ska man lägga till 44 för att få det \enquote{riktiga} svaret på uppgift~5?
+\end{itemize}
+
+\redovisa{förutsägelserna och svaren på frågorna.}
+
+\labtask{Del 10}{Flaggorna i SREG}\phantomsection\label{lab3:d10}
+\task{Mål}
+Förutsäga flaggorna \code{C}, \code{Z}, \code{N}, \code{V}, \code{S} och \code{H} efter olika
+operationer, och kontrollera dem.
+
+\task{Bakgrund}
+\Secref{c8:a6} och~\ref{c8:a7}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Fyll i tabellen \textbf{för hand}. Varje rad görs för sig, med \code{add}, \code{sub},
+    \code{andi} eller \code{com} som anges.
+
+    \begin{filltable}{@{}cp{11.2em}Y*{6}{C{1.5em}}@{}}
+      \thead{Rad} & \thead{Operation} & \thead{Resultat} & \thead{C} & \thead{Z} & \thead{N} &
+        \thead{V} & \thead{S} & \thead{H} \\
+      \midrule
+      a & \code{0x7F + 0x01} & & & & & & & \fillrule
+      b & \code{0xFF + 0x01} & & & & & & & \fillrule
+      c & \code{0x80 + 0x80} & & & & & & & \fillrule
+      d & \code{0x05 - 0x07} & & & & & & & \fillrule
+      e & \code{0x40 + 0x40} & & & & & & & \fillrule
+      f & \code{0x0F + 0x01} & & & & & & & \fillrule
+      g & \code{0x0F} AND \code{0xF0} (\code{andi}) & & & & & & & \fillrule
+      h & NOT \code{0x00} (\code{com}) & & & & & & & \\
+    \end{filltable}
+  \item Skriv ett program med en rad per operation och en etikett efter varje, till exempel
+    \code{row_a}, \code{row_b} och så vidare.
+  \item Kör fram till varje etikett och jämför SREG med tabellen. Markera varje ruta ni hade fel
+    på.
+  \item För rad g och h: vilka flaggor ändrades inte av operationen? Jämför med kolumnen
+    \emph{Flaggor} på referensbladet i bilaga~\ref{app:avr}.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Rad a och rad e ger båda \code{V = 1}. Vad har de gemensamt?
+  \item Rad d ger \code{C = 1} men \code{V = 0}. Är svaret rätt eller fel? Svara både utan och med
+    tecken.
+\end{itemize}
+
+\redovisa{tabellen, med era förutsägelser och de rätta värdena bredvid varandra.}

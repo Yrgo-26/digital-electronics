@@ -1,0 +1,232 @@
+% Solutions to Chapter 3's exercises, from lectures/L03/appendix/c_solutions.md. No exercise in the
+% chapter is a program, so every one is answered. Exercise 1's solution goes network by network, as
+% the source does, so its entries are headed "Nät a)" to "Nät c)" rather than by the exercise's
+% parts.
+
+\answerchapter{c3:ch}
+
+\answer{c3:ex:1}{Läs av uttrycket}
+\pt{Nät a}Den minsta gruppen är parallellkopplingen av S2 slutande och S2 brytande,
+\code{S2 + S2'}. Den sitter i serie med S1:
+
+\begin{textdrawing}
+H1 = S1 · (S2 + S2')
+\end{textdrawing}
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{S1} & \thead{S2} & \thead{H1} \\
+  \midrule
+  0 & 0 & 0 \\
+  0 & 1 & 0 \\
+  1 & 0 & 1 \\
+  1 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent Med ord: lampan lyser när S1 är nedtryckt. S2 spelar ingen roll.
+
+\pt{Nät b}Den minsta gruppen är parallellkopplingen av S1 slutande och S2 slutande,
+\code{S1 + S2}. Den sitter i serie med S1 brytande:
+
+\begin{textdrawing}
+H2 = S1' · (S1 + S2)
+\end{textdrawing}
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{S1} & \thead{S2} & \thead{H2} \\
+  \midrule
+  0 & 0 & 0 \\
+  0 & 1 & 1 \\
+  1 & 0 & 0 \\
+  1 & 1 & 0 \\
+\end{narrowtable}
+
+\noindent Med ord: lampan lyser när S2 är nedtryckt och S1 inte är det.
+
+\pt{Nät c}Två seriekopplingar, \code{S1 · S2} och \code{S1 · S3}, som sitter parallellt:
+
+\begin{textdrawing}
+H3 = S1 · S2 + S1 · S3
+\end{textdrawing}
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{S1} & \thead{S2} & \thead{S3} & \thead{H3} \\
+  \midrule
+  0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 0 \\
+  1 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 1 \\
+  1 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\noindent Med ord: lampan lyser när S1 är nedtryckt tillsammans med minst en av S2 och S3.
+
+\answer{c3:ex:2}{Det minsta nätet}
+\pt{a}\leavevmode
+\begin{itemize}
+  \item \code{S1 · (S2 + S2') = S1 · 1 = S1} (komplement och identitet).
+  \item \code{S1' · (S1 + S2) = S1'·S1 + S1'·S2 = 0 + S1'·S2 = S1' · S2} (distributiv lag och
+    komplement; det är förenklingslagen \code{A(A' + B) = AB} med S1' i A:s roll).
+  \item \code{S1 · S2 + S1 · S3 = S1 · (S2 + S3)} (distributiva lagen, S1 bruten ut).
+\end{itemize}
+
+\pt{b}\leavevmode
+\begin{itemize}
+  \item Nät a): \textbf{S1 slutande ensam}, i serie med lampan.
+  \item Nät b): \textbf{S1 brytande i serie med S2 slutande}.
+  \item Nät c): \textbf{S1 slutande i serie med parallellkopplingen av S2 och S3}.
+\end{itemize}
+
+\pt{c}\leavevmode
+\begin{itemize}
+  \item Nät a): tre kontakter blir en; \textbf{två sparade}. S2 behövde både sitt slutande och sitt
+    brytande element, och behövs efteråt inte alls.
+  \item Nät b): tre kontakter blir två; \textbf{en sparad}. S1 behövde två element, slutande och
+    brytande, och behöver efteråt bara det brytande.
+  \item Nät c): fyra kontakter blir tre; \textbf{en sparad}. S1 behövde två slutande element, och
+    behöver efteråt ett.
+\end{itemize}
+
+\answer{c3:ex:3}{Kontroll: förutsäg och bygg}
+\pt{a}Två parallellkopplingar i serie:
+
+\begin{textdrawing}
+H1 = (S1 + S2') · (S1' + S2)
+\end{textdrawing}
+
+\begin{narrowtable}{@{}ccccc@{}}
+  \thead{S1} & \thead{S2} & \thead{S1 + S2'} & \thead{S1' + S2} & \thead{H1} \\
+  \midrule
+  0 & 0 & 1 & 1 & 1 \\
+  0 & 1 & 0 & 1 & 0 \\
+  1 & 0 & 1 & 0 & 0 \\
+  1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{b}\leavevmode
+
+\begin{textdrawing}
+(S1 + S2')(S1' + S2) = S1·S1' + S1·S2 + S2'·S1' + S2'·S2
+                     = 0 + S1·S2 + S1'·S2' + 0
+                     = S1·S2 + S1'·S2'
+\end{textdrawing}
+
+\noindent Lampan lyser när knapparna är i \textbf{samma} läge: \textbf{XNOR}.
+
+\pt{c}Lampan ska lysa när ingen knapp och när båda knapparna är nedtryckta, och vara släckt när
+bara en av dem är det. Stämmer det inte: kontrollera först att varje knapp sitter med sitt slutande
+element i den ena parallellkopplingen och sitt brytande i den andra, precis som ritningen visar.
+Det vanligaste felet är att båda elementen i en knapp har hamnat i samma parallellkoppling.
+
+\pt{d}Båda näten har \textbf{fyra kontakter}, och båda använder varje knapps slutande och brytande
+element en gång. Nätet i Labb~1 är skrivet som en summa av produkter, \code{S1·S2 + S1'·S2'}: två
+seriekopplingar parallellt. Nätet här är en produkt av summor: två parallellkopplingar i serie.
+Uttrycken ser olika ut, men uträkningen i b) visar att de är samma funktion, och det är allt som
+räknas för den som trycker på knapparna.
+
+\answer{c3:ex:4}{Syntes}
+\pt{a}Lampan är släckt på en enda rad, S1 = 1 och S2 = 0. Uttrycket på SP-form är
+
+\begin{textdrawing}
+H1 = S1'·S2' + S1'·S2 + S1·S2 = S1'(S2' + S2) + S1·S2 = S1' + S1·S2 = S1' + S2
+\end{textdrawing}
+
+\noindent där det sista steget är förenklingslagen med S1' i A:s roll. Det minsta nätet är
+\textbf{S1 brytande parallellt med S2 slutande}, två kontakter.
+
+Ett snabbare sätt att se det: lampan är släckt bara när S1 är nedtryckt och S2 inte är det, alltså
+\code{H1' = S1 · S2'}. Enligt De Morgan är då \code{H1 = (S1 · S2')' = S1' + S2}.
+
+\pt{b}\leavevmode
+
+\begin{textdrawing}
+K1 = (S1 + S2) · S3
+\end{textdrawing}
+
+\noindent En strömväg: S1 och S2 \textbf{slutande} parallellt, i serie med givaren S3
+\textbf{slutande}, och därefter reläspolen K1. S3 är slutande eftersom den ska vara påverkad,
+alltså sluten, när grinden är stängd.
+
+\answer{c3:ex:5}{Felsökning}
+\pt{a}Spänningen finns före S3 men inte efter, så \textbf{S3 leder inte}, fast den är släppt och
+ska vara sluten. Den troligaste orsaken är att sladdarna sitter på S3:s \textbf{slutande}
+kontaktelement i stället för det brytande. Pröva: tänds lampan när du trycker på S3? Då är det så.
+Tänds den inte alls, är det i stället en lös sladd eller en trasig kontakt vid S3.
+
+\pt{b}Lampan slocknar inte när S3 trycks, så S3 bryter inte strömvägen. \textbf{S3 är
+förbikopplad}: en extra sladd går förbi den, eller båda sladdarna har hamnat på samma anslutning.
+Strömmen tar då en väg runt S3, och lampan realiserar bara \code{S1 + S2}.
+
+\pt{c}Lampan lyser bara när S3 är nedtryckt: S3 fungerar som en \textbf{slutande} kontakt.
+Sladdarna sitter på S3:s slutande element i stället för det brytande, samma fel som var den
+troligaste orsaken i a). Nätet realiserar då \code{(S1 + S2) · S3} i stället för
+\code{(S1 + S2) · S3'}.
+
+\answer{c3:ex:6}{Stoppknappen}
+\pt{a}En avbruten ledning bryter strömvägen precis som ett tryck på stoppknappen gör.
+\textbf{Maskinen stannar}, och går inte att starta igen förrän felet är åtgärdat.
+
+\pt{b}En avbruten ledning till en slutande stoppknapp gör att knappen aldrig kan sluta kretsen.
+Maskinen fortsätter gå, och \textbf{stoppknappen fungerar inte}. Ingen märker felet förrän någon
+behöver stoppa maskinen, och då är det för sent.
+
+\pt{c}En stoppfunktion ska kopplas så att \textbf{ett fel leder till det säkra läget}: en bruten
+ledning, en lossnad sladd eller en trasig kontakt ska stoppa maskinen, inte hindra den från att
+stoppas. Därför används brytande kontakter för stopp och nödstopp.
+
+\answer{c3:ex:7}{Alla funktioner av två knappar}
+\pt{a}Varje rad i tabellen kan ha utgången \code{0} eller \code{1}, oberoende av de andra. Med
+fyra rader finns $2^4 = \mathbf{16}$ olika tabeller, alltså 16 olika funktioner av två variabler.
+
+\pt{b}\textbf{Konstant 0}, lampan lyser aldrig, realiseras genom att inte ansluta lampan till
++24~V alls. \textbf{Konstant 1}, lampan lyser alltid, realiseras med en ledning direkt från +24~V
+till lampan.
+
+\pt{c}\textbf{XOR} och \textbf{XNOR}. Båda är \code{S1·S2' + S1'·S2} respektive
+\code{S1·S2 + S1'·S2'} på minsta form, och i båda förekommer varje variabel både rak och
+inverterad. Alla andra funktioner av två variabler klarar sig med högst ett kontaktelement per
+knapp.
+
+\needspace{16\baselineskip}
+\answer{c3:ex:8}{En väljare av kontakter}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}cccccc@{}}
+  \thead{S1} & \thead{S2} & \thead{S3} & \thead{S1 + S2} & \thead{S1' + S3} & \thead{H1} \\
+  \midrule
+  0 & 0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & 1 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 1 & 1 & 1 \\
+  0 & 1 & 1 & 1 & 1 & 1 \\
+  1 & 0 & 0 & 1 & 0 & 0 \\
+  1 & 0 & 1 & 1 & 1 & 1 \\
+  1 & 1 & 0 & 1 & 0 & 0 \\
+  1 & 1 & 1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{b}I den övre halvan, S1 = 0, är H1 samma som \textbf{S2}. I den nedre, S1 = 1, är H1 samma som
+\textbf{S3}. S1 väljer alltså vilken av de andra två knapparna som styr lampan.
+
+\pt{c}\leavevmode
+
+\begin{textdrawing}
+(S1 + S2)(S1' + S3) = S1·S1' + S1·S3 + S2·S1' + S2·S3
+                    = S1·S3 + S1'·S2 + S2·S3
+\end{textdrawing}
+
+\noindent Termen \code{S2·S3} är onödig. Den är \code{1} bara när S2 = S3 = 1, och då är antingen
+S1 = 0, så att \code{S1'·S2} redan är \code{1}, eller S1 = 1, så att \code{S1·S3} redan är
+\code{1}. Den tillför alltså ingen etta som de andra termerna inte redan har, och kan strykas:
+
+\begin{textdrawing}
+H1 = S1'·S2 + S1·S3
+\end{textdrawing}
+
+\noindent (Regeln bakom kallas konsensusregeln, och Karnaughdiagrammen i kapitel~\ref{c4:ch} hittar
+sådana onödiga termer utan att man behöver leta efter dem.)
+
+\pt{d}Båda är \textbf{väljare}, multiplexrar: en signal bestämmer vilken av två andra som släpps
+fram till utgången. I \secref{c2:a8} var det A som valde mellan B och C; här är det S1 som väljer
+mellan S2 och S3. Samma funktion kan alltså byggas både med grindar och med kontakter.

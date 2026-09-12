@@ -1,0 +1,179 @@
+% Section 6.4, from lectures/L06/appendix/c_exercises.md.
+
+\section{Övningar}
+\label{c6:sec:exercises}\label{c6:app:c}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Ett sekvensnät kan inte kontrolleras rad för rad i en
+sanningstabell, eftersom samma ingångar kan ge olika utgång beroende på vad som hänt innan. Gå i
+stället igenom en \textbf{följd} av ingångar, ett steg i taget, och skriv upp tillståndet efter
+varje steg. I CircuitVerse gör du samma sak: ändra en ingång, titta på utgången, anteckna, nästa.
+
+Kontrolluppgiften är övning~\ref{c6:ex:4}. Lösningsförslagen finns i bilaga~\ref{app:answers}.
+\end{aside}
+
+Varje övning är märkt med sin sort.
+
+\exercise{Kombinatoriskt eller sekventiellt?}{Förståelse}
+\label{c6:ex:1}
+Avgör för var och en av kretsarna nedan om den är kombinatorisk eller sekventiell, och motivera med
+en mening.
+\begin{parts}
+  \item Tankens larm i kapitel~\ref{c4:ch}, som går när minst två av tre givare ger 1.
+  \item Start- och stoppkretsen med självhållning i kapitel~\ref{c2:ch}.
+  \item En avkodare som tänder rätt segment i en sifferdisplay för en BCD-siffra.
+  \item Ett trafikljus som växlar mellan rött, gult och grönt.
+  \item Ett kodlås som öppnar när siffrorna 3, 7 och 1 har tryckts i den ordningen.
+  \item Bromsassistenten i kapitel~\ref{c2:ch}.
+\end{parts}
+
+\exercise{SR-låset}{Räkna för hand}
+\label{c6:ex:2}
+Ett SR-lås av två NOR-grindar (\secref{c6:a3}) börjar med \code{Q = 0}. Ingångarna ändras i den här
+ordningen. Fyll i \code{Q} efter varje steg.
+
+\begin{filltable}{@{}YYYY@{}}
+  \thead{Steg} & \thead{S} & \thead{R} & \thead{Q} \\
+  \midrule
+  start & 0 & 0 & 0 \fillrule
+  1 & 1 & 0 & \fillrule
+  2 & 0 & 0 & \fillrule
+  3 & 0 & 0 & \fillrule
+  4 & 0 & 1 & \fillrule
+  5 & 0 & 0 & \fillrule
+  6 & 1 & 0 & \fillrule
+  7 & 0 & 0 & \\
+\end{filltable}
+
+\begin{parts}
+  \item Fyll i tabellen.
+  \item Steg 2, 3, 5 och 7 har samma ingångar. Har de samma \code{Q}? Varför är det här skälet till
+    att nätet kallas sekventiellt?
+  \item Varför är kombinationen \code{S = R = 1} förbjuden i ett SR-lås av NOR-grindar?
+\end{parts}
+
+\exercise{Lås och vippa}{Räkna för hand}
+\label{c6:ex:3}
+Ett D-lås och en D-vippa får samma klocka och samma \code{D}. Låset är genomsläppligt medan
+klockan är hög; vippan läser \code{D} vid varje stigande flank. Båda börjar med \code{Q = 0}.
+
+\bookfigure{l06_ex_timing}{Klockan och \code{D} för övning~\ref{c6:ex:3}.}{c6:fig:ex_timing}
+
+\begin{parts}
+  \item Rita \code{Q} för låset.
+  \item Rita \code{Q} för vippan.
+  \item \code{D} har en kort puls mellan den andra och den tredje stigande flanken. Syns den på
+    låsets utgång? På vippans? Förklara.
+\end{parts}
+
+\exercise{Kontroll: bygg ett SR-lås}{Kontroll}
+\label{c6:ex:4}
+\emph{Förutsäg, bygg i CircuitVerse, jämför.}
+\begin{parts}
+  \item \textbf{Förutsäg.} Använd din tabell från övning~\ref{c6:ex:2}.
+  \item \textbf{Bygg} SR-låset av två NOR-grindar i CircuitVerse
+    (\url{https://circuitverse.org/simulator}), med två ingångar \code{S} och \code{R} och två
+    utgångar \code{Q} och \code{Q'}, korskopplade som i \secref{c6:a3}.
+  \item \textbf{Kör följden} från övning~\ref{c6:ex:2}, ett steg i taget. Anteckna \code{Q} och
+    \code{Q'} efter varje steg, och jämför med din förutsägelse.
+  \item När du precis har byggt kretsen, innan du tryckt på något, vad visar \code{Q}? Är det samma
+    sak varje gång du bygger om den? Vad säger det om ett minne som slås på?
+  \item Ställ in \code{S = R = 1} och sedan båda till 0 samtidigt. Vad händer, och stämmer det med
+    vad \secref{c6:a3} säger?
+\end{parts}
+
+\exercise{Klockan}{Räkna för hand}
+\label{c6:ex:5}
+\begin{parts}
+  \item En Arduino Uno har klockfrekvensen 16~MHz. Hur lång är en klockcykel?
+  \item Hur många klockcykler går det på en millisekund? På en sekund?
+  \item Ett program utför 1000 instruktioner som tar en klockcykel var. Hur lång tid tar det?
+  \item Samma program på en krets som går på 8~MHz. Hur lång tid då?
+\end{parts}
+
+\exercise{Räknare}{Räkna för hand}
+\label{c6:ex:6}
+\begin{parts}
+  \item En 3-bitars räknare står på \code{000}. Vad står den på efter 11 stigande klockflanker?
+  \item Hur många vippor behövs för en räknare som ska kunna räkna från 0 till 999?
+  \item En 4-bitars räknare får en klocka på 16~Hz. Med vilken frekvens växlar den mest
+    signifikanta biten, \code{Q3}?
+  \item Ett 8-bitars register står på 255, och räknas upp ett steg. Vad står det på efter? Varför?
+\end{parts}
+
+\exercise{Skiftregister}{Räkna för hand}
+\label{c6:ex:7}
+Ett 4-bitars skiftregister som i \secref{c6:a8} börjar med \code{Q0 Q1 Q2 Q3 = 0000}.
+\begin{parts}
+  \item Bitarna 1, 1, 0 och 1 skickas in på \code{in}, en per klockflank. Skriv upp
+    \code{Q0}--\code{Q3} efter varje flank.
+  \item Läs \code{Q3 Q2 Q1 Q0} som ett binärt tal. Registret innehåller \code{0011} (talet 3), och
+    ett steg till skiftas in med \code{in = 0}. Vilket tal står det nu? Vilken räkneoperation
+    motsvarar ett steg?
+\end{parts}
+
+\exercise{Blockschemat}{Förståelse}
+\label{c6:ex:8}
+Vilket block i mikrodatorn (\secref{c6:b2}) beskrivs?
+\begin{parts}
+  \item Håller adressen till nästa instruktion.
+  \item Adderar två tal, eller jämför dem.
+  \item Håller programmet, även när strömmen är avslagen.
+  \item Talar om att det senaste resultatet blev noll.
+  \item Tolkar instruktionen och talar om för de andra blocken vad de ska göra.
+  \item Ett register vars bitar är kopplade till kretsens stift.
+  \item Håller variablerna medan programmet kör.
+  \item Ger takten som alla vippor uppdateras i.
+\end{parts}
+
+\exercise{Instruktionscykeln}{Räkna för hand}
+\label{c6:ex:9}
+Programminnet innehåller:
+
+\begin{narrowtable}{@{}cll@{}}
+  \thead{Adress} & \thead{Instruktion} & \thead{Betyder} \\
+  \midrule
+  0 & \code{ldi r16, 10} & lägg 10 i r16 \\
+  1 & \code{ldi r17, 20} & lägg 20 i r17 \\
+  2 & \code{add r16, r17} & r16 = r16 + r17 \\
+  3 & \code{rjmp 3} & hoppa till adress 3 \\
+\end{narrowtable}
+
+\begin{parts}
+  \item Fyll i en tabell som den i \secref{c6:b4} för de sex första instruktionerna som utförs: PC
+    före, instruktionen, vad som händer, r16 och r17 efter, PC efter.
+  \item Vad gör programmet efter steg 4, och hur länge? Varför behövs en sådan instruktion sist i
+    ett program för en mikrokontroller?
+\end{parts}
+
+\exercise{Tre minnen}{Förståelse}
+\label{c6:ex:10}
+\begin{parts}
+  \item I vilket av ATmega328P:s tre minnen hamnar: programmet; en variabel som räknar hur många
+    gånger en knapp tryckts; ett kalibreringsvärde som ska finnas kvar efter ett strömavbrott?
+  \item Varför finns programmet kvar när strömmen slås av, men inte variablerna?
+  \item Vad betyder det att ATmega328P har en Harvardarkitektur?
+\end{parts}
+
+\exercise{Bussar och minnesstorlek}{Räkna för hand}
+\label{c6:ex:11}
+\begin{parts}
+  \item ATmega328P har 2~kB SRAM, alltså 2048 byte. Hur många adressbitar behövs för att peka ut
+    varje byte?
+  \item Flashminnet är 32~kB och varje instruktion är 16 bitar (2 byte). Hur många instruktioner
+    ryms som mest, och hur många bitar behöver programräknaren?
+  \item Hur många olika värden kan databussen i en 8-bitars dator bära?
+\end{parts}
+
+\exercise{Självhållning och SR-lås}{Konstruktion, Fördjupning}
+\label{c6:ex:12}
+Titta på självhållningskretsen i \secref{c6:a2}.
+\begin{parts}
+  \item Vilken knapp motsvarar SR-låsets \code{S}, och vilken \code{R}?
+  \item Vad händer i reläkretsen om båda knapparna trycks samtidigt? Jämför med SR-låset av
+    NOR-grindar.
+  \item I en del maskiner är det tvärtom önskvärt att start vinner om båda trycks, kallat
+    \textbf{tillslagsdominerande} självhållning. Rita om kretsen så att \code{S1} alltid kan dra
+    \code{K1}, även när \code{S2} är nedtryckt. Varför är den varianten sällsynt för maskiner där
+    stopp är en säkerhetsfunktion?
+\end{parts}

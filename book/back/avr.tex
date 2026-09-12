@@ -1,0 +1,207 @@
+% Appendix, from info/avr_instructions.md: the reference sheet with the course's instructions and
+% directives, handed out with the written exam. Set compact, a table per group of instructions,
+% so that it can be copied and laid beside the keyboard. A dash in the flags column means that no
+% flag changes. One deliberate difference: the table of the course's I/O registers, last on the
+% sheet, follows the directives here, with the other names a program uses, so that the tables
+% break into four pages without a page left almost empty.
+
+\chapter{Referensblad: AVR-instruktionerna}
+\label{app:avr}
+
+% The tables of the sheet are set with a little less space between their columns, which keeps
+% most rows to one line; the group ends at the end of the file.
+\begingroup
+\setlength{\tabcolsep}{4pt}
+
+De instruktioner och direktiv som används i kursen, för ATmega328P. Bladet delas ut tillsammans
+med det skriftliga provet (bilaga~\ref{app:exam}), och är tänkt att ligga bredvid tangentbordet
+under Labb~3.
+
+\code{Rd} och \code{Rr} är vilket som helst av registren \code{r0}--\code{r31}. \code{K} är en
+konstant, 0--255. Instruktioner med \code{K} fungerar \textbf{bara med \code{r16}--\code{r31}}.
+Klockfrekvensen på ett Arduino Uno-kort är 16~MHz, så en klockcykel tar 62,5~ns.
+
+Flaggorna i SREG: \textbf{C} carry (minnessiffra, eller lån vid subtraktion), \textbf{Z} zero
+(resultatet blev noll), \textbf{N} negative (bit~7 i resultatet), \textbf{V} overflow (spill i
+tvåkomplement), \textbf{S} sign (\code{N} xor \code{V}), \textbf{H} half carry (minnessiffra från
+bit~3). I kolumnen \emph{Flaggor} står de flaggor instruktionen kan ändra; övriga flaggor lämnas
+orörda.
+
+\subsection*{Direktiv}
+\markright{Direktiv}
+Direktiv är instruktioner till assemblern, inte till processorn. De blir ingen maskinkod.
+
+\begin{booktable}{@{}p{6.6em}p{12.6em}L@{}}
+  \thead{Direktiv} & \thead{Exempel} & \thead{Betydelse} \\
+  \midrule
+  \code{.include} & \code{.include "m328Pdef.inc"} & Läs in en annan fil, här registernamnen för
+    ATmega328P. \\
+  \code{.org} & \code{.org 0x0000} & Lägg nästa instruktion på den här adressen i programminnet. \\
+  \code{.def} & \code{.def counter = r16} & Ge ett register ett namn. \\
+  \code{.equ} & \code{.equ LIMIT = 10} & Ge en konstant ett namn. \\
+  \code{low()}, \code{high()} & \code{ldi r16, low(RAMEND)} & Den låga respektive höga byten av
+    ett 16-bitars värde. \\
+\end{booktable}
+
+\noindent Talformat: decimalt \code{25}, binärt \code{0b00011001}, hexadecimalt \code{0x19} eller
+\code{$19}, tecken \code{'A'}.
+
+\subsection*{I/O-registren i kursen}
+\markright{I/O-registren i kursen}
+\begin{booktable}{@{}p{8.4em}L@{}}
+  \thead{Register} & \thead{Betydelse} \\
+  \midrule
+  \code{DDRB}, \code{DDRD} & Riktning: 1 = utgång, 0 = ingång, en bit per stift. \\
+  \code{PORTB}, \code{PORTD} & Utgång: nivån som drivs ut. Ingång: 1 = pull-up påslagen. \\
+  \code{PINB}, \code{PIND} & Stiftens verkliga nivå, att läsa. \\
+  \code{SPH}, \code{SPL} & Stackpekaren, hög och låg byte. \code{RAMEND} = \code{0x08FF}. \\
+  \code{SREG} & Statusregistret, med flaggorna. \\
+\end{booktable}
+
+\subsection*{Dataöverföring}
+\markright{Dataöverföring}
+\begin{booktable}{@{}p{5.8em}p{8.0em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{ldi Rd, K} & \code{ldi r16, 0x2A} & Rd = K & -- & 1 \\
+  \code{mov Rd, Rr} & \code{mov r17, r16} & Rd = Rr & -- & 1 \\
+  \code{movw Rd, Rr} & \code{movw r24, r22} & Rd+1:Rd = Rr+1:Rr (ett registerpar; Rd och Rr
+    jämna) & -- & 1 \\
+  \code{clr Rd} & \code{clr r16} & Rd = 0 & Z N V S & 1 \\
+  \code{ser Rd} & \code{ser r16} & Rd = 0xFF (bara \code{r16}--\code{r31}, som \code{ldi}) & -- &
+    1 \\
+  \code{in Rd, A} & \code{in r16, PIND} & Rd = I/O-registret A & -- & 1 \\
+  \code{out A, Rr} & \code{out PORTB, r16} & I/O-registret A = Rr & -- & 1 \\
+  \code{lds Rd, k} & \code{lds r16, 0x0100} & Rd = byten på adress k i dataminnet (SRAM) & -- &
+    2 \\
+  \code{sts k, Rr} & \code{sts 0x0100, r16} & Byten på adress k i dataminnet = Rr & -- & 2 \\
+  \code{push Rr} & \code{push r16} & Lägg Rr på stacken & -- & 2 \\
+  \code{pop Rd} & \code{pop r16} & Hämta Rd från stacken & -- & 2 \\
+\end{booktable}
+
+\subsection*{Aritmetik}
+\markright{Aritmetik}
+\begin{booktable}{@{}p{5.8em}p{6.6em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{add Rd, Rr} & \code{add r16, r17} & Rd = Rd + Rr & H S V N Z C & 1 \\
+  \code{adc Rd, Rr} & \code{adc r17, r19} & Rd = Rd + Rr + C & H S V N Z C & 1 \\
+  \code{sub Rd, Rr} & \code{sub r16, r17} & Rd = Rd -- Rr & H S V N Z C & 1 \\
+  \code{subi Rd, K} & \code{subi r16, 5} & Rd = Rd -- K & H S V N Z C & 1 \\
+  \code{sbc Rd, Rr} & \code{sbc r17, r19} & Rd = Rd -- Rr -- C & H S V N Z C & 1 \\
+  \code{inc Rd} & \code{inc r16} & Rd = Rd + 1 & S V N Z & 1 \\
+  \code{dec Rd} & \code{dec r16} & Rd = Rd -- 1 & S V N Z & 1 \\
+  \code{neg Rd} & \code{neg r16} & Rd = 0 -- Rd (tvåkomplement) & H S V N Z C & 1 \\
+  \code{adiw Rd, K} & \code{adiw r24, 1} & Rd+1:Rd = Rd+1:Rd + K, K = 0--63 & S V N Z C & 2 \\
+  \code{sbiw Rd, K} & \code{sbiw r24, 1} & Rd+1:Rd = Rd+1:Rd -- K, K = 0--63 & S V N Z C & 2 \\
+\end{booktable}
+
+\noindent Det finns ingen \code{addi}. Addera en konstant genom att subtrahera dess negativa värde:
+\code{subi r16, -5} adderar 5. \code{inc} och \code{dec} ändrar \textbf{inte} C. \code{adiw} och
+\code{sbiw} fungerar bara med registerparen \code{r25:r24}, \code{r27:r26}, \code{r29:r28} och
+\code{r31:r30}.
+
+\subsection*{Logiska operationer}
+\markright{Logiska operationer}
+\begin{booktable}{@{}p{5.8em}p{7.4em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{and Rd, Rr} & \code{and r16, r17} & Rd = Rd AND Rr, bit för bit & S V N Z & 1 \\
+  \code{andi Rd, K} & \code{andi r16, 0x0F} & Rd = Rd AND K & S V N Z & 1 \\
+  \code{or Rd, Rr} & \code{or r16, r17} & Rd = Rd OR Rr & S V N Z & 1 \\
+  \code{ori Rd, K} & \code{ori r16, 0x80} & Rd = Rd OR K & S V N Z & 1 \\
+  \code{eor Rd, Rr} & \code{eor r16, r17} & Rd = Rd XOR Rr & S V N Z & 1 \\
+  \code{com Rd} & \code{com r16} & Rd = NOT Rd (inverterar alla bitar) & S V N Z C & 1 \\
+  \code{tst Rd} & \code{tst r16} & Rd AND Rd: sätter Z och N, ändrar inte Rd & S V N Z & 1 \\
+  \code{swap Rd} & \code{swap r16} & Byter plats på de två halvorna (nibblarna) & -- & 1 \\
+\end{booktable}
+
+\noindent Efter \code{and}, \code{andi}, \code{or}, \code{ori}, \code{eor}, \code{com} och
+\code{tst} är V alltid 0. Efter \code{com} är C alltid 1.
+
+\subsection*{Skift och rotation}
+\markright{Skift och rotation}
+\begin{booktable}{@{}p{5.8em}p{4.6em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{lsl Rd} & \code{lsl r16} & Skifta vänster; bit~7 till C, 0 in i bit~0 (Rd × 2) &
+    H S V N Z C & 1 \\
+  \code{lsr Rd} & \code{lsr r16} & Skifta höger; bit~0 till C, 0 in i bit~7 (Rd / 2, utan tecken) &
+    S V N Z C & 1 \\
+  \code{asr Rd} & \code{asr r16} & Skifta höger; bit~7 behålls (Rd / 2, med tecken) & S V N Z C &
+    1 \\
+  \code{rol Rd} & \code{rol r16} & Rotera vänster genom C: C in i bit~0, bit~7 till C &
+    H S V N Z C & 1 \\
+  \code{ror Rd} & \code{ror r16} & Rotera höger genom C: C in i bit~7, bit~0 till C & S V N Z C &
+    1 \\
+\end{booktable}
+
+\subsection*{Jämförelse}
+\markright{Jämförelse}
+\begin{booktable}{@{}p{5.8em}p{6.6em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{cp Rd, Rr} & \code{cp r16, r17} & Beräknar Rd -- Rr, sparar bara flaggorna & H S V N Z C &
+    1 \\
+  \code{cpc Rd, Rr} & \code{cpc r17, r19} & Beräknar Rd -- Rr -- C, sparar bara flaggorna &
+    H S V N Z C & 1 \\
+  \code{cpi Rd, K} & \code{cpi r16, 100} & Beräknar Rd -- K, sparar bara flaggorna & H S V N Z C &
+    1 \\
+\end{booktable}
+
+\subsection*{Hopp}
+\markright{Hopp}
+\begin{booktable}{@{}p{5.8em}Llc@{}}
+  \thead{Instruktion} & \thead{Hoppar om} & \thead{Flagga} & \thead{Cykler} \\
+  \midrule
+  \code{rjmp k} & alltid & -- & 2 \\
+  \code{breq k} & lika (resultatet var noll) & Z = 1 & 1 / 2 \\
+  \code{brne k} & inte lika & Z = 0 & 1 / 2 \\
+  \code{brlo k} & lägre, utan tecken & C = 1 & 1 / 2 \\
+  \code{brsh k} & samma eller högre, utan tecken & C = 0 & 1 / 2 \\
+  \code{brlt k} & mindre än, med tecken & S = 1 & 1 / 2 \\
+  \code{brge k} & större än eller lika, med tecken & S = 0 & 1 / 2 \\
+  \code{brmi k} & negativt (bit~7 satt) & N = 1 & 1 / 2 \\
+  \code{brpl k} & positivt (bit~7 noll) & N = 0 & 1 / 2 \\
+  \code{brcs k} & carry satt & C = 1 & 1 / 2 \\
+  \code{brcc k} & carry noll & C = 0 & 1 / 2 \\
+\end{booktable}
+
+\noindent\code{k} är en etikett. Ett villkorligt hopp tar \textbf{1 cykel om det inte hoppar och 2
+om det hoppar}. Det når högst 64 instruktioner bort; längre bort når man med ett \code{rjmp}.
+
+\subsection*{Subrutiner}
+\markright{Subrutiner}
+\begin{booktable}{@{}p{5.8em}p{6.2em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{rcall k} & \code{rcall delay} & Lägg returadressen på stacken och hoppa till k & -- & 3 \\
+  \code{ret} & \code{ret} & Hämta returadressen från stacken och hoppa tillbaka & -- & 4 \\
+\end{booktable}
+
+\subsection*{Bitinstruktioner}
+\markright{Bitinstruktioner}
+\begin{booktable}{@{}p{5.8em}p{6.4em}Llc@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} & \thead{Flaggor} & \thead{Cykler} \\
+  \midrule
+  \code{sbi A, b} & \code{sbi PORTB, 5} & Sätt bit b i I/O-registret A till 1 & -- & 2 \\
+  \code{cbi A, b} & \code{cbi PORTB, 5} & Nollställ bit b i I/O-registret A & -- & 2 \\
+  \code{sbic A, b} & \code{sbic PIND, 2} & Hoppa över nästa instruktion om bit b i A är 0 & -- &
+    1 / 2 \\
+  \code{sbis A, b} & \code{sbis PIND, 2} & Hoppa över nästa instruktion om bit b i A är 1 & -- &
+    1 / 2 \\
+  \code{sbrc Rr, b} & \code{sbrc r16, 0} & Hoppa över nästa instruktion om bit b i Rr är 0 & -- &
+    1 / 2 \\
+  \code{sbrs Rr, b} & \code{sbrs r16, 7} & Hoppa över nästa instruktion om bit b i Rr är 1 & -- &
+    1 / 2 \\
+  \code{clc} & \code{clc} & Nollställ carryflaggan: C = 0 & C & 1 \\
+  \code{sec} & \code{sec} & Ettställ carryflaggan: C = 1 & C & 1 \\
+  \code{nop} & \code{nop} & Ingenting, en cykel & -- & 1 \\
+\end{booktable}
+
+\noindent\code{sbi}, \code{cbi}, \code{sbic} och \code{sbis} når bara I/O-registren på adress 0--31,
+bland annat \code{PINB}, \code{DDRB}, \code{PORTB}, \code{PIND}, \code{DDRD} och \code{PORTD}. En
+instruktion som hoppar över nästa tar 1 cykel om den inte hoppar och 2 om den hoppar, eller 3 om
+instruktionen den hoppar över är två ord lång, som \code{lds} och \code{sts}.
+
+\endgroup

@@ -1,0 +1,181 @@
+% Section 8.3, from lectures/L08/appendix/c_output_port.md. "I kursen" is "i boken".
+%
+% Typesetting only: in the listing of 8.3.4 the comments start four columns further left than in
+% the lecture, so that the longest line fits the listing's width, and the sentence before it is
+% turned around ("Båda används i programmet ...") so that the long file name does not leave a gappy
+% line.
+
+\section{Utporten}
+\label{c8:app:c}
+
+\subsection{Portar och stift}
+\label{c8:c1}
+Hittills har programmen bara ändrat register inuti processorn. För att styra något utanför, en
+lysdiod, ett relä, en motor, behövs en \textbf{utport}: ett register vars bitar är kopplade till
+kretsens stift. En etta i biten ger 5~V på stiftet, en nolla ger 0~V.
+
+ATmega328P har tre portar, B, C och D, med upp till åtta stift var. På ett Arduino Uno-kort är
+stiften numrerade på Arduinos eget sätt, och de motsvarar portbitar så här:
+
+\bookfigure{avr_arduino_pins}{Arduinokortets digitala stift 0--13 och portbitarna de motsvarar.}
+  {c8:fig:arduino_pins}
+
+I boken är \textbf{port B utporten}. I simulatorn syns alla åtta bitar i port B. På Arduino
+Uno-kortet går bara bit 0--5 ut till stiften 8--13; bit~6 och 7 används av klockan. Port D används
+som \textbf{inport} i kapitel~\ref{c10:ch}.
+
+\subsection{Tre register per port}
+\label{c8:c2}
+Varje port styrs av tre I/O-register. För port B heter de \code{DDRB}, \code{PORTB} och
+\code{PINB}:
+
+\begin{booktable}{@{}p{5em}L@{}}
+  \thead{Register} & \thead{Betydelse} \\
+  \midrule
+  \code{DDRB} & \emph{Data Direction Register}. En bit per stift: 1 = utgång, 0 = ingång. \\
+  \code{PORTB} & För en utgång: nivån som drivs ut, 1 = 5~V, 0 = 0~V. \\
+  \code{PINB} & Stiftets verkliga nivå, att läsa. Används för ingångar, i kapitel~\ref{c10:ch}. \\
+\end{booktable}
+
+\noindent Två bitar per stift, \code{DDRB} och \code{PORTB}, ger fyra kombinationer:
+
+\bookfigure{avr_port_states}{De fyra lägena som \code{DDRx} och \code{PORTx} ger ett
+stift.}{c8:fig:port_states}
+
+För en utport räcker den nedre raden: \textbf{\code{DDRB} avgör att stiftet är en utgång, och
+\code{PORTB} avgör om det är högt eller lågt.} Alla bitar i \code{DDRB} är 0 när processorn
+startar, så varje stift är en ingång tills programmet säger något annat.
+
+\subsection{Att skriva till en port: \code{out}}
+\label{c8:c3}
+I/O-register skrivs med instruktionen \textbf{\code{out}}, och läses med \textbf{\code{in}}:
+
+\begin{asmcode}
+    ser r16                         ; r16 = 0xFF
+    out DDRB, r16                   ; Every pin of port B is an output.
+    ldi r16, 0b00100001
+    out PORTB, r16                  ; PB5 and PB0 high, the other six low.
+\end{asmcode}
+
+\noindent Tre saker att lägga märke till:
+\begin{itemize}
+  \item \textbf{\code{out} tar ett register, inte en konstant.} Det finns ingen
+    \code{out PORTB, 0x21}. Värdet laddas först i ett register med \code{ldi}.
+  \item \textbf{Ordningen är I/O-registret först}, sedan registret: \code{out PORTB, r16},
+    \enquote{ut till \code{PORTB} från \code{r16}}. För \code{in} är det tvärtom:
+    \code{in r16, PIND}, \enquote{in till \code{r16} från \code{PIND}}. Målet står alltid först,
+    precis som i \code{ldi} och \code{mov}.
+  \item \textbf{\code{out} skriver alla åtta bitarna.} Stift som var höga och får en nolla blir
+    låga. Vill man bara ändra ett stift används \code{sbi} eller \code{cbi} (\secref{c8:c4}), eller
+    en mask (\secref{c8:c5}).
+\end{itemize}
+
+Namnen \code{DDRB} och \code{PORTB} kommer från \code{m328Pdef.inc} (\secref{c7:b3}). De är
+adresserna till I/O-registren, och \code{out} och \code{in} tar just den sortens adress.
+
+\subsection{Ett stift i taget: \code{sbi} och \code{cbi}}
+\label{c8:c4}
+Två instruktioner ändrar en enda bit i ett I/O-register och lämnar resten orört:
+
+\begin{booktable}{@{}p{5.5em}p{7.5em}L@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} \\
+  \midrule
+  \code{sbi} & \code{sbi PORTB, 3} & \emph{set bit in I/O}: bit~3 i \code{PORTB} blir 1 \\
+  \code{cbi} & \code{cbi PORTB, 0} & \emph{clear bit in I/O}: bit~0 i \code{PORTB} blir 0 \\
+\end{booktable}
+
+\noindent De tar en konstant bitposition, 0--7, och behöver inget register. Båda används i
+programmet \code{leds_on_portb.asm}:
+
+\begin{asmcode}
+    ser r16
+    out DDRB, r16               ; Every pin of port B is an output.
+    ldi r16, 0b00100001         ; LEDs on PB5 and PB0.
+    out PORTB, r16              ; Write all eight bits at once.
+    sbi PORTB, 3                ; Also light PB3, leaving the others as they were.
+    cbi PORTB, 0                ; Put out PB0, leaving the others as they were.
+\end{asmcode}
+
+\noindent Efter programmet är \code{PORTB} = \code{0b00101000}: bit~5 och bit~3.
+
+\code{sbi} och \code{cbi} tar två klockcykler, mot en för \code{out}. De når bara de lägsta
+I/O-registren, men dit hör alla portregistren i boken.
+
+\subsection{Ändra några stift med en mask}
+\label{c8:c5}
+När flera stift ska ändras, men inte alla, kombineras \code{in}, en maskoperation från
+\secref{c8:b2} och \code{out}:
+
+\begin{asmcode}
+    in r16, PORTB                   ; Read what port B drives now.
+    ori r16, 0b00000110             ; Set PB2 and PB1, leave the rest.
+    out PORTB, r16                  ; Write it back.
+\end{asmcode}
+
+\noindent Mönstret kallas \textbf{läs, ändra, skriv}. Man kan läsa \code{PORTB} tillbaka med
+\code{in} och få det värde man senast skrev dit.
+
+\subsection{Namn på register med \code{.def}}
+\label{c8:c6}
+I ett program som räknar på en port blir det snabbt svårt att komma ihåg vad \code{r16} och
+\code{r17} används till. Direktivet \code{.def} ger ett register ett namn:
+
+\begin{asmcode}
+.def counter = r16                  ; The value shown on port B.
+.def temp = r17                     ; A scratch register.
+\end{asmcode}
+
+\noindent Sedan kan man skriva \code{inc counter} och \code{out PORTB, counter}, och assemblern
+byter ut namnen mot \code{r16}. Maskinkoden blir densamma, men programmet går att läsa. Namn skrivs
+med små bokstäver, och \code{.def} placeras överst i programmet, efter \code{.include}.
+
+\subsection{I/O-simulering}
+\label{c8:c7}
+I simulatorn kan du följa portarna i fönstret \textbf{I/O} (\textbf{Debug $\rightarrow$ Windows
+$\rightarrow$ I/O}). Välj port B i listan över enheter, där den heter ungefär \emph{I/O Port
+(PORTB)}, så visas \code{PINB}, \code{DDRB} och \code{PORTB} med en ruta per bit. En fylld ruta är
+en etta.
+
+Stega ett program som räknar på port B, som i Labb~3 \hyperref[lab3:d6]{del~6}:
+
+\begin{asmcode}
+.def counter = r16
+.def temp = r17
+
+main:
+    ser temp
+    out DDRB, temp                  ; All eight pins of port B are outputs.
+    clr counter
+
+loop:
+    out PORTB, counter              ; Show the count on port B.
+    inc counter                     ; Count up.
+    rjmp loop                       ; And again, forever.
+\end{asmcode}
+
+\noindent För varje varv i loopen visar rutorna i \code{PORTB} nästa binära tal: 0000 0001, 0000
+0010, 0000 0011 och så vidare. Det är binär räkning, bit för bit, och varje ruta är en lysdiod på
+ett riktigt kort.
+
+Lägg märke till att även \textbf{\code{PINB}} ändras, fast programmet aldrig skriver till den.
+\code{PINB} visar stiftens verkliga nivå, och ett utgångsstift har den nivå porten driver ut.
+
+Om du i stället kör programmet fritt, med \textbf{Continue} (\textbf{F5}), och sedan stoppar med
+\textbf{Break All}, har räknaren hunnit många varv, och värdet i \code{PORTB} ser ut som ett
+slumpmässigt tal. Varje varv tar fyra klockcykler, alltså 0,25 mikrosekunder. På ett riktigt kort
+skulle lysdioderna byta så fort att alla åtta bara skulle se ut att lysa svagt, hela tiden. För att
+ett program ska gå att följa med ögat behövs tidsfördröjningar, och det är ämnet för
+kapitel~\ref{c9:ch}.
+
+\needspace{12\baselineskip}
+\subsection{En lysdiod på riktigt}
+\label{c8:c8}
+En utgång på ATmega328P kan driva en lysdiod direkt, men alltid genom ett
+\textbf{förkopplingsmotstånd} som begränsar strömmen:
+
+\bookfigure{avr_led_circuit}{En lysdiod med förkopplingsmotstånd på stiftet PB5.}
+  {c8:fig:led_circuit}
+
+Utan motståndet begränsas strömmen bara av vad stiftet orkar leverera, vilket är mer än både
+lysdioden och stiftet tål. Arduino Uno-kortet har en lysdiod med motstånd redan monterad på stift
+13, alltså PB5. Att koppla egna lysdioder och räkna ut motståndet gör du i kapitel~\ref{c11:ch}.

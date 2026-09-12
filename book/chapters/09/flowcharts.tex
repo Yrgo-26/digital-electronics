@@ -1,0 +1,271 @@
+% Section 9.1, from lectures/L09/appendix/a_flowcharts_and_branches.md.
+%
+% Typesetting only: in the listings of 9.1.5 and 9.1.6 the comments start four columns further left
+% than in the lecture, so that the longest line fits the listing's width.
+
+\section{Flödesplaner och villkorliga hopp}
+\label{c9:app:a}
+
+\subsection{Flödesplaner}
+\label{c9:a1}
+Programmen hittills har gått rakt uppifrån och ned, en instruktion efter en annan. Riktiga program
+måste \textbf{välja}: tänd värmen om det är kallt, annars inte. Innan ett sådant program skrivs är
+det värt att rita det, som en \textbf{flödesplan}.
+
+En flödesplan beskriver vad programmet ska göra, i vilken ordning, och var det väljer väg, utan att
+bry sig om vilka instruktioner som behövs. Den ritas med fem symboler:
+
+\bookfigure{l09_symbols}{De fem symbolerna i en flödesplan.}{c9:fig:symbols}
+
+\begin{booktable}{@{}p{6.4em}Lp{8.6em}@{}}
+  \thead{Symbol} & \thead{Betyder} & \thead{Exempel} \\
+  \midrule
+  Start/stopp & Var programmet börjar och slutar & Start \\
+  Process & Något programmet gör & \code{summa = summa + 1} \\
+  Beslut & En fråga med två utgångar, Ja och Nej & \code{r16 = 0?} \\
+  In/utmatning & Läsa en ingång eller skriva en utgång & \code{PORTB = mönster} \\
+  Subrutin & Ett delprogram som anropas; tas upp i kapitel~\ref{c10:ch} & \code{delay} \\
+\end{booktable}
+
+\noindent Fyra regler gör en flödesplan lätt att läsa, och lätt att översätta till ett program:
+\begin{itemize}
+  \item \textbf{En start}, och flödet går uppifrån och ned. Pilar som går uppåt är loopar.
+  \item \textbf{Varje beslut har exakt två utgångar}, märkta Ja och Nej.
+  \item \textbf{Skriv vad, inte hur.} \code{Värme på} är bättre än \code{sbi PORTB, 0}; vilken
+    instruktion det blir bestäms när programmet skrivs.
+  \item \textbf{Grenar som delar sig ska mötas igen.} Mer om det i \secref{c9:a8}.
+\end{itemize}
+
+\subsection{Från flödesplan till program}
+\label{c9:a2}
+När flödesplanen är klar översätts den ruta för ruta:
+\begin{itemize}
+  \item en \textbf{process} eller en \textbf{in/utmatning} blir en eller några få instruktioner;
+  \item ett \textbf{beslut} blir en jämförelse följd av ett villkorligt hopp (\secref{c9:a3}
+    och~\ref{c9:a4});
+  \item varje ställe dit en \textbf{pil pekar} från mer än ett håll får en \textbf{etikett}, så att
+    ett hopp kan hamna där.
+\end{itemize}
+
+Det sista är nyckeln. Ett program kör uppifrån och ned tills en hoppinstruktion skickar det någon
+annanstans, och dit måste det finnas en etikett att hoppa till.
+
+\subsection{Jämförelse: \code{cp}, \code{cpi} och \code{tst}}
+\label{c9:a3}
+Ett beslut i en flödesplan är en fråga om två tal: är de lika, är det ena mindre? På AVR ställs
+frågan med en \textbf{jämförelse}:
+
+\begin{booktable}{@{}p{5.6em}p{7em}L@{}}
+  \thead{Instruktion} & \thead{Exempel} & \thead{Gör} \\
+  \midrule
+  \code{cp} & \code{cp r16, r17} & Beräknar \code{r16 - r17} och sparar bara flaggorna. \\
+  \code{cpi} & \code{cpi r16, 20} & Beräknar \code{r16 - 20} och sparar bara flaggorna. Bara
+    \code{r16}--\code{r31}. \\
+  \code{tst} & \code{tst r16} & Sätter \code{Z} om \code{r16} är noll och \code{N} om bit~7 är
+    satt. \\
+\end{booktable}
+
+\noindent \textbf{En jämförelse är en subtraktion vars resultat kastas bort.} \code{cp r16, r17}
+räknar ut \code{r16 - r17} precis som \code{sub} gör, men lägger inte svaret någonstans: \code{r16}
+är oförändrat efteråt. Det enda som blir kvar är flaggorna, och de säger allt man behöver veta om de
+två talen:
+
+\begin{booktable}{@{}p{12em}p{10em}L@{}}
+  \thead{Om \code{r16} och \code{r17} är} & \thead{blir \code{r16 - r17}} &
+    \thead{och flaggorna} \\
+  \midrule
+  lika & noll & \code{Z = 1}, \code{C = 0} \\
+  \code{r16} större, utan tecken & positivt, inget lån & \code{Z = 0}, \code{C = 0} \\
+  \code{r16} mindre, utan tecken & ett lån behövs & \code{Z = 0}, \code{C = 1} \\
+\end{booktable}
+
+\noindent Flaggorna och deras betydelse kommer från \secref{c8:a6}. Det är det flaggorna är till
+för.
+
+\textbf{Är du osäker på vilken väg en jämförelse läses}, skriv ut subtraktionen. \code{cp r16, r17}
+är \code{r16 - r17}, alltid i den ordningen.
+
+\subsection{Villkorliga hopp}
+\label{c9:a4}
+Ett \textbf{villkorligt hopp} hoppar till en etikett om en flagga har ett visst värde, och
+fortsätter annars med nästa instruktion. Tillsammans med en jämförelse blir det ett beslut. De
+vanligaste:
+
+\begin{booktable}{@{}p{3.6em}Lp{4.6em}@{}}
+  \thead{Hopp} & \thead{Efter \code{cp a, b}: hoppar om} & \thead{Läser} \\
+  \midrule
+  \code{breq} & $a = b$ (\emph{branch if equal}) & \code{Z = 1} \\
+  \code{brne} & $a \neq b$ (\emph{branch if not equal}) & \code{Z = 0} \\
+  \code{brlo} & $a < b$, utan tecken (\emph{lower}) & \code{C = 1} \\
+  \code{brsh} & $a \geq b$, utan tecken (\emph{same or higher}) & \code{C = 0} \\
+  \code{brlt} & $a < b$, med tecken (\emph{less than}) & \code{S = 1} \\
+  \code{brge} & $a \geq b$, med tecken (\emph{greater or equal}) & \code{S = 0} \\
+  \code{brmi} & resultatet negativt (\emph{minus}) & \code{N = 1} \\
+  \code{brpl} & resultatet positivt eller noll (\emph{plus}) & \code{N = 0} \\
+\end{booktable}
+
+\noindent Hela listan finns på referensbladet i bilaga~\ref{app:avr}. Två saker till är värda att
+veta:
+\begin{itemize}
+  \item \textbf{\code{rjmp}} är det \textbf{ovillkorliga} hoppet: det hoppar alltid.
+  \item \textbf{Ett villkorligt hopp tar 1 klockcykel om det inte hoppar och 2 om det hoppar},
+    eftersom processorn då måste hämta en annan instruktion än den som stod på tur. Det spelar
+    roll för tidsfördröjningarna i \secref{c9:app:b}.
+\end{itemize}
+
+Det finns inga hopp för \enquote{större än} och \enquote{mindre än eller lika med}. De behövs inte:
+$a > b$ är detsamma som $b < a$, så man byter plats på operanderna i \code{cp}, eller jämför med ett
+tal ett steg högre: \code{r16 > 24} är \code{r16 ≥ 25}.
+
+\subsection{Om, annars}
+\label{c9:a5}
+Det vanligaste beslutet är \textbf{om-annars} (\emph{if-else}): om villkoret gäller, gör en sak,
+annars en annan. Här är värmaren i \code{compare_branch.asm}, först som flödesplan:
+
+\bookfigure{l09_if_else}{Flödesplan för värmaren: ett om-annars.}{c9:fig:if_else}
+
+\needspace{10\baselineskip}
+\noindent och sedan som program:
+
+\begin{asmcode}
+    cpi r16, LIMIT              ; Compare: computes r16 - 20, keeps only the flags.
+    brlo heater_on              ; Branch if lower (C = 1): temperature < 20.
+    cbi PORTB, 0                ; Otherwise: heater off,
+    rjmp done                   ; and jump past the other branch.
+heater_on:
+    sbi PORTB, 0                ; Heater on.
+done:
+    rjmp done
+\end{asmcode}
+
+\noindent Följ de två vägarna:
+\begin{itemize}
+  \item \textbf{Temperaturen är 18.} \code{cpi} räknar $18 - 20$, som kräver ett lån, så
+    \code{C = 1}. \code{brlo} hoppar till \code{heater_on}, och värmen slås på.
+  \item \textbf{Temperaturen är 22.} $22 - 20$ kräver inget lån, \code{C = 0}. \code{brlo} hoppar
+    inte, och programmet fortsätter med \code{cbi}, som slår av värmen. Sedan hoppar
+    \code{rjmp done} \textbf{förbi} \code{heater_on}.
+\end{itemize}
+
+\textbf{Det sista \code{rjmp} är lätt att glömma, och då blir programmet fel.} Utan det skulle
+programmet efter \code{cbi} fortsätta rakt ned in i \code{heater_on} och slå på värmen igen. I
+flödesplanen ser det ut som att grenarna är åtskilda; i programmet ligger de efter varandra, och
+det är hoppen som håller isär dem.
+
+\subsubsection{Bara om}
+Utan annars-gren blir det enklare: hoppa \textbf{förbi} det som bara ska göras ibland. Då hoppar
+man på det \textbf{motsatta} villkoret:
+
+\begin{asmcode}
+    cpi r16, 30
+    brlo not_too_hot                ; Below 30: skip the alarm.
+    sbi PORTB, 7                    ; 30 or above: sound the alarm.
+not_too_hot:
+\end{asmcode}
+
+\noindent Flödesplanen säger \enquote{om r16 $\geq$ 30, larma}, och programmet säger
+\enquote{om r16 $<$ 30, hoppa över larmet}. Det är samma sak, och det är det vanligaste
+mönstret i assembler.
+
+\subsection{Utan tecken eller med tecken}
+\label{c9:a6}
+Samma jämförelse kan ge olika svar beroende på om talen läses med eller utan tecken
+(\secref{c8:a5}). Jämför $-5$ med 3:
+
+\begin{asmcode}
+    ldi r16, -5                 ; 0xFB: 251 without sign, -5 with.
+    ldi r17, 3
+    cp r16, r17                 ; Unsigned 251 > 3: C = 0. Signed -5 < 3: S = 1.
+\end{asmcode}
+
+\noindent Efter \code{cp} är \code{C = 0}, så \code{brlo} hoppar \textbf{inte}: utan tecken är 251
+inte mindre än 3. Men \code{S = 1}, så \code{brlt} hoppar: med tecken är $-5$ mindre än 3. Välj
+hopp efter vad talen betyder:
+\begin{itemize}
+  \item \textbf{utan tecken}, räknare, antal, portvärden: \code{brlo} och \code{brsh};
+  \item \textbf{med tecken}, tal som kan bli negativa, som en utomhustemperatur: \code{brlt} och
+    \code{brge}.
+\end{itemize}
+
+Värmaren i \secref{c9:a5} använder \code{brlo}. Det fungerar så länge temperaturen aldrig är
+negativ, vilket gäller inomhus. Vid $-5$ grader läser \code{brlo} talet som 251, bedömer att det är
+varmt nog, och slår av värmen. En termostat för minusgrader behöver \code{brlt}; se
+övning~\ref{c9:ex:12}.
+
+\subsection{Flerval}
+\label{c9:a7}
+Ibland finns fler än två alternativ: ett läge 0, 1, 2 eller 3, som var och ett ska ge ett eget
+mönster på lysdioderna. Det byggs som en \textbf{kedja av beslut}, där varje beslut testar ett
+alternativ:
+
+\bookfigure{l09_menu}{Flödesplan för ett flerval med en gemensam utgång.}{c9:fig:menu}
+
+Programmet \code{menu.asm} följer flödesplanen rad för rad:
+
+\begin{asmcode}
+    cpi r16, 0
+    breq mode_0
+    cpi r16, 1
+    breq mode_1
+    cpi r16, 2
+    breq mode_2
+    cpi r16, 3
+    breq mode_3
+    ldi r17, 0b01010101             ; None of them: the error pattern.
+    rjmp show
+mode_0:
+    ldi r17, 0b00000000
+    rjmp show
+    ...
+mode_3:
+    ldi r17, 0b11110000
+show:
+    out PORTB, r17                  ; The one place every alternative ends up.
+\end{asmcode}
+
+\noindent Varje alternativ gör bara en sak, lägger sitt mönster i \code{r17}, och hoppar sedan till
+samma ställe, \code{show}. Det sista alternativet behöver inget \code{rjmp show}, eftersom
+\code{show} kommer direkt efter.
+
+Tänk på \textbf{alternativet som inte finns med}: vad ska hända om läget är 7? En flödesplan utan
+svar på den frågan ger ett program som gör något ingen har bestämt. Här visar det ett felmönster.
+
+\subsection{Att arbeta om en flödesplan}
+\label{c9:a8}
+Den första flödesplanen man ritar blir sällan den bästa. Ett vanligt första försök för flervalet
+ser ut så här: varje ja-gren får en egen \code{PORTB = mönster} och en egen stopp-ruta. Det
+fungerar, men flödesplanen får fyra slut, och programmet får fyra kopior av \code{out} och fyra
+slutloopar. Den dag något ska ändras i slutet, en fördröjning, en loop tillbaka till början, måste
+det göras på fyra ställen, och ett av dem glöms.
+
+Att \textbf{arbeta om} flödesplanen betyder att flytta det som är gemensamt till ett ställe:
+\begin{enumerate}
+  \item \textbf{Leta efter rutor som gör samma sak} i flera grenar. Här är det
+    \code{PORTB = mönster} och stopp.
+  \item \textbf{Låt grenarna bara göra det som skiljer dem åt}, att välja mönster, och låt dem
+    mötas.
+  \item \textbf{Rita den gemensamma delen en gång}, efter mötespunkten.
+\end{enumerate}
+
+Resultatet är flödesplanen i \secref{c9:a7}: en väg in, en väg ut, och varje alternativ en enda
+ruta. Det är den form som blir ett kort och läsbart program, och den form som går att bygga vidare
+på. I Labb~3 \hyperref[lab3:d17]{del~17} gör du samma omarbetning själv.
+
+\subsection{Vanliga fel}
+\label{c9:a9}
+\begin{itemize}
+  \item \textbf{Flaggorna skrivs över mellan jämförelsen och hoppet.} Nästan alla
+    räkneinstruktioner ändrar flaggorna. Lägg hoppet direkt efter \code{cp} eller \code{cpi}.
+    \code{ldi}, \code{mov} och \code{out} ändrar inga flaggor och är ofarliga emellan;
+    \code{inc}, \code{dec} och \code{add} är det inte.
+  \item \textbf{Fel sorts hopp.} \code{brlo} för tal med tecken, eller \code{brlt} för tal utan,
+    fungerar för de flesta värden och blir fel för några. Se \secref{c9:a6}.
+  \item \textbf{Det saknade \code{rjmp}} efter den första grenen i ett om-annars, så att programmet
+    ramlar in i den andra grenen. Se \secref{c9:a5}.
+  \item \textbf{Omvänd jämförelse.} \code{cp r16, r17} följt av \code{brlo} hoppar om
+    \code{r16 < r17}, inte tvärtom. Skriv ut subtraktionen om du är osäker.
+  \item \textbf{Hoppet når inte fram.} Ett villkorligt hopp når bara ungefär 64 instruktioner
+    bort. Längre bort ger ett felmeddelande när programmet byggs, och löses genom att hoppa på det
+    motsatta villkoret förbi ett \code{rjmp}, som når ungefär 2\,000 instruktioner åt vardera
+    hållet.
+\end{itemize}

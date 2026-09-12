@@ -1,0 +1,248 @@
+% Solutions to Chapter 7's exercises, from lectures/L07/appendix/e_solutions.md. Exercise 6 is a
+% program: the program itself is left out, and the parts worked on paper, the register values and
+% the cycle count, are kept. The one or two lines of assembly in exercises 1, 3 and 5 are kept,
+% because there the lines are the answer, and exercise 5 asks for the corrected program.
+%
+% Exercise 10 a) says that the program sits in the template, as the exercise now does; see
+% chapters/07/exercises.tex.
+
+\answerchapter{c7:ch}
+
+\answer{c7:ex:1}{Arbetsbänken}
+\pt{a}32 register, \code{r0}--\code{r31}, med 8 bitar, en byte, vardera.
+
+\pt{b}\code{r16}--\code{r31}.
+
+\pt{c}\code{ldi} är 16 bitar lång. Fyra av bitarna är operationskoden och åtta är konstanten, så
+det blir bara \textbf{fyra bitar} kvar till registret. Fyra bitar kan räkna från 0 till 15, alltså
+skilja på sexton register, och processorn lägger till 16: \code{0000} betyder \code{r16} och
+\code{1111} betyder \code{r31}. Det finns inget bitmönster som betyder \code{r5}.
+
+\pt{d}Ladda konstanten i ett övre register och kopiera den:
+
+\begin{asmcode}
+    ldi r16, 7                      ; r16 = 7
+    mov r5, r16                     ; r5 = r16 = 7
+\end{asmcode}
+
+\noindent\code{mov} fungerar med alla 32 register, eftersom den inte har någon konstant att få
+plats med.
+
+\answer{c7:ex:2}{Tre minnen}
+\pt{a}I programminnet, flashminnet.
+
+\pt{b}I dataminnet, SRAM. Under SRAM, på dataminnets lägsta adresser, ligger också registren och
+I/O-registren.
+
+\pt{c}Flashminnet behåller innehållet utan ström. Därför börjar ett Arduino-kort köra sitt program
+så fort det får ström, utan att programmet behöver laddas in igen. SRAM töms när strömmen bryts.
+
+\pt{d}\code{RAMEND}, den sista adressen i SRAM. Där börjar stacken, som kapitel~\ref{c10:ch}
+handlar om.
+
+\answer{c7:ex:3}{Samma tal, olika skrivsätt}
+\pt{a}45 = 32 + 8 + 4 + 1 = \code{0b00101101}, och \code{0010 1101} = \code{0x2D}:
+
+\begin{asmcode}
+    ldi r16, 45
+    ldi r16, 0b00101101
+    ldi r16, 0x2D
+\end{asmcode}
+
+\pt{b}\leavevmode
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{Decimalt} & \thead{Binärt} & \thead{Hexadecimalt} \\
+  \midrule
+  255 & \code{0b11111111} & \code{0xFF} \\
+  16 & \code{0b00010000} & \code{0x10} \\
+  100 & \code{0b01100100} & \code{0x64} \\
+\end{narrowtable}
+
+\noindent 100 = 64 + 32 + 4, alltså bitarna 6, 5 och 2.
+
+\pt{c}\leavevmode
+\begin{itemize}
+  \item \code{0b01010101} = 64 + 16 + 4 + 1 = \textbf{85}.
+  \item \code{0x3F} = 3 · 16 + 15 = \textbf{63}.
+  \item \code{$80} = 8 · 16 = \textbf{128}. \code{$} är ett annat sätt att skriva \code{0x}.
+  \item \code{'a'} = \code{0x61} = 6 · 16 + 1 = \textbf{97}.
+\end{itemize}
+
+\pt{d}Binärt. Då står varje bit, och därmed varje lysdiod, för sig i programmet:
+\code{0b10000001} tänder de två yttersta lysdioderna, vilket inte syns lika lätt i \code{0x81} och
+inte alls i \code{129}.
+
+\answer{c7:ex:4}{Förutsäg registren}
+\begin{narrowtable}{@{}lccccc@{}}
+  \thead{Efter} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{\code{r18}} &
+    \thead{\code{r19}} & \thead{\code{r20}} \\
+  \midrule
+  \code{ldi r16, 0x10} & 0x10 & 0x00 & 0x00 & 0x00 & 0x00 \\
+  \code{ldi r17, 7} & 0x10 & 0x07 & 0x00 & 0x00 & 0x00 \\
+  \code{mov r18, r17} & 0x10 & 0x07 & 0x07 & 0x00 & 0x00 \\
+  \code{inc r18} & 0x10 & 0x07 & 0x08 & 0x00 & 0x00 \\
+  \code{inc r18} & 0x10 & 0x07 & 0x09 & 0x00 & 0x00 \\
+  \code{dec r16} & 0x0F & 0x07 & 0x09 & 0x00 & 0x00 \\
+  \code{mov r19, r16} & 0x0F & 0x07 & 0x09 & 0x0F & 0x00 \\
+  \code{clr r17} & 0x0F & 0x00 & 0x09 & 0x0F & 0x00 \\
+  \code{ser r20} & 0x0F & 0x00 & 0x09 & 0x0F & 0xFF \\
+  \code{dec r20} & 0x0F & 0x00 & 0x09 & 0x0F & 0xFE \\
+\end{narrowtable}
+
+\noindent Två rader brukar ge fel svar:
+\begin{itemize}
+  \item \textbf{\code{dec r16} från \code{0x10}} blir \code{0x0F}, inte \code{0x09}.
+    Hexadecimalt räknar man ned från \code{10} till \code{0F}, precis som decimalt från 10 till 9.
+    Den som svarar \code{0x09} har räknat hexadecimalt som om det vore decimalt.
+  \item \textbf{\code{mov r19, r16}} kopierar det värde \code{r16} har \textbf{då}, \code{0x0F},
+    inte det den fick i början.
+\end{itemize}
+
+\answer{c7:ex:5}{Hitta felen}
+Sex fel:
+\begin{enumerate}
+  \item \textbf{\code{main}} saknar kolon. Utan kolon läser assemblern ordet som en instruktion,
+    och det finns ingen instruktion som heter \code{main}.
+  \item \textbf{\code{ldi r16 5}} saknar kommatecken mellan operanderna.
+  \item \textbf{\code{ldi r10, 3}}: \code{ldi} når bara \code{r16}--\code{r31}. Använd till
+    exempel \code{r20}.
+  \item \textbf{\code{mov r17 r16}} saknar kommatecken.
+  \item \textbf{\code{inc r20, 1}}: \code{inc} har bara en operand. Den ökar alltid med ett.
+  \item \textbf{\code{rjmp mian}}: etiketten heter \code{main}. Assemblern känner inte till
+    \code{mian}.
+\end{enumerate}
+
+\needspace{14\baselineskip}
+Det rättade programmet:
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.org 0x0000
+    rjmp main
+
+main:
+    ldi r16, 5
+    ldi r20, 3
+    mov r17, r16
+    inc r20
+    rjmp main
+\end{asmcode}
+
+I Microchip Studio får du inte alltid alla sex felen på en gång. Rätta det första, bygg om, och
+fortsätt med nästa, som i \secref{c7:c4}.
+
+\answer{c7:ex:6}{Ditt första egna program}
+\noanswer{Programmet självt har inget lösningsförslag här; simulatorn visar om det gör vad det
+ska.}
+
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}lcc@{}}
+  \thead{Register} & \thead{Decimalt} & \thead{Hexadecimalt} \\
+  \midrule
+  \code{r16} & 12 & 0x0C \\
+  \code{r17} & 15 & 0x0F \\
+  \code{r18} & 0 & 0x00 \\
+  \code{r19} & 170 & 0xAA \\
+\end{narrowtable}
+
+\pt{b}Värdena ska stämma. Om \code{r19} är 0 har \code{clr r18} hamnat före \code{mov r19, r18}:
+ordningen spelar roll, eftersom \code{mov} kopierar det värde registret har just då.
+
+\pt{c}Programmet har åtta instruktioner i \code{main}: \code{ldi}, \code{mov}, tre \code{inc},
+\code{ldi}, \code{mov} och \code{clr}. \code{rjmp main} tar 2 cykler och de åtta instruktionerna 1
+cykel var: 2 + 8 = \textbf{10} cykler. Cycle Counter ska visa 10 när den gula pilen står på
+\code{rjmp end}.
+
+\answer{c7:ex:7}{Maskinkod för hand}
+\pt{a}Mönstret är \code{1110 KKKK dddd KKKK}, med konstantens höga halva i de första \code{K} och
+den låga halvan i de sista.
+
+\code{ldi r16, 0x2A}: konstanten \code{0x2A} = \code{0010 1010}, registret \code{r16} ger
+\code{dddd} = 16 -- 16 = 0 = \code{0000}:
+
+\begin{textdrawing}
+1110  0010  0000  1010  =  0xE20A
+\end{textdrawing}
+
+\noindent De övriga på samma sätt:
+
+\begin{narrowtable}{@{}lcccc@{}}
+  \thead{Instruktion} & \thead{\code{K} höga halvan} & \thead{\code{dddd}} &
+    \thead{\code{K} låga halvan} & \thead{Maskinkod} \\
+  \midrule
+  \code{ldi r16, 0x2A} & \code{0010} & \code{0000} (r16) & \code{1010} & \code{0xE20A} \\
+  \code{ldi r24, 0x2A} & \code{0010} & \code{1000} (r24) & \code{1010} & \code{0xE28A} \\
+  \code{ldi r31, 0xFF} & \code{1111} & \code{1111} (r31) & \code{1111} & \code{0xEFFF} \\
+  \code{ldi r20, 0x03} & \code{0000} & \code{0100} (r20) & \code{0011} & \code{0xE043} \\
+\end{narrowtable}
+
+\noindent En genväg: i hexadecimal form är maskinkoden \code{E}, konstantens första siffra,
+registrets nummer minus 16, och konstantens andra siffra. \code{ldi r24, 0x2A} blir
+\code{E 2 8 A}.
+
+\pt{b}Listfilen visar samma fyra ord, \code{e20a}, \code{e28a}, \code{efff} och \code{e043}, på
+adresserna där instruktionerna hamnade.
+
+\pt{c}De ska stämma. Det vanligaste felet är att skriva konstanten i ett stycke, till exempel
+\code{1110 0000 0010 1010} = \code{0xE02A} för \code{ldi r16, 0x2A}. Det är fel ordning på fälten:
+konstanten är delad, med registerfältet emellan. Ett annat vanligt fel är att skriva registrets
+nummer utan att dra ifrån 16, \code{1 0000}, vilket inte ens får plats i fyra bitar.
+
+\pt{d}Registerfältet har fyra bitar och betyder \code{r16}--\code{r31}. Det finns inget värde i
+fältet som betyder \code{r15}, så det finns ingen maskinkod att skriva, och assemblern ger ett fel.
+
+\answer{c7:ex:8}{Programmet som inte tog slut}
+\pt{a}Processorn slutar aldrig köra. Det finns inget operativsystem att återvända till, så när
+programmet har gjort sitt måste det stanna någonstans, och \code{rjmp end} hoppar till sig självt
+för evigt.
+
+\pt{b}Processorn fortsätter med det som ligger efter programmet i flashminnet. Där har du inte
+skrivit något: ett tomt flashminne innehåller bara ettor, \code{0xFF}, och processorn försöker
+tolka dem som instruktioner. I praktiken löper programräknaren då igenom resten av minnet, slår
+runt till adress 0 och kör programmet från början igen, om och om igen. Programmet ser ut att
+starta om av sig självt, vilket är ett förvirrande fel att leta efter om man inte vet om det.
+
+\pt{c}Adresserna närmast 0 är reserverade för avbrottsvektorer. Boken använder inga avbrott, men
+vanan att börja med ett hopp gör att programmet fortsätter att fungera om något läggs där, och det
+är så nästan alla AVR-program börjar (\secref{c7:b6}).
+
+\answer{c7:ex:9}{Tillåtet eller inte?}
+\pt{a}\textbf{Tillåtet.} \code{mov} kopierar mellan två valfria register, \code{r0}--\code{r31}.
+
+\pt{b}\textbf{Inte tillåtet.} \code{ldi} når bara \code{r16}--\code{r31}. Skriv
+\code{ldi r16, 16} och \code{mov r5, r16}.
+
+\pt{c}\textbf{Inte tillåtet.} \code{mov} kopierar mellan register; den har ingen konstant. Skriv
+\code{ldi r16, 5}.
+
+\pt{d}\textbf{Inte tillåtet.} \code{ldi} laddar en konstant, inte ett register. Skriv
+\code{mov r16, r5}.
+
+\pt{e}\textbf{Tillåtet.} \code{inc} fungerar med alla 32 register.
+
+\answer{c7:ex:10}{Hur lång tid tar programmet?}
+\pt{a}\code{rjmp main} tar 2 cykler och de tio instruktionerna i \code{main} 1 cykel var:
+2 + 10 = \textbf{12} cykler.
+
+\pt{b}12 · 62,5~ns = \textbf{750~ns}, det vill säga 0,75 mikrosekunder.
+
+\pt{c}1~s / 750~ns $\approx$ 1,3 miljoner gånger per sekund. Så snabbt går det; det är därför
+programmet måste stegas i simulatorn för att man ska se något.
+
+\answer{c7:ex:11}{Maskinkod baklänges}
+Dela ordet i fyra hexadecimala siffror: \code{E}, konstantens höga halva, registrets nummer minus
+16, och konstantens låga halva.
+
+\pt{a}\code{0xE3F5}: konstanten \code{0x35}, registerfältet \code{F} = 15, 15 + 16 = 31.
+\textbf{\code{ldi r31, 0x35}}.
+
+\pt{b}\code{0xE0A0}: konstanten \code{0x00}, registerfältet \code{A} = 10, 10 + 16 = 26.
+\textbf{\code{ldi r26, 0x00}}.
+
+\pt{c}\code{0xEF0F}: konstanten \code{0xFF}, registerfältet \code{0} = 0, alltså \code{r16}.
+\textbf{\code{ldi r16, 0xFF}}. Det är exakt vad \code{ser r16} gör, och \code{ser} är i själva
+verket bara ett annat namn på \code{ldi} med konstanten \code{0xFF}: assemblern gör samma maskinkod
+av båda. Det syns i listfilen i \secref{c7:b7}, där \code{ser r20} blev \code{ef4f}.

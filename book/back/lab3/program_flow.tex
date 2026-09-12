@@ -1,0 +1,261 @@
+% Labb 3, parts 11, 12 and 14 to 17, from labs/lab3/c_program_flow.md. Each part is a \labtask,
+% and its Mål, Bakgrund, Specifikation, Programmet, Uppgifter and Frågor are \task headings. The
+% program given in part 15 is the handout's.
+
+\section{Del 11, 12 och 14--17: Programflöde, loopar och tidsfördröjningar}
+\label{lab3:sec:c}
+Delarna hör till kapitel~\ref{c9:ch}. Varje del är ett eget projekt som utgår från mallen
+(\secref{lab3:template}).
+
+Från och med nu gäller två vanor till:
+\begin{itemize}
+  \item \textbf{Rita flödesplanen först}, på papper, innan ni skriver en enda instruktion
+    (\secref{c9:a1}).
+  \item \textbf{Mät tider med stoppuret}, med Frequency inställd på 16~MHz (\secref{c9:b6}).
+\end{itemize}
+
+Del 13 ingår inte i laborationen; numreringen hoppar från 12 till 14.
+
+\labtask{Del 11}{Vitsen med flaggor: jämförelse med cp}\phantomsection\label{lab3:d11}
+\task{Mål}
+Se vad \code{cp} och \code{cpi} gör med flaggorna, och hur flaggorna säger om två tal är lika,
+större eller mindre.
+
+\task{Bakgrund}
+\Secref{c9:a3} och~\ref{c9:a6}.
+
+\task{Uppgifter}
+Skriv ett program med de fem jämförelserna nedan, med en etikett efter var och en.
+\textbf{Förutsäg} \code{Z}, \code{C} och \code{S} för varje jämförelse i en tabell innan ni kör
+fram till etiketterna.
+
+\begin{filltable}{@{}p{8.8em}cc*{3}{C{1.8em}}Y@{}}
+  \thead{Jämförelse} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{Z} & \thead{C} &
+    \thead{S} & \thead{\code{r16} är \dots\ \code{r17}} \\
+  \midrule
+  1. \code{cp r16, r17} & 50 & 30 & & & & \fillrule
+  2. \code{cp r16, r17} & 50 & 50 & & & & \fillrule
+  3. \code{cp r16, r17} & 50 & 70 & & & & \fillrule
+  4. \code{cpi r16, 50} & 50 & -- & & & & \fillrule
+  5. \code{cp r16, r17} & $-5$ & 3 & & & & \\
+\end{filltable}
+
+\begin{enumerate}
+  \item Fyll i tabellen, och fyll i sista kolumnen med \emph{större än}, \emph{lika med} eller
+    \emph{mindre än}.
+  \item Kör fram till varje etikett och kontrollera flaggorna.
+  \item Kontrollera efter jämförelse 1--3 att \code{r16} fortfarande är 50. Varför ändras det inte,
+    fast \code{cp} räknar ut en subtraktion?
+  \item Titta särskilt på jämförelse~5. Är $-5$ mindre eller större än 3? Svara både
+    \textbf{utan} tecken, när \code{r16} läses som 251, och \textbf{med} tecken. Vilken flagga
+    svarar på vilken fråga?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Vilka två flaggor räcker för att avgöra om två tal utan tecken är lika, om det första är
+    större, eller om det är mindre?
+  \item Varför behövs både \code{brlo} och \code{brlt}?
+\end{itemize}
+
+\redovisa{tabellen.}
+
+\labtask{Del 12}{Flödesplan och villkorliga hopp}\phantomsection\label{lab3:d12}
+\task{Mål}
+Rita en flödesplan med beslut, och skriva det som ett program med jämförelser och villkorliga hopp.
+
+\task{Bakgrund}
+\Secref{c9:a4} och~\ref{c9:a5}.
+
+\task{Specifikation}
+En termostat styr ett rum. Temperaturen i grader finns i \code{r16}. Port B styr två saker:
+\begin{itemize}
+  \item \textbf{PB0}, en värmare, ska vara på när temperaturen är \textbf{under 20} grader;
+  \item \textbf{PB1}, en fläkt, ska vara på när temperaturen är \textbf{25 grader eller mer};
+  \item mellan 20 och 24 grader ska båda vara av.
+\end{itemize}
+
+Programmet ska gå i en loop: det läser \code{r16}, sätter utgångarna, och börjar om. Då kan ni
+stoppa simuleringen, ändra värdet i \code{r16} i Processor Status, och köra vidare för att se
+utgångarna ändras.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Rita flödesplanen. Den har två beslut. Märk varje beslut med Ja och Nej.
+  \item Skriv programmet. Ladda startvärdet 18 i \code{r16} \textbf{före} loopen, så att ett värde
+    ni skriver in i Processor Status inte skrivs över.
+  \item \textbf{Förutsäg} \code{PORTB} för temperaturerna 18, 20, 24, 25 och 30. Testa alla fem i
+    simulatorn.
+  \item Vilka av värdena är \textbf{gränsfall}, och varför är det de som är viktigast att testa?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Villkoret \enquote{25 grader eller mer} används för fläkten. Hur skriver man \enquote{mer
+    än 24} med de hopp som finns?
+  \item Vad händer med termostaten vid $-5$ grader? Se \secref{c9:a6}.
+\end{itemize}
+
+\redovisa{flödesplanen och programmet, och visa minst tre temperaturer i simulatorn.}
+
+\labtask{Del 14}{Loop med visst antal varv}\phantomsection\label{lab3:d14}
+\task{Mål}
+Skriva en loop som går ett bestämt antal varv med en räknare, och veta exakt hur många gånger
+varje instruktion i den körs.
+
+\task{Bakgrund}
+\Secref{c9:b1}.
+
+\task{Specifikation}
+Processorn har ingen multiplikation i den här laborationen. Räkna ut $7 \cdot 3$ genom att addera 3
+sju gånger, med en loop. Visa antalet varv som hittills gått på port B, så att det syns i
+I/O-fönstret.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Rita flödesplanen. Använd ett register för resultatet, ett för talet som adderas, ett för
+    varven som är kvar och ett för varven som har gått.
+  \item Skriv programmet med \code{.equ} för konstanterna, till exempel \code{.equ LAPS = 7} och
+    \code{.equ TERM = 3}.
+  \item \textbf{Förutsäg} resultatet och \code{PORTB} när programmet är klart. Stega igenom minst
+    två varv och se \code{PORTB} räkna, kör sedan till slutet med \textbf{Run To Cursor}.
+  \item Hur många gånger körs \code{brne}, och hur många av dem hoppar den?
+  \item Ändra \code{LAPS} till 0. \textbf{Förutsäg} resultatet innan ni kör. Förklara det ni ser.
+  \item Räkna ut $12 \cdot 25$ med samma program. Stämmer resultatet? Varför, eller varför inte?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför behövs ingen \code{cpi} före \code{brne}?
+\end{itemize}
+
+\redovisa{programmet och svaren på uppgift 4--6.}
+
+\labtask{Del 15}{Kort tidsfördröjning}\phantomsection\label{lab3:d15}
+\task{Mål}
+Göra en tidsfördröjning med en loop, räkna ut dess längd i klockcykler, och kontrollera den med
+stoppuret.
+
+\task{Bakgrund}
+\Secref{c9:b3} och~\ref{c9:b4}.
+
+\task{Programmet}
+\begin{asmcode}
+main:
+    sbi DDRB, 0                     ; PB0 is an output.
+    sbi PORTB, 0                    ; The pulse starts.
+
+delay_start:
+    ldi r18, 200
+delay_loop:
+    dec r18
+    brne delay_loop
+delay_end:
+    cbi PORTB, 0                    ; The pulse ends.
+
+end:
+    rjmp end
+\end{asmcode}
+
+Programmet ger en puls på PB0: stiftet går högt, fördröjningen körs, och stiftet går lågt.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Räkna ut fördröjningens längd, från \code{delay_start} till \code{delay_end}, i
+    klockcykler och i mikrosekunder. Använd en tabell med en rad per instruktion, som i
+    \secref{c9:b4}.
+  \item Mät samma sak i simulatorn: brytpunkt på \code{delay_start} och \code{delay_end},
+    Frequency på 16~MHz, och stoppuret nollställt vid den första brytpunkten. Stämmer det?
+  \item Pulsen ska vara \textbf{30~µs}. Räkna ut hur många varv loopen ska gå, ändra programmet, och
+    mät.
+  \item Vilken är den längsta fördröjning loopen kan ge? Räkna först, mät sedan.
+  \item Flytta den första brytpunkten till \code{sbi PORTB, 0}. \textbf{Förutsäg} hur mycket
+    mätningen ändras.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför blir det exakt $3 \cdot n$ cykler och inte $3 \cdot n + 1$?
+\end{itemize}
+
+\redovisa{uträkningen och mätningen för 30~µs.}
+
+\labtask{Del 16}{Längre tidsfördröjning}\phantomsection\label{lab3:d16}
+\task{Mål}
+Göra en längre fördröjning med två loopar i varandra, och träffa en önskad tid exakt.
+
+\task{Bakgrund}
+\Secref{c9:b5}.
+
+\task{Specifikation}
+PB0 ska byta läge var \textbf{10:e millisekund}: hög i 10~ms, låg i 10~ms, och så vidare, för
+alltid. Byt läge genom att läsa \code{PORTB}, invertera bit~0 med \code{eor} och en mask, och
+skriva tillbaka. Fördröjningen mellan bytena görs med två loopar i varandra.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Rita flödesplanen: en loop som byter läge på PB0 och sedan väntar, med fördröjningen som
+    två loopar i varandra.
+  \item Välj OUTER och INNER med formeln $\text{OUTER} \cdot (3 \cdot \text{INNER} + 3)$ så att
+    fördröjningen blir så nära 10~ms som möjligt. Skriv programmet och mät fördröjningen.
+  \item Lägg till en \code{nop} i den yttre loopen. Hur ändras formeln? Välj nya konstanter så att
+    fördröjningen blir \textbf{exakt} 10~ms, 160\,000 cykler. Mät.
+  \item Mät nu en hel halvperiod: från ett byte av PB0 till nästa. Den blir några cykler längre än
+    fördröjningen. Hur många, och vilka instruktioner är det?
+  \item Kör programmet fritt med \textbf{F5} i några sekunder och stoppa. Hur lång tid har gått
+    enligt stoppuret? Ungefär hur många gånger har PB0 bytt läge?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Skulle en lysdiod på PB0 synas blinka med den här fördröjningen på ett riktigt kort?
+    Varför inte?
+\end{itemize}
+
+\redovisa{konstanterna för exakt 10~ms och mätningarna.}
+
+\labtask{Del 17}{Flervalssituationer och omarbetning av flödesplaner}%
+\phantomsection\label{lab3:d17}
+\task{Mål}
+Skriva ett program som väljer mellan flera alternativ, och arbeta om en flödesplan så att
+programmet får en väg in och en väg ut.
+
+\task{Bakgrund}
+\Secref{c9:a7} och~\ref{c9:a8}.
+
+\task{Specifikation}
+Ett läge i \code{r16} väljer ett mönster på port B:
+
+\begin{narrowtable}{@{}cl@{}}
+  \thead{Läge} & \thead{Mönster på port B} \\
+  \midrule
+  0 & alla släckta \\
+  1 & alla tända \\
+  2 & de fyra nedre, PB0--PB3 \\
+  3 & de fyra övre, PB4--PB7 \\
+  annat & varannan, \code{0101 0101}, som felindikering \\
+\end{narrowtable}
+
+Programmet går i en loop, så att läget kan ändras i Processor Status medan programmet står
+stilla.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Rita en \textbf{första} flödesplan, hur ni vill. Skriv programmet efter den, och testa alla
+    lägen, inklusive ett felläge.
+  \item Räkna i er flödesplan och i programmet: hur många rutor eller instruktioner skriver till
+    port B? Hur många ställen går programmet tillbaka till loopens början från?
+  \item \textbf{Arbeta om} flödesplanen enligt \secref{c9:a8}: låt varje alternativ bara välja
+    mönster, och låt alla alternativ mötas i \textbf{en} ruta som skriver till port B.
+  \item Skriv om programmet efter den nya flödesplanen. Testa alla lägen igen. Programmet ska göra
+    exakt samma sak som förut.
+  \item Lägg till läge~4, PB0 och PB7 tända. Hur många ställen i programmet behövde ändras, i den
+    första versionen och i den omarbetade?
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Varför är det viktigt att ha med alternativet \enquote{annat} i flödesplanen?
+\end{itemize}
+
+\redovisa{båda flödesplanerna och det omarbetade programmet.}

@@ -1,0 +1,206 @@
+% Section 2.4, from lectures/L02/appendix/c_exercises.md.
+
+\section{Övningar}
+\label{c2:sec:exercises}\label{c2:app:c}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Varje uttryck du förenklar kan kontrolleras med en
+sanningstabell: räkna ut det ursprungliga och det förenklade uttrycket för alla kombinationer av
+ingångarna, och jämför kolumnerna. Är de lika på varje rad är förenklingen rätt, oavsett vilken väg
+du tog dit. Varje grindnät kan dessutom byggas i CircuitVerse och kontrolleras rad för rad, enligt
+\secref{c2:a9}.
+
+Lösningsförslagen finns i bilaga~\ref{app:answers}.
+
+Varje övning är märkt med sin sort. Övning~\ref{c2:ex:7} är kapitlets
+\textbf{kontrolluppgift}.
+\end{aside}
+
+\exercise{Grindar med tre ingångar}{Förståelse}
+\label{c2:ex:1}
+\begin{parts}
+  \item Skriv sanningstabellen för en AND-grind, en OR-grind och en XOR-grind med tre ingångar A,
+    B och C, i samma tabell.
+  \item Beskriv med en mening var för varje grind när utgången är \code{1}.
+  \item På hur många av de åtta raderna är AND-grinden \code{1}? OR-grinden? Förklara varför
+    svaren är så olika.
+\end{parts}
+
+\exercise{Från ord till uttryck}{Förståelse}
+\label{c2:ex:2}
+Skriv ett booleskt uttryck för varje beskrivning. Välj själv bokstäver för signalerna, och ange vad
+de betyder.
+\begin{parts}
+  \item Larmet ska ljuda om dörren är öppen och larmet är aktiverat.
+  \item Pumpen ska gå om nivån i tanken är låg och ingen har tryckt på det manuella stoppet.
+  \item Varningslampan ska lysa om minst en av tre dörrar är öppen.
+  \item Beskriv med ord vad \mbox{\code{X = AB' + C}} betyder, om A är
+    \enquote{maskinen är påslagen}, B är \enquote{skyddet är på plats} och C är
+    \enquote{nödlarmet är utlöst}.
+  \item Beräkna \mbox{\code{AB + C}} och \mbox{\code{A(B + C)}} för A = 0, B = 0 och C = 1. Vad
+    visar resultatet om prioritetsordningen?
+\end{parts}
+
+\exercise{Räknelagarna}{Räkna för hand}
+\label{c2:ex:3}
+Förenkla med lagarna i \secref{c2:a4}, och ange vilken lag du använder.
+\begin{parts}
+  \item \code{A + A}
+  \item \code{A · A'}
+  \item \code{A + 1}
+  \item \code{(A')'}
+  \item \code{A + AB}
+  \item \code{A(A + B)}
+  \item \code{A + A'B}
+  \item \code{AB + A'B}
+\end{parts}
+
+\exercise{De Morgan}{Räkna för hand}
+\label{c2:ex:4}
+\begin{parts}
+  \item Skriv om \code{(AB)'} utan någon inversion av ett helt uttryck.
+  \item Skriv om \mbox{\code{(A + B + C)'}} på samma sätt.
+  \item Förenkla \code{(A'B)'}. Tänk på att \mbox{\code{(A')' = A}}.
+  \item Förenkla \mbox{\code{(A + B')'}}.
+  \item Visa med en sanningstabell att \mbox{\code{(AB)' = A' + B'}}.
+\end{parts}
+
+\exercise{Från sanningstabell till uttryck}{Räkna för hand}
+\label{c2:ex:5}
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{X} \\
+  \midrule
+  0 & 0 & 0 & 1 \\
+  0 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 1 \\
+  0 & 1 & 1 & 0 \\
+  1 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 \\
+  1 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\begin{parts}
+  \item Läs av uttrycket för X på SP-form, med en minterm per etta.
+  \item Förenkla uttrycket algebraiskt. Du ska få två termer med två variabler var.
+  \item Kontrollera ditt förenklade uttryck mot tabellen, rad för rad.
+  \item Hur många grindar behöver det oförenklade respektive det förenklade uttrycket, om du har
+    NOT-grindar och AND- och OR-grindar med så många ingångar du vill?
+\end{parts}
+
+\exercise{Algebraisk förenkling}{Räkna för hand}
+\label{c2:ex:6}
+Förenkla så långt det går, och kontrollera varje svar med en sanningstabell.
+\begin{parts}
+  \item \code{AB + AB' + A'B}
+  \item \code{(A + B)(A + B')}
+  \item \mbox{\code{S'R + SR' + SR}}, som behövdes i härledningen av bromsassistenten i
+    \secref{c2:a10}. Visa att det är \mbox{\code{S + R}}.
+  \item \code{A'B'C + A'BC + ABC}
+\end{parts}
+
+\exercise{Kontroll: analys av ett grindnät}{Kontroll}
+\label{c2:ex:7}
+\emph{Analysera för hand, bygg och simulera, jämför.}
+
+\bookfigure{l02_ex_network}{Grindnätet i övning~\ref{c2:ex:7}.}{c2:fig:ex_network}
+
+\noindent Gör delarna i ordning, och skriv ned varje svar innan du går vidare.
+
+\task{a) För hand}
+Ge NOR-grindens utgång namnet P och AND-grindens utgång namnet Q. Skriv uttrycken för P, Q och X.
+
+\task{b)}
+Räkna fram sanningstabellen med kolumnerna A, B, C, P, Q och X, som i \secref{c2:a8}.
+
+\task{c) I CircuitVerse}
+Bygg nätet precis som det är ritat, och gå igenom alla åtta kombinationerna. Stämmer simuleringen
+med din tabell?
+
+\task{d)}
+Om inte: är det tabellen eller bygget som är fel? Kontrollera den rad som skiljer genom att räkna ut
+P och Q för just den raden en gång till, och genom att följa varje ledning i bygget.
+
+\task{e)}
+Beskriv med en mening när X är \code{1}.
+
+\exercise{Från uttryck till grindnät}{Konstruktion}
+\label{c2:ex:8}
+\begin{parts}
+  \item Rita grindnätet för \mbox{\code{X = A'B + BC'}} med NOT-, AND- och OR-grindar. Hur många
+    grindar går det åt?
+  \item Bryt ut B ur uttrycket, och använd De Morgan på det som blir kvar. Visa att samma funktion
+    går att bygga med en NAND-grind och en AND-grind.
+  \item Rita grindnätet för \mbox{\code{Y = (A + B)C'}}. Hur många grindar går det åt?
+  \item Bygg nätet från b) i CircuitVerse och kontrollera det mot en sanningstabell för
+    \mbox{\code{A'B + BC'}}.
+\end{parts}
+
+\exercise{Allt av NAND}{Konstruktion}
+\label{c2:ex:9}
+\Secref{c2:a5} påstår att varje funktion går att bygga med enbart NAND-grindar. Visa det för de tre
+grundoperationerna.
+\begin{parts}
+  \item Visa algebraiskt att en NAND-grind med båda ingångarna ihopkopplade är en NOT-grind.
+  \item Hur bygger du en AND av NAND-grindar? Hur många behövs?
+  \item Utgå från \mbox{\code{A + B = ((A + B)')'}} och använd De Morgan för att skriva OR med
+    enbart NAND-operationer. Hur många NAND-grindar behövs?
+  \item Bygg alla tre i CircuitVerse med enbart NAND-grindar, och kontrollera var och en mot sin
+    sanningstabell.
+\end{parts}
+
+\exercise{Från uttryck till kontaktnät}{Konstruktion}
+\label{c2:ex:10}
+Rita ett strömvägsschema mellan +24~V och 0~V för varje uttryck, med tryckknappar och lampan H1.
+Ange för varje kontakt om den är slutande eller brytande.
+\begin{parts}
+  \item \code{H1 = S1 · S2'}
+  \item \code{H1 = S1 + S2 · S3}
+  \item \code{H1 = (S1 + S2) · S3'}
+  \item Hur många kontaktelement behöver varje knapp ha i a)--c)? Och hur många i XOR-kopplingen i
+    \secref{c2:b5}?
+\end{parts}
+
+\exercise{Analys av kontaktnät}{Räkna för hand}
+\label{c2:ex:11}
+
+\bookfigure{l02_ex_contact}{Kontaktnäten a) och b) i övning~\ref{c2:ex:11}.}{c2:fig:ex_contact}
+
+\begin{parts}
+  \item Skriv uttrycket för H1 i nät a), och ta fram sanningstabellen för S1, S2 och S3.
+  \item Gör samma sak för H2 i nät b).
+  \item I nät b): vilka kombinationer tänder H2 utan att S1 eller S2 är nedtryckt? Förklara med
+    ritningen varför.
+\end{parts}
+
+\exercise{Självhållning}{Förståelse}
+\label{c2:ex:12}
+Utgå från självhållningskretsen i \secref{c2:b7}, figur~\ref{c2:fig:relay_self_hold}.
+\begin{parts}
+  \item Beskriv vad som händer med spolen K1 och lampan H1 när du trycker på S1, och sedan när du
+    släpper den.
+  \item Beskriv vad som händer när du sedan trycker på S2, och när du släpper den.
+  \item Vad händer om någon trycker på S1 och S2 samtidigt? Vilken av knapparna \enquote{vinner}?
+  \item Vid monteringen kopplas stoppknappen S2 av misstag med sitt slutande kontaktelement i
+    stället för sitt brytande. Beskriv hur maskinen beter sig.
+  \item Förklara varför kretsen inte är ett kombinatoriskt nät. Använd ordet minne.
+\end{parts}
+
+\exercise{Bromsassistenten, felkopplad}{Räkna för hand, Fördjupning}
+\label{c2:ex:13}
+En konstruktör vill spara en grind och kopplar bromsassistenten från \secref{c2:a10} som
+
+\begin{console}
+B = (D + S + R)F'
+\end{console}
+
+\noindent Det är en OR-grind med tre ingångar följd av en AND med den inverterade felsignalen, och
+det ser rimligt ut.
+\begin{parts}
+  \item Ta fram sanningstabellen för det nya uttrycket, och jämför den rad för rad med tabellen i
+    \secref{c2:a10}. På vilka rader skiljer de sig?
+  \item Vad har de raderna gemensamt? Beskriv vad som händer fysiskt i bilen i en sådan situation.
+  \item Vad säger det här om värdet av en sanningstabell som är härledd ur kravet, jämfört med en
+    som är avläst ur en krets man redan har byggt?
+\end{parts}

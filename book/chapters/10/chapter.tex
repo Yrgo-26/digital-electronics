@@ -1,0 +1,53 @@
+% Chapter 10, typeset from lectures/L10: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix E, the
+% solutions, is in back/answers/c10.tex. The lab guide the chapter goes with is bilaga
+% \ref{app:lab3}; its parts are linked with \hyperref, so the text reads "del 21" whatever the
+% label prints. The two predictions from the lecture plan are kept in the opening paragraphs; the
+% README's note that part 21 of the lab is required for a pass is course administration and is left
+% out.
+
+\chapter{Inporten, subrutiner och stacken}
+\label{c10:ch}
+
+{\large\itshape Hur ett program läser en knapp, räknar med tal större än 255 och gör samma sak från
+flera ställen.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Tecken är tal: ASCII-koder, och hur en byte blir två tecken med \code{swap} och
+    \code{andi}.
+  \item Tal större än 255: registerpar, \code{add}/\code{adc}, \code{sub}/\code{sbc},
+    \code{adiw}, \code{sbiw} och \code{movw}.
+  \item En lång tidsfördröjning, exakt en sekund, med en 16-bitars loop.
+  \item Inporten: \code{DDRD}, pull-up-motståndet och \code{PIND}, och varför en nedtryckt knapp
+    läses som noll.
+  \item Att testa en enda bit med \code{sbic} och \code{sbis}, och att vänta på en knapp.
+  \item Subrutiner: \code{rcall}, \code{ret} och returadressen på stacken.
+  \item Stacken som lagringsplats: \code{push}, \code{pop}, och kursens regel om att spara det man
+    ändrar.
+  \item \textbf{Labb~3}, del 18--23 (bilaga~\ref{app:lab3}).
+\end{itemize}
+\end{chapterbox}
+
+Hittills har programmen bara skrivit till en port, räknat med tal som ryms i en byte och gått
+rakt igenom sin kod, med loopar och villkorliga hopp. Det här kapitlet ger dem tre saker till: de
+kan göra om tal till text, räkna med 16 bitar och vänta i en hel sekund, de kan läsa en knapp på
+inporten, och de kan dela upp sig i subrutiner som anropas från flera ställen, med stacken som
+håller reda på vart de ska återvända.
+
+Kapitlet förutsätter att du har gjort Labb~3 till och med \hyperref[lab3:d17]{del~17}, och det
+använder looparna och de villkorliga hoppen från kapitel~\ref{c9:ch} hela tiden. Repetera ASCII i
+\secref{c1:b4} och utporten i \secref{c8:app:c} om det behövs. Läs sedan \secref{c10:app:a} och
+\secref{c10:app:b} innan du börjar på \hyperref[lab3:d18]{del~18--23} i Labb~3, och
+\secref{c10:app:c}, om subrutiner och stacken, innan \hyperref[lab3:d22]{del~22}. Övningarna i
+\secref{c10:sec:exercises} kontrollerar du mot bilaga~\ref{app:answers}.
+
+Gör två förutsägelser innan du kör exempelprogrammen i simulatorn: vilken text byten \code{0x3C}
+blir, och vilken byte varje tecken är; och vad \code{SP} är mitt i \code{delay_ms}, när
+returadressen och tre register ligger på stacken. Stega sedan och jämför.
+
+\input{chapters/10/ascii}
+\input{chapters/10/input}
+\input{chapters/10/stack}
+\input{chapters/10/summary}
+\input{chapters/10/exercises}

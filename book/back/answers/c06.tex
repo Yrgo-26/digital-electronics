@@ -1,0 +1,227 @@
+% Solutions to Chapter 6's exercises, from lectures/L06/appendix/d_solutions.md. None of the
+% exercises is a program, so every one is answered.
+%
+% One correction to the source: 6.6 d) said that the bit lost when a register is counted up past
+% 255 lands in the carry flag. That is true of an addition, but inc, which is how a register is
+% counted up one step, leaves the carry flag alone (chapter 8). The source is corrected to match.
+
+\answerchapter{c6:ch}
+
+\answer{c6:ex:1}{Kombinatoriskt eller sekventiellt?}
+\pt{a}\textbf{Kombinatoriskt.} Larmet beror bara på vad givarna visar just nu.
+
+\pt{b}\textbf{Sekventiellt.} Med båda knapparna släppta kan reläet vara draget eller inte,
+beroende på vilken knapp som trycktes sist. Kretsen minns.
+
+\pt{c}\textbf{Kombinatoriskt.} Samma siffra in ger alltid samma segment tända.
+
+\pt{d}\textbf{Sekventiellt.} Vilken färg som tänds härnäst beror på vilken som lyser nu.
+Trafikljuset måste minnas sitt tillstånd.
+
+\pt{e}\textbf{Sekventiellt.} Siffran 1 öppnar bara om 3 och 7 kom före. Låset måste minnas hur
+långt i koden det har kommit.
+
+\pt{f}\textbf{Kombinatoriskt.} Bromsbeslutet beror bara på de fyra ingångarna i det ögonblicket.
+
+\medskip\noindent Frågan att ställa är alltid: \textbf{kan samma ingångar ge olika utgång?} Om ja,
+finns ett minne.
+
+\answer{c6:ex:2}{SR-låset}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}ccccl@{}}
+  \thead{Steg} & \thead{S} & \thead{R} & \thead{Q} & \thead{Varför} \\
+  \midrule
+  start & 0 & 0 & 0 & givet \\
+  1 & 1 & 0 & 1 & ettställ \\
+  2 & 0 & 0 & 1 & minns \\
+  3 & 0 & 0 & 1 & minns \\
+  4 & 0 & 1 & 0 & nollställ \\
+  5 & 0 & 0 & 0 & minns \\
+  6 & 1 & 0 & 1 & ettställ \\
+  7 & 0 & 0 & 1 & minns \\
+\end{narrowtable}
+
+\pt{b}Nej: steg 2, 3 och 7 har \code{Q = 1} och steg 5 har \code{Q = 0}, trots samma ingångar.
+Utgången beror på vad som hände tidigare, och det är definitionen av ett sekvensnät. Ingen
+sanningstabell med bara \code{S} och \code{R} som ingångar kan beskriva låset; tabellen måste också
+ha med det tidigare \code{Q}.
+
+\pt{c}Med \code{S = R = 1} har båda NOR-grindarna en etta på en ingång, så båda utgångarna blir 0.
+\code{Q} och \code{Q'} är då inte längre varandras invers. Värre är vad som händer när båda släpps
+samtidigt: båda grindarna ser då två nollor och vill bli 1, och den grind som hinner först vinner.
+Resultatet går inte att förutsäga. En kombination som ger ett oförutsägbart minne är värdelös,
+därför är den förbjuden.
+
+\answer{c6:ex:3}{Lås och vippa}
+
+\bookfigure{l06_sol_timing}{Klockan, \code{D} och utgångarna för lås och
+vippa.}{c6:fig:sol_timing}
+
+\pt{a}Låset följer \code{D} medan klockan är hög (de skuggade fönstren) och håller medan den är
+låg: det blir 1 vid den första flanken, eftersom \code{D} redan är 1 då; 0 vid den andra, eftersom
+\code{D} då är 0; 1 och sedan 0 igen under den korta pulsen, som kommer medan klockan fortfarande
+är hög; oförändrat 0 genom det tredje fönstret; 1 vid den fjärde flanken, och kvar på 1.
+
+\pt{b}Vippan läser \code{D} vid varje stigande flank: 1, 0, 0, 1, 1. Den enda skillnaden mot låset
+är pulsen efter den andra flanken.
+
+\pt{c}Pulsen kommer medan klockan är \textbf{hög}, strax efter den andra flanken. Då är låset
+genomsläppligt, och pulsen går rakt igenom till låsets \code{Q}. Vippan ser den inte: den läste
+\code{D} vid den andra flanken, innan pulsen kom, och läser nästa gång vid den tredje, när pulsen
+redan är över. Hade pulsen kommit medan klockan var låg hade inte heller låset släppt igenom den.
+Det är skillnaden mellan nivåkänsligt och flanktriggat, i ett enda exempel.
+
+\ptnote{Vanligt fel}Att låta låset ändra sig bara vid flankerna, som vippan. Låset ändrar sig när
+som helst medan klockan är hög, inte bara i början av det fönstret.
+
+\answer{c6:ex:4}{Kontroll: bygg ett SR-lås}
+\pt{a) och c}Tabellen från övning~\ref{c6:ex:2} ska stämma steg för steg. \code{Q'} ska vara
+inversen av \code{Q} i varje steg, eftersom \code{S = R = 1} aldrig förekommer i följden. Om ett
+steg skiljer sig är den vanligaste orsaken en felkopplad återkoppling: \code{Q} ska gå till den
+\textbf{andra} grindens ingång, inte tillbaka till sin egen.
+
+\pt{d}Innan någon ingång ändrats finns inget \enquote{rätt} värde. Kretsen har två stabila lägen,
+\code{Q = 0} och \code{Q = 1}, och vilket den hamnar i beror på i vilken ordning simulatorn räknar
+ut grindarna. En riktig krets hamnar på samma sätt i ett okänt läge när strömmen slås på, beroende
+på små skillnader mellan transistorerna. Därför behöver varje verkligt system en \textbf{reset}: ett
+sätt att ställa alla minnen i ett känt läge vid start. En mikrokontroller har en resetingång av
+just det skälet.
+
+\pt{e}Med \code{S = R = 1} blir både \code{Q} och \code{Q'} 0. När båda släpps samtidigt ser båda
+grindarna två nollor, och i en simulator som räknar båda grindarna i samma steg kan de börja
+\textbf{svänga}: båda blir 1, sedan båda 0, och så vidare. Andra gånger lägger sig kretsen i ett av
+lägena. Båda utfallen bekräftar \secref{c6:a3}: kombinationen ger inget förutsägbart minne.
+
+\answer{c6:ex:5}{Klockan}
+\pt{a}\leavevmode
+\[
+  T = \frac{1}{16\,000\,000\ \text{Hz}} = 62{,}5\ \text{ns}
+\]
+
+\pt{b}16\,000\,000 cykler per sekund, alltså \textbf{16\,000 cykler per millisekund}.
+
+\pt{c}1000 · 62,5~ns = 62\,500~ns = \textbf{62,5~µs}.
+
+\pt{d}Halva frekvensen ger dubbla cykeltiden, 125~ns, och \textbf{125~µs}.
+
+\answer{c6:ex:6}{Räknare}
+\pt{a}En 3-bitars räknare börjar om efter 8 steg. 11 = 8 + 3, så den står på 3,
+\textbf{\code{011}}.
+
+\pt{b}999 kräver \textbf{10 bitar}: $2^9 = 512$ räcker inte, $2^{10} = 1024$ gör det. Tio vippor.
+
+\pt{c}Varje bit har halva frekvensen av biten före: \code{Q0} 8~Hz, \code{Q1} 4~Hz, \code{Q2} 2~Hz
+och \textbf{\code{Q3} 1~Hz}. \code{Q3} är en fyrkantvåg som är hög en halv sekund och låg en halv
+sekund.
+
+\pt{d}Det står på \textbf{0}. 255 är \code{1111 1111}, och ett till ger \code{1 0000 0000}, men den
+nionde biten finns inte i ett 8-bitars register. Den tappas bort, och kvar blir \code{0000 0000}.
+Det kallas rundgång. När mikrodatorn adderar hamnar den bortfallna biten i carry-flaggan, men inte
+när den räknar upp med \code{inc}: \code{inc} lämnar carry-flaggan orörd (\secref{c8:a3}).
+
+\answer{c6:ex:7}{Skiftregister}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}cccccc@{}}
+  \thead{Efter flank} & \thead{in} & \thead{Q0} & \thead{Q1} & \thead{Q2} & \thead{Q3} \\
+  \midrule
+  start & & 0 & 0 & 0 & 0 \\
+  1 & 1 & 1 & 0 & 0 & 0 \\
+  2 & 1 & 1 & 1 & 0 & 0 \\
+  3 & 0 & 0 & 1 & 1 & 0 \\
+  4 & 1 & 1 & 0 & 1 & 1 \\
+\end{narrowtable}
+
+\pt{b}Före: \code{Q3 Q2 Q1 Q0 = 0011}. Vid flanken tar varje vippa värdet från vippan före, och
+\code{Q0} får \code{in = 0}: \code{Q0 = 0}, \code{Q1 = 1}, \code{Q2 = 1}, \code{Q3 = 0}. Registret
+innehåller \textbf{\code{0110}, talet 6}. Ett steg mot de mer signifikanta bitarna är
+\textbf{multiplikation med 2}, precis som att lägga till en nolla sist i ett decimalt tal
+multiplicerar med 10. Mikrodatorns instruktion \code{lsl} gör just det (kapitel~\ref{c8:ch}).
+
+\answer{c6:ex:8}{Blockschemat}
+\pt{a}Programräknaren, PC.
+\pt{b}ALU:n.
+\pt{c}Programminnet (flash).
+\pt{d}Statusregistret, SREG, med noll-flaggan.
+\pt{e}Styrenheten.
+\pt{f}En utport, till exempel PORTB.
+\pt{g}Dataminnet (SRAM).
+\pt{h}Klockan.
+
+\answer{c6:ex:9}{Instruktionscykeln}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}cclcccc@{}}
+  \thead{Steg} & \thead{PC före} & \thead{Instruktion} & \thead{Händer} & \thead{r16} &
+    \thead{r17} & \thead{PC efter} \\
+  \midrule
+  1 & 0 & \code{ldi r16, 10} & r16 = 10 & 10 & ? & 1 \\
+  2 & 1 & \code{ldi r17, 20} & r17 = 20 & 10 & 20 & 2 \\
+  3 & 2 & \code{add r16, r17} & r16 = 10 + 20 & 30 & 20 & 3 \\
+  4 & 3 & \code{rjmp 3} & PC = 3 & 30 & 20 & 3 \\
+  5 & 3 & \code{rjmp 3} & PC = 3 & 30 & 20 & 3 \\
+  6 & 3 & \code{rjmp 3} & PC = 3 & 30 & 20 & 3 \\
+\end{narrowtable}
+
+\noindent\code{r17} har inget känt värde före steg 2; programmet har inte skrivit något där än.
+
+\pt{b}Programmet hoppar till sig självt, om och om igen, så länge strömmen är på. En mikrokontroller
+har inget operativsystem att återvända till när programmet är slut. Utan hoppet skulle PC fortsätta
+till adress 4, 5, 6 och vidare, och CPU:n skulle utföra det som råkar ligga i flashminnet där, som
+inte är ett program. En oändlig loop är hur ett program för en mikrokontroller slutar.
+
+\answer{c6:ex:10}{Tre minnen}
+\pt{a}Programmet i \textbf{flashminnet}. Knapptryckningsräknaren i \textbf{SRAM}.
+Kalibreringsvärdet i \textbf{EEPROM}, som bevaras utan ström och kan skrivas en byte i taget.
+
+\pt{b}Flash och EEPROM lagrar laddning på ett sätt som finns kvar utan matning. SRAM är i princip
+lås (\secref{c6:a4}), och ett lås minns bara så länge dess grindar har ström: när matningen
+försvinner försvinner återkopplingen, och därmed minnet.
+
+\pt{c}Programminnet och dataminnet är \textbf{separata minnen med var sin buss}. CPU:n kan därför
+hämta nästa instruktion samtidigt som den läser eller skriver data, och ett tal i programminnet nås
+med andra instruktioner än ett tal i dataminnet.
+
+\answer{c6:ex:11}{Bussar och minnesstorlek}
+\pt{a}$2048 = 2^{11}$, så \textbf{11 adressbitar}.
+
+\pt{b}32~kB = 32\,768 byte, och med 2 byte per instruktion blir det \textbf{16\,384
+instruktioner}. $16\,384 = 2^{14}$, så programräknaren behöver \textbf{14 bitar}. (Några få
+AVR-instruktioner är dubbelt så långa, 32 bitar, och tar två platser; det ändrar inte hur många
+platser som finns.)
+
+\pt{c}$2^8 =$ \textbf{256} olika värden, 0--255.
+
+\answer{c6:ex:12}{Självhållning och SR-lås}
+\pt{a}Startknappen \code{S1} ettställer, som \textbf{S}. Stoppknappen \code{S2} nollställer, som
+\textbf{R}.
+
+\pt{b}I reläkretsen sitter \code{S2} i serie med allt annat i spolens strömväg. När den trycks
+bryts strömmen, vad \code{S1} än gör: \textbf{stopp vinner}. Kretsen kallas därför
+\textbf{frånslagsdominerande}. I NOR-låset ger \code{S = R = 1} i stället två nollor på utgångarna
+och ett oförutsägbart läge efteråt. Reläkretsen har alltså ingen förbjuden kombination: den har en
+regel för vem som vinner, och regeln är vald för säkerhetens skull.
+
+\pt{c}Låt \code{S1} gå förbi \code{S2}: koppla \code{S1} direkt från +24~V till spolen,
+parallellt med seriekopplingen av \code{S2} och \code{K1}:s kontakt. Då drar \code{S1} alltid
+reläet, även när \code{S2} är nedtryckt, och när \code{S1} släpps håller självhållningen genom
+\code{K1} bara om \code{S2} inte är nedtryckt.
+
+\begin{textdrawing}
+            +24 V
+       ┌──────┴──────┐
+       │             │
+   S2 (NC)       S1 (NO)
+       │             │
+   K1 (NO)           │
+       └──────┬──────┘
+         spole K1
+              │
+             0 V
+\end{textdrawing}
+
+\noindent Den varianten är ovanlig för maskiner, eftersom \textbf{stopp ska alltid vinna}: den som
+trycker på stopp ska kunna lita på att maskinen stannar, även om någon annan samtidigt håller in
+start eller en startknapp har fastnat. Nödstopp kopplas därför alltid så att de bryter, och de
+bryter allt.

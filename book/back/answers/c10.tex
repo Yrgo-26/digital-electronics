@@ -1,0 +1,280 @@
+% Solutions to Chapter 10's exercises, from lectures/L10/appendix/e_solutions.md.
+%
+% Exercises 9 and 13 are programs: the programs themselves (9 b, 13 b) are left out, and what is
+% worked on paper is kept: the flow chart in words, the table of test results and the
+% explanations; the note on why 13 b) does the low nibble first follows 13 a). Exercise 3 c) keeps
+% its four lines of assembly, since they are the answer asked for.
+%
+% One correction, made in the lecture too: 8 b) said that PB6 and PB7 are "kristallens stift", but
+% the Uno clocks the ATmega328P with a ceramic resonator (section 11.1.7); it now says, as section
+% 11.1.5 does, that the two pins are used by the clock.
+
+\answerchapter{c10:ch}
+
+Varje antal cykler här är uppmätt i simulatorn, inte bara uträknat.
+
+\answer{c10:ex:1}{Tecken och koder}
+\pt{a}\code{'5'} = \code{0x35}, \code{'9'} = \code{0x39}, \code{'E'} = \code{0x45}, \code{'F'} =
+\code{0x46}.
+
+\pt{b}\code{0x38 - 0x30 = 0x08}, alltså 8. Det är skälet till att \code{subi r16, 0x30} gör om ett
+siffertecken till sitt värde.
+
+\pt{c}Siffrorna \code{'0'}--\code{'9'} ligger direkt efter varandra från \code{0x30}, men mellan
+\code{'9'} (\code{0x39}) och \code{'A'} (\code{0x41}) ligger sju andra tecken, och de måste hoppas
+över.
+
+\pt{d}För läsbarheten. \code{'E'} säger att konstanten är tänkt som ett tecken; \code{0x45} säger
+bara att den är ett tal. Maskinen ser ingen skillnad, men den som läser programmet gör det.
+
+\answer{c10:ex:2}{En byte blir text}
+\pt{a}Den höga nibblen av \code{0x9E}:
+
+\begin{booktable}{@{}llL@{}}
+  \thead{Instruktion} & \thead{\code{r24}} & \thead{Kommentar} \\
+  \midrule
+  \code{mov r24, r16} & \code{0x9E} & \\
+  \code{swap r24} & \code{0xE9} & halvorna byter plats \\
+  \code{andi r24, 0x0F} & \code{0x09} & den höga nibblen \\
+  \code{cpi r24, 10} & \code{0x09} & 9 < 10, så \code{brlo} hoppar över \code{subi r24, -7} \\
+  \code{subi r24, -0x30} & \code{0x39} & \\
+\end{booktable}
+
+\noindent\code{r20} = \code{0x39} = \code{'9'}.
+
+\pt{b}Den låga nibblen: \code{mov} ger \code{0x9E}, \code{andi} ger \code{0x0E}. 14 är inte mindre
+än 10, så \code{brlo} hoppar inte, och \code{subi r24, -7} ger \code{0x15}. Sista \code{subi} ger
+\code{0x45}. \code{r21} = \code{0x45} = \code{'E'}.
+
+\pt{c}\code{0x39} på adress \code{0x0100} och \code{0x45} på \code{0x0101}: texten \code{9E}.
+
+\pt{d}För \code{0x5A}: den höga nibblen blir \code{0x05}, som är mindre än 10, och blir
+\code{0x35} = \code{'5'}. Den låga blir \code{0x0A}, som inte är mindre än 10:
+\code{0x0A + 7 = 0x11}, och \code{0x11 + 0x30 = 0x41} = \code{'A'}. Texten blir \code{5A}.
+
+\answer{c10:ex:3}{Från tecken till värde}
+\pt{a}\code{0x42 - 0x30 = 0x12} = 18. 18 är inte mindre än 10, så koden subtraherar 7 till:
+\code{r22} = 11 = \code{0x0B}. Rätt: B är 11.
+
+\pt{b}\code{0x34 - 0x30 = 4}. 4 är mindre än 10, och koden är klar: \code{r22} = 4.
+
+\pt{c}\code{0x62 - 0x30 = 0x32} = 50, och \code{50 - 7 = 43} = \code{0x2B}. Det är inget värde
+0--15 alls; koden förutsätter stora bokstäver. En liten bokstav har en kod som är \code{0x20} högre
+än motsvarande stora: \code{'a'} = \code{0x61} och \code{'A'} = \code{0x41}. Gör om små bokstäver
+till stora först:
+
+\needspace{6\baselineskip}
+\begin{asmcode}
+    cpi r22, 'a'                    ; A lowercase letter?
+    brlo not_lower
+    subi r22, 0x20                  ; 'a'-'f' -> 'A'-'F'.
+not_lower:
+\end{asmcode}
+
+\noindent Det frestande alternativet, att nollställa bit~5 med \code{andi r22, 0xDF}, fungerar för
+bokstäverna men förstör siffrorna: \code{'0'} = \code{0x30} har också bit~5 satt, och skulle bli
+\code{0x10}.
+
+\answer{c10:ex:4}{Registerpar}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}rccc@{}}
+  \thead{Tal} & \thead{Hexadecimalt} & \thead{\code{high()}} & \thead{\code{low()}} \\
+  \midrule
+  2500 & \code{0x09C4} & \code{0x09} & \code{0xC4} \\
+  256 & \code{0x0100} & \code{0x01} & \code{0x00} \\
+  255 & \code{0x00FF} & \code{0x00} & \code{0xFF} \\
+  40\,000 & \code{0x9C40} & \code{0x9C} & \code{0x40} \\
+\end{narrowtable}
+
+\noindent Uträkningen för 2500: \code{2500 / 256 = 9} med resten \code{196}, och
+\code{196 = 0xC4}. För 40\,000: \mbox{\code{40 000 / 256 = 156}} med resten \code{64}, och
+\code{156 = 0x9C}, \code{64 = 0x40}.
+
+Lägg märke till 255 och 256: talen skiljer sig med ett, men bytena är helt olika. 255 är den
+största låga byten, och 256 är den första ettan i den höga.
+
+\pt{b}\code{0x12 · 256 + 0x34 = 18 · 256 + 52 = 4608 + 52 = 4660}.
+
+\pt{c}\code{0xFFFF} = 65\,535 = \code{2^16 - 1}. Sexton bitar ger \code{2^16} = 65\,536 olika
+värden, och det första är 0.
+
+\answer{c10:ex:5}{Addition och subtraktion med 16 bitar}
+\needspace{12\baselineskip}
+\pt{a}\leavevmode
+
+\begin{textdrawing}
+                 r25    r24
+                0x12   0xF0      4848
+             +  0x0A   0x20      2592
+             ---------------
+  add r24:             0x110  -> r24 = 0x10, C = 1
+  adc r25:     0x12 + 0x0A + 1 = 0x1D
+             ---------------
+                0x1D   0x10      7440
+\end{textdrawing}
+
+\noindent Kontroll decimalt: \code{0x12F0 = 18 · 256 + 240 = 4848},
+\code{0x0A20 = 10 · 256 + 32 = 2592}, och \code{4848 + 2592 = 7440}. Resultatet
+\code{0x1D10 = 29 · 256 + 16 = 7440}. Det stämmer.
+
+\pt{b}\code{add} tar inte med minnessiffran: \code{0x12 + 0x0A = 0x1C}, och svaret blir
+\code{0x1C10} = 7184. Det är 256 för lite, precis värdet av den minnessiffra som tappades.
+
+\pt{c}\code{sub r20, r22}: \code{0x00 - 0x01} går inte utan att låna, så \code{r20} = \code{0xFF}
+och \code{C} = 1. \code{sbc r21, r23}: \code{0x01 - 0x00 - 1 = 0x00}, så \code{r21} =
+\code{0x00}. Resultatet är \code{0x00FF} = 255, som det ska.
+
+\pt{d}\code{sbiw} fungerar bara på paren \code{r25:r24}, \code{r27:r26}, \code{r29:r28} och
+\code{r31:r30} (\secref{c10:a8}), och assemblern godtar inte \code{r20}. Med talet i
+\code{r25:r24} hade \code{sbiw r24, 1} fungerat.
+
+\answer{c10:ex:6}{En fördröjning på 10 ms}
+\pt{a}\mbox{\code{0,010 s · 16 000 000 cykler/s = 160 000 cykler}}.
+
+\pt{b}De två \code{ldi} tar 2 cykler och loopen \code{4N - 1}, totalt \code{4N + 1}.
+\mbox{\code{4N + 1 = 160 000}} ger \mbox{\code{N = 39 999,75}}, som inte är ett heltal.
+\mbox{\code{N = 40 000}} ger \mbox{\code{160 001}} cykler, en cykel för mycket, och
+\mbox{\code{N = 39 999}} ger \mbox{\code{159 997}}, tre för lite. \textbf{\mbox{\code{N = 40 000}},
+160\,001 cykler}, vilket också är vad simulatorn mäter.
+
+\pt{c}\code{r24} = 10, och anropet tar \mbox{\code{16 000 · 10 + 18 = 160 018}} cykler
+(\secref{c10:c4}).
+
+\pt{d}Loopen är närmast: en cykel, 62,5~ns, fel, mot 18 cykler, drygt 1~µs, för subrutinen. Men
+båda felen är långt under vad något i ett styrsystem märker. Välj ändå subrutinen: den skrivs en
+gång, tar tiden som parameter, och lämnar alla register som den fann dem. Loopen måste skrivas av
+på varje ställe den behövs, och förstör \code{r25:r24} där.
+
+\answer{c10:ex:7}{Knappen som läses baklänges}
+\pt{a}När knappen är nedtryckt är stiftet direkt förbundet med jord, 0~V. Pull-up-motståndet på
+20--50~kΩ ligger mellan 5~V och stiftet, och hela spänningen hamnar över motståndet, med en mycket
+liten ström. Stiftet ligger på 0~V och läses som 0.
+
+\pt{b}Utan pull-up är stiftet \textbf{flytande} när knappen är släppt: ingenting bestämmer dess
+nivå. Programmet läser 0 eller 1 beroende på brus, luftfuktighet och var händerna är. Felet är
+svårt att hitta eftersom programmet ofta \emph{verkar} fungera en stund, och slutar fungera när man
+tar i kortet eller flyttar det.
+
+\pt{c}En nedtryckt knapp läses som 0, men en lysdiod tänds av en etta. \code{com} vänder på varje
+bit. Utan \code{com} hade alla lysdioder lyst när ingen knapp var nedtryckt, och en lysdiod hade
+slocknat när dess knapp trycktes.
+
+\answer{c10:ex:8}{Följ programmet}
+\pt{a}Bit~2 är 0, så knappen på PD2 är nedtryckt. \code{com} ger \code{0b00000100}, och lysdioden
+på PB2 lyser: \code{PORTB} = \code{0b00000100}.
+
+\pt{b}Med \code{andi r16, 0xF0} behålls bara bit 4--7. För \code{0b11111011} blir det
+\code{0b00000100 AND 0xF0} = \code{0b00000000}: ingenting lyser, trots att en knapp är nedtryckt,
+eftersom den ligger i den bortmaskade halvan.
+
+För \code{0b01101111}: \code{com} ger \code{0b10010000}, och masken ändrar ingenting.
+\code{PORTB} = \code{0b10010000}, så PB7 och PB4 lyser. PB7 syns i simulatorn men inte på
+Arduino-kortet, där PB6 och PB7 används av klockan.
+
+\pt{c}\code{in} 1, \code{com} 1, \code{out} 1 och \code{rjmp} 2: 5 cykler per varv.
+\mbox{\code{16 000 000 / 5 = 3 200 000}} läsningar per sekund.
+
+\answer{c10:ex:9}{Start och stopp med självhållning}
+\pt{a}Flödesplanen, i ord:
+\begin{enumerate}
+  \item Start. Gör PB0 till utgång, och slå på pull-uparna på PD2 och PD3.
+  \item Är stoppknappen nedtryckt? \textbf{Ja:} släck PB0 och gå till 2. \textbf{Nej:} fortsätt.
+  \item Är startknappen nedtryckt? \textbf{Ja:} tänd PB0. \textbf{Nej:} gör ingenting.
+  \item Gå till 2.
+\end{enumerate}
+Frågan om stopp ställs \textbf{först}, så att stopp vinner när båda är nedtryckta.
+
+\pt{c}Uppmätt i simulatorn:
+
+\begin{narrowtable}{@{}lc@{}}
+  \thead{Händelse} & \thead{\code{PORTB} bit~0} \\
+  \midrule
+  Ingen knapp & 0 \\
+  Start trycks och släpps & 1, och förblir 1 \\
+  Stopp trycks & 0 \\
+  Båda nedtryckta & 0 \\
+\end{narrowtable}
+
+\pt{d}Minnet är utgångsregistret \code{PORTB} självt. När ingen knapp är nedtryckt gör programmet
+ingenting med PB0, och biten behåller det värde den senast fick. Det motsvarar reläets
+självhållningskontakt: den håller kvar tillståndet tills något aktivt ändrar det. Det är samma idé
+som vippan i kapitel~\ref{c6:ch}, ett minne som ändras bara när det tillåts.
+
+\answer{c10:ex:10}{\code{rcall}, \code{ret} och stacken}
+\pt{a}Först läggs returadressen, adressen till instruktionen efter \code{rcall}, på stacken, och
+\code{SP} flyttas två steg nedåt. Sedan hoppar programmet till subrutinen.
+
+\pt{b}Returadressen måste finnas kvar tills subrutinen är klar, hur många register subrutinen än
+använder och hur många anrop den själv gör. Ett fast register hade skrivits över av nästa anrop i
+en subrutin som anropar en annan. Stacken ger varje pågående anrop en egen plats, och den växer och
+krymper med anropen.
+
+\pt{c}\code{0x08FD} i subrutinen, eftersom två byte har lagts dit. \code{0x08FF} igen efter
+\code{ret}.
+
+\pt{d}Allt som ligger under \code{SP} räknas som ledigt. Ingen läser det, och nästa \code{rcall}
+eller \code{push} skriver över det.
+
+\answer{c10:ex:11}{Kontroll: förutsäg stacken}
+\pt{a}\code{rcall} ligger på \code{0x0007}, så returadressen är \code{0x0008}. \code{rcall} skriver
+den låga byten först, på \code{0x08FF}, och den höga på \code{0x08FE}. Därefter lägger
+\code{push r16} värdet \code{0xA5} på \code{0x08FD}, och \code{push r17} värdet \code{0x3C} på
+\code{0x08FC}.
+
+\begin{narrowtable}{@{}ccl@{}}
+  \thead{Adress} & \thead{Byte} & \thead{Vad det är} \\
+  \midrule
+  \code{0x08FF} & \code{0x08} & returadressens låga byte \\
+  \code{0x08FE} & \code{0x00} & returadressens höga byte \\
+  \code{0x08FD} & \code{0xA5} & \code{r16} \\
+  \code{0x08FC} & \code{0x3C} & \code{r17} \\
+\end{narrowtable}
+
+\noindent Fyra byte är upptagna, och \code{SP} = \code{0x08FF - 4} = \textbf{\code{0x08FB}}.
+
+\pt{b}Simulatorn visar \code{SP} = \code{0x08FB}, och i fönstret Memory står, från adress
+\code{0x08FC} och uppåt, bytena \code{3C A5 00 08}: precis tabellen ovan, läst nedifrån och upp.
+
+\pt{c}De två vanligaste avvikelserna:
+\begin{itemize}
+  \item \textbf{Returadressen i fel ordning}, \code{0x00} på \code{0x08FF} och \code{0x08} på
+    \code{0x08FE}. Den låga byten läggs dit först och hamnar därför på den högre adressen; stacken
+    växer nedåt.
+  \item \textbf{\code{SP} en byte fel}, \code{0x08FC}. \code{SP} pekar på den första
+    \textbf{lediga} byten, inte på den senast använda. Den senast använda är \code{0x08FC}, och den
+    första lediga är en under.
+\end{itemize}
+
+\pt{d}Efter \code{pop r17}, \code{pop r16} och \code{ret} är \code{SP} tillbaka på \code{0x08FF}.
+Inget av de fyra bytena har ändrats: \code{pop} och \code{ret} läser och flyttar \code{SP}, men
+raderar ingenting. \code{r16} och \code{r17} har sina gamla värden, \code{0xA5} och \code{0x3C}.
+
+\answer{c10:ex:12}{Hitta felet}
+\pt{a}Registren hämtas i samma ordning som de lades dit, i stället för i omvänd ordning.
+\code{pop r16} får det som lades dit sist, \code{r17}:s värde, och tvärtom. Subrutinen återvänder
+rätt, men programmet som anropar den finner \code{r16} och \code{r17} med bytta värden. Felet märks
+först långt senare, som ett konstigt resultat, och ser inte alls ut att ha med subrutinen att göra.
+
+\pt{b}En byte, \code{r16}:s sparade värde, ligger kvar ovanpå returadressen. \code{ret} läser den
+som en del av adressen och hoppar någonstans där ingen har bestämt att programmet ska vara.
+Därifrån kör processorn vad som helst som råkar ligga i programminnet, ofta tomt flashminne, tills
+den kommer runt till adress 0 och börjar om. Det märks direkt, men felet syns inte på raden där det
+sitter.
+
+\pt{c}Läs \code{SP} i Processor Status när programmet står på \code{rcall}, och igen när det står
+på instruktionen efter. Är värdena olika, lämnar subrutinen stacken i ett annat skick än den fann
+den.
+
+\answer{c10:ex:13}{Hela byten som text}
+\pt{a}\code{r24} och \code{r25} får svaren och behöver inte sparas: det står i kommentaren att de
+är subrutinens resultat. Subrutinen behöver också ett register för att spara byten under tiden,
+här \code{r16}, och det måste sparas med \code{push} och \code{pop}.
+
+Den låga nibblen görs först, eftersom \code{nibble_to_ascii} lämnar sitt svar i \code{r24}, och
+det är där den höga nibblens tecken ska hamna till sist.
+
+\pt{c}I simulatorn står \code{42 37} på adress \code{0x0100}, och fönstret visar \code{B7}. Stacken
+är som djupast inne i \code{nibble_to_ascii}: två byte returadress till huvudprogrammet, en byte
+för \code{r16} och två byte returadress till \code{byte_to_ascii}, fem byte. \code{SP} är då
+\code{0x08FA}.

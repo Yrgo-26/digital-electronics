@@ -1,0 +1,48 @@
+% Section 7.4, from lectures/L07/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\section{Sammanfattning}
+\label{c7:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Beskriva ATmega328P:s delar, register, statusregister, programräknare och minnen, och
+    koppla dem till mikrodatorns blockschema.
+  \item Säga vilka register \code{ldi} kan ladda, och förklara varför utifrån instruktionens
+    kodning.
+  \item Förklara skillnaden mellan programminnet och dataminnet.
+  \item Läsa en rad assembler och peka ut etikett, instruktion, operander och kommentar.
+  \item Skriva samma tal decimalt, binärt och hexadecimalt i ett program.
+  \item Skapa ett projekt i Microchip Studio, bygga det, rätta felen, och stega programmet i
+    simulatorn.
+  \item Förutsäga registrens värden efter varje instruktion i ett kort program, och kontrollera
+    förutsägelsen i simulatorn.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför kan \code{ldi} ladda \code{r16} men inte \code{r15}? Hur löser du det om du ändå
+    behöver en konstant i \code{r5}?
+  \item Den gula pilen i simulatorn står på \code{inc r18}. Har \code{inc r18} körts?
+  \item Vad händer om du tar bort raden \code{rjmp end} sist i programmet?
+  \item \code{ldi r16, 200}, \code{ldi r16, 0b11001000} och \code{ldi r16, 0xC8}: vad skiljer
+    maskinkoden åt?
+  \item Vad är skillnaden mellan en instruktion och ett direktiv? Blir \code{.def counter = r16}
+    någon maskinkod?
+  \item Ett program assembleras utan fel men ger fel resultat. Vad säger det om vad assemblern
+    kontrollerar?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c8:ch} handlar om aritmetik, flaggor och logik i registren:
+\begin{itemize}
+  \item Addition och subtraktion i registren, och vad som händer när resultatet inte får plats.
+  \item Tvåkomplement: hur samma byte kan vara 255 eller $-1$.
+  \item Flaggorna i SREG: vad varje instruktion lämnar efter sig.
+  \item Logiska operationer, skift och rotation.
+  \item Utporten: de första lysdioderna, i simulatorns I/O-fönster.
+\end{itemize}

@@ -1,0 +1,41 @@
+% Section 5.2, from lectures/L05/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\section{Sammanfattning}
+\label{c5:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet och Labb~2 ska du kunna:
+\begin{itemize}
+  \item Koppla upp ett grindnät med 74HC-kretsar på ett kopplingsdäck, med matning, ingångar och
+    utgång, enligt en grindtilldelning och en kopplingslista.
+  \item Verifiera ett nät mot dess sanningstabell, rad för rad, med förväntat och uppmätt värde.
+  \item Bygga NOT, AND och OR av enbart NAND-grindar, och bygga ett nät med enbart NAND.
+  \item Mäta en logisk nivå med en multimeter och avgöra om den är 0, 1 eller ogiltig.
+  \item Felsöka ett nät systematiskt: matningen först, sedan signalen grind för grind, och läsa ut
+    ur sanningstabellen var felet troligen sitter.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför ska matningen mätas först, även när nätet delvis verkar fungera?
+  \item En utgång visar 2,4~V. Vad kan det betyda?
+  \item Ett nät är fel på exakt de rader där en viss AND-term ska göra utgången till 1. Var mäter
+    du först?
+  \item Varför kan en 74HC32 sitta där det ska vara en 74HC08 utan att du märker det på alla rader?
+  \item Varför är 74HC02 den krets flest kopplar fel, och vad händer om den kopplas som en 74HC00?
+  \item \code{X = AB + C} med enbart NAND har en grind mer än med AND och OR. Vad vinner du ändå?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c6:ch} handlar om sekvensnät, vippor och mikrodatorns uppbyggnad:
+\begin{itemize}
+  \item Sekvensnät: kretsar som minns, från reläets självhållning till SR-låset.
+  \item D-låset och D-vippan, klockan och flanken.
+  \item Register, räknare och skiftregister, byggda av vippor.
+  \item Mikrodatorns uppbyggnad på blockschemanivå, och hur varje block går tillbaka till grindar
+    och vippor.
+\end{itemize}

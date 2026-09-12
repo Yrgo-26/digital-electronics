@@ -1,0 +1,212 @@
+% Section 12.3, from lectures/L12/appendix/b_exercises.md. Each exercise names the part of the
+% review it repeats, "(A.2)" in the lecture, as a first line: "Repeterar avsnitt 12.1.2".
+
+\section{Övningar}
+\label{c12:sec:exercises}\label{c12:app:b}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Övningarna är repetition av hela kursen, i samma stil som
+provets frågor. Gör dem på papper, utan miniräknare, med referensbladet i bilaga~\ref{app:avr}
+bredvid, och kontrollera mot lösningsförslagen i bilaga~\ref{app:answers}.
+Övning~\ref{c12:ex:10}, kontrollen, görs först för hand och sedan i Microchip Studio.
+
+Varje övning säger vilken del av \secref{c12:app:a} den repeterar. Går en övning dåligt, läs den
+delen och det kapitel den pekar på innan du går vidare.
+
+Varje övning är märkt med sin sort. Exakt en övning är en \textbf{kontrolluppgift}, och i det här
+kapitlet är det övning~\ref{c12:ex:10}.
+\end{aside}
+
+\exercise{Talomvandlingar}{Räkna för hand}
+\label{c12:ex:1}
+\emph{Repeterar \secref{c12:a2}.}
+
+Fyll i tabellen. Visa hur du räknar i minst en omvandling åt varje håll.
+
+\begin{filltable}{@{}YYY@{}}
+  \thead{Binärt} & \thead{Decimalt} & \thead{Hexadecimalt} \\
+  \midrule
+  \code{1011 0101} & & \fillrule
+  & 200 & \fillrule
+  & & \code{0x7E} \fillrule
+  & 64 & \\
+\end{filltable}
+
+\exercise{Binär addition och flaggor}{Räkna för hand}
+\label{c12:ex:2}
+\emph{Repeterar \secref{c12:a2} och \secref{c12:a6}.}
+\begin{parts}
+  \item Addera \code{0110 1101} och \code{0101 1011} binärt, med minnessiffror. Kontrollera svaret
+    decimalt.
+  \item Additionen görs med \code{add} i ett 8-bitars register. Blir flaggan \code{C} satt? Blir
+    \code{N} satt?
+  \item Läs resultatet som ett tal \textbf{med tecken}, i tvåkomplement. Vilket tal är det? Varför
+    är det ett konstigt svar på en addition av två positiva tal?
+\end{parts}
+
+\exercise{Koder}{Räkna för hand}
+\label{c12:ex:3}
+\emph{Repeterar \secref{c12:a2}.}
+\begin{parts}
+  \item Skriv 47 i BCD.
+  \item Skriv de åtta 3-bitars Graykoderna i ordning, från \code{000}. Hur många bitar ändras mellan
+    två koder som står bredvid varandra?
+  \item Vilka ASCII-koder har tecknen i texten \code{OK}? Bokstäverna ligger i alfabetisk ordning
+    från \code{'A'} = \code{0x41}.
+\end{parts}
+
+\exercise{Vilken grind är det?}{Räkna för hand}
+\label{c12:ex:4}
+\emph{Repeterar \secref{c12:a3}.}
+
+\bookfigure{l12_review_network}{Ett grindnät med en NOR-, en AND- och en
+OR-grind.}{c12:fig:review_network}
+
+\begin{parts}
+  \item Skriv uttrycket vid varje grinds utgång, och uttrycket för X.
+  \item Gör sanningstabellen för X.
+  \item Vilken enda grind gör samma sak som hela nätet?
+\end{parts}
+
+\exercise{Förenkla}{Räkna för hand}
+\label{c12:ex:5}
+\emph{Repeterar \secref{c12:a3}.}
+
+Förenkla algebraiskt, och ange vilken lag varje steg använder. Kontrollera svaret med en
+sanningstabell.
+\begin{parts}
+  \item \code{X = ABC + ABC' + AB'C}
+  \item \code{X = (A + B)(A + B')}
+\end{parts}
+
+\exercise{Två NAND-grindar}{Konstruktion}
+\label{c12:ex:6}
+\emph{Repeterar \secref{c12:a3} och \secref{c12:a4}.}
+\begin{parts}
+  \item Visa med De Morgan att \code{X = AB + C'} kan skrivas \code{X = ((AB)' · C)'}.
+  \item Rita nätet med enbart NAND-grindar med två ingångar. Hur många behövs?
+  \item Hur många kapslar 74HC00 behövs, och hur många grindar blir över?
+\end{parts}
+
+\exercise{Ett kontaktnät}{Konstruktion}
+\label{c12:ex:7}
+\emph{Repeterar \secref{c12:a3}.}
+
+Lampan H1 ska styras av tre tryckknappar enligt \code{H1 = S1(S2 + S3')}.
+\begin{parts}
+  \item Rita kontaktnätet mellan +24~V och 0~V. Vilka kontakter är slutande, och vilka är
+    brytande?
+  \item Gör sanningstabellen. För vilka kombinationer av nedtryckta knappar lyser lampan?
+\end{parts}
+
+\exercise{Karnaughdiagram}{Räkna för hand}
+\label{c12:ex:8}
+\emph{Repeterar \secref{c12:a4}.}
+
+En funktion av A, B, C och D är 1 för mintermerna 0, 1, 4, 5, 10, 11, 14 och 15, och 0 annars.
+\begin{parts}
+  \item Rita Karnaughdiagrammet, med \code{AB} på raderna och \code{CD} på kolumnerna, och fyll i
+    ettorna.
+  \item Gruppera minimalt, och skriv det minimerade uttrycket.
+  \item Uttrycket är en känd grind med två av variablerna som ingångar. Vilken?
+\end{parts}
+
+\exercise{Mikrodatorn}{Förståelse}
+\label{c12:ex:9}
+\emph{Repeterar \secref{c12:a5}.}
+\begin{parts}
+  \item Rita mikrodatorns blockschema, med CPU (ALU, register, styrenhet, programräknare),
+    programminne, dataminne, in- och utportar och bussar.
+  \item Beskriv vad programräknaren gör under hämta-avkoda-utföra för en instruktion.
+  \item ATmega328P startas om efter ett strömavbrott. Vad finns kvar i flashminnet, i SRAM och i
+    registren?
+\end{parts}
+
+\exercise{Kontroll: följ programmet}{Kontroll}
+\label{c12:ex:10}
+\emph{Repeterar \secref{c12:a6}. Förutsäg för hand, kontrollera i simulatorn, förklara
+skillnaden.}
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.org 0x0000
+    rjmp main
+
+main:
+    ldi r16, 0x9C
+    ldi r17, 0x64
+    add r16, r17
+    ldi r18, 5
+    sub r18, r17
+    mov r19, r18
+    lsr r19
+    andi r19, 0x0F
+end:
+    rjmp end
+\end{asmcode}
+
+\task{a) För hand}
+Fyll i tabellen med värdena \textbf{efter} varje instruktion, hexadecimalt. Fyll i flaggorna på
+varje rad, men lämna en registerruta tom om registret inte har ändrats sedan raden ovanför.
+
+\begin{filltable}{@{}lYYYYYYY@{}}
+  \thead{Instruktion} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{\code{r18}} &
+    \thead{\code{r19}} & \thead{\code{C}} & \thead{\code{Z}} & \thead{\code{N}} \\
+  \midrule
+  \code{add r16, r17} & & & & & & & \fillrule
+  \code{sub r18, r17} & & & & & & & \fillrule
+  \code{lsr r19} & & & & & & & \fillrule
+  \code{andi r19, 0x0F} & & & & & & & \\
+\end{filltable}
+
+\task{b) I simulatorn}
+Skriv in programmet, stega det, och jämför med tabellen efter varje steg.
+
+\task{c) Jämför}
+Vilka rutor hade du fel i? Den vanligaste avvikelsen gäller \code{C} efter \code{andi}: vad visar
+simulatorn, och varför?
+
+\exercise{En loop}{Räkna för hand}
+\label{c12:ex:11}
+\emph{Repeterar \secref{c12:a6}.}
+
+\begin{asmcode}
+    ldi r20, 50
+loop:
+    nop
+    dec r20
+    brne loop
+\end{asmcode}
+
+\begin{parts}
+  \item Hur många cykler tar koden, från \code{ldi} till och med den sista \code{brne}?
+  \item Hur lång tid är det vid 16~MHz?
+  \item Vilket värde ska laddas i \code{r20} för att koden ska ta exakt 25~µs?
+\end{parts}
+
+\exercise{Om, annars}{Program}
+\label{c12:ex:12}
+\emph{Repeterar \secref{c12:a6}.}
+
+Lysdioden på PB0 ska lysa om värdet i \code{r16} är \textbf{minst 100}, och lysdioden på PB1
+annars.
+\begin{parts}
+  \item Rita flödesplanen.
+  \item Skriv programmet. Vilket villkorligt hopp används, och varför just det?
+  \item Testa i simulatorn med \code{r16} = 150, 100 och 99. Vilket av de tre värdena är viktigast
+    att testa, och varför?
+\end{parts}
+
+\exercise{Stacken}{Räkna för hand, Fördjupning}
+\label{c12:ex:13}
+\emph{Repeterar \secref{c12:a6}.}
+
+\code{SP} är \code{0x08FF}. Programmet kör \code{rcall work}, och subrutinen \code{work} börjar med
+\code{push r16} och \code{push r17}.
+\begin{parts}
+  \item Vad är \code{SP} efter de två \code{push}?
+  \item Vilka byte ligger på adresserna \code{0x08FF}--\code{0x08FC}, i ord?
+  \item Subrutinen slutar med \code{pop r16}, \code{pop r17} och \code{ret}. Programmet återvänder
+    rätt, men något annat är fel. Vad?
+\end{parts}

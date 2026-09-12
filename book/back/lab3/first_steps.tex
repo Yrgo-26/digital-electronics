@@ -1,0 +1,169 @@
+% Labb 3, parts 1.1, 1.2 and 2, from labs/lab3/a_first_steps.md. Each part is a \labtask, and its
+% Mål, Bakgrund, Programmet, Uppgifter and Frågor are \task headings. The program given in part
+% 1.1 and the four faulty lines in part 1.2 are the handout's, and are printed as the guide
+% prints them.
+
+\section{Del 1.1, 1.2 och 2: Första stegen}
+\label{lab3:sec:a}
+Delarna hör till kapitel~\ref{c7:ch}. Läs \secref{c7:app:b} och \secref{c7:app:c} innan ni börjar,
+och ha bilaga~\ref{app:studio} om Microchip Studio öppen bredvid.
+
+\labtask{Del 1.1}{Microchip Studio: skapa, skriva, spara, assemblera, simulera}%
+\phantomsection\label{lab3:d1-1}
+\task{Mål}
+Skapa ett assemblerprojekt, skriva ett program, bygga det och stega igenom det i simulatorn.
+
+\task{Bakgrund}
+Arbetsgången, skriv, bygg, förutsäg, stega och jämför, beskrivs i \secref{c7:c1}. Instruktionerna
+i programmet står i \secref{c7:b5}.
+
+\task{Programmet}
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.org 0x0000
+    rjmp main
+
+main:
+    ldi r16, 10                     ; r16 = 10
+    ldi r17, 20                     ; r17 = 20
+    mov r18, r16                    ; r18 = r16
+    inc r18                         ; r18 = r18 + 1
+    inc r18                         ; r18 = r18 + 1
+    dec r17                         ; r17 = r17 - 1
+
+end:
+    rjmp end
+\end{asmcode}
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Skapa ett projekt med namnet \code{lab3_01_1} enligt \secref{studio:2}.
+  \item Ersätt innehållet i \code{main.asm} med programmet ovan. \textbf{Skriv av det} i stället
+    för att klistra in: det är så ni lär er hur en rad är uppbyggd. Kommentarerna kan ni hoppa
+    över.
+  \item Spara med \textbf{Ctrl+S}.
+  \item Bygg med \textbf{F7}. Läs utskriften i fönstret Output: står det \code{0 errors}? Om inte,
+    rätta raden Error List pekar på och bygg om.
+  \item Välj simulatorn som verktyg (\secref{studio:4-1}) och starta med \textbf{Debug
+    $\rightarrow$ Start Debugging and Break} (\textbf{Alt+F5}). Öppna fönstret \textbf{Processor
+    Status}.
+  \item \textbf{Innan ni stegar:} fyll i tabellen nedan med registrens värden efter varje
+    instruktion, decimalt och hexadecimalt.
+
+    \begin{filltable}{@{}p{8.4em}YYY@{}}
+      \thead{Efter} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{\code{r18}} \\
+      \midrule
+      \code{ldi r16, 10} & & & \fillrule
+      \code{ldi r17, 20} & & & \fillrule
+      \code{mov r18, r16} & & & \fillrule
+      \code{inc r18} & & & \fillrule
+      \code{inc r18} & & & \fillrule
+      \code{dec r17} & & & \\
+    \end{filltable}
+  \item Stega med \textbf{F11}, en instruktion i taget, och jämför Processor Status med tabellen
+    efter varje steg. Lägg märke till att registret som just ändrades visas i rött.
+  \item Läs av \textbf{Program Counter} vid varje steg. Med hur mycket ökar den för varje
+    instruktion?
+  \item När den gula pilen står på \code{rjmp end}: vad visar \textbf{Cycle Counter}? Räkna ut
+    värdet för hand först, med hjälp av \secref{c7:c5}.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Den gula pilen står på \code{inc r18}. Har \code{inc r18} körts ännu?
+  \item Ändras \code{r16} av instruktionen \code{mov r18, r16}?
+\end{itemize}
+
+\redovisa{tabellen och simuleringen för läraren.}
+
+\labtask{Del 1.2}{Öppna, ändra, rätta, assemblera, simulera}\phantomsection\label{lab3:d1-2}
+\task{Mål}
+Öppna ett befintligt projekt, ändra programmet, och rätta fel med hjälp av felmeddelandena.
+
+\task{Bakgrund}
+De vanligaste felmeddelandena, och hur de rättas, står i \secref{c7:c4}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Stäng Microchip Studio och starta det igen. Öppna projektet från del 1.1, antingen från
+    listan över senaste projekt på startsidan eller med \textbf{File $\rightarrow$ Open
+    $\rightarrow$ Project/Solution...}
+  \item Ändra programmet:
+    \begin{itemize}
+      \item \code{r16} ska laddas med 25 i stället för 10;
+      \item lägg till raden \code{mov r19, r17} efter \code{dec r17}.
+    \end{itemize}
+  \item \textbf{Förutsäg} värdena i \code{r16}--\code{r19} när programmet når \code{end}. Bygg,
+    simulera och kontrollera.
+  \item Lägg nu till de här fyra raderna direkt efter \code{mov r19, r17}. De innehåller fyra fel
+    med flit:
+\begin{asmcode}
+    ldi r16 7
+    ldi r5, 3
+    inc r19, 2
+    rjmp ennd
+\end{asmcode}
+    Meningen med raderna är: ladda 7 i \code{r16}, ladda 3 i något register, öka \code{r19} med
+    två, och hoppa till \code{end}.
+  \item Bygg. Läs det första felet i \textbf{Error List}, dubbelklicka på det, rätta raden och bygg
+    om. Fortsätt tills programmet byggs utan fel. Skriv för varje fel ned vad meddelandet sa och
+    hur ni rättade det.
+  \item \textbf{Förutsäg} värdena i \code{r16}--\code{r20} när programmet når \code{end}. Simulera
+    och kontrollera.
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Hur många gånger behövde ni bygga om innan alla fel var borta? Fick ni alla fyra felen på
+    en gång?
+  \item Varför kan \code{inc} inte öka med två på en gång?
+\end{itemize}
+
+\redovisa{det rättade programmet och de fyra felmeddelandena.}
+
+\labtask{Del 2}{Decimalt, binärt eller hexadecimalt}\phantomsection\label{lab3:d2}
+\task{Mål}
+Skriva tal i ett program decimalt, binärt och hexadecimalt, och läsa dem i simulatorn.
+
+\task{Bakgrund}
+Talformaten står i \secref{c7:b4} och omvandlingen mellan talsystemen i kapitel~\ref{c1:ch}.
+
+\task{Uppgifter}
+\begin{enumerate}
+  \item Skriv ett program som laddar talet 200 i \code{r16} decimalt, i \code{r17} binärt och i
+    \code{r18} hexadecimalt. Räkna ut det binära och det hexadecimala skrivsättet för hand.
+    \textbf{Förutsäg} hur Processor Status visar de tre registren. Simulera och kontrollera.
+  \item Fyll i de tomma rutorna i tabellen \textbf{för hand}:
+
+    \begin{filltable}{@{}p{5em}YYY@{}}
+      \thead{Register} & \thead{Decimalt} & \thead{Binärt} & \thead{Hexadecimalt} \\
+      \midrule
+      \code{r19} & 9 & & \fillrule
+      \code{r20} & & \code{0b00001111} & \fillrule
+      \code{r21} & & & \code{0x10} \fillrule
+      \code{r22} & 100 & & \fillrule
+      \code{r23} & & \code{0b01111111} & \fillrule
+      \code{r24} & & & \code{0x80} \fillrule
+      \code{r25} & 255 & & \\
+    \end{filltable}
+  \item Lägg till en \code{ldi} per rad i programmet, som laddar registret med talet \textbf{i det
+    skrivsätt tabellen ger det}: \code{ldi r19, 9}, \code{ldi r20, 0b00001111}, och så vidare.
+    Simulera och kontrollera att Processor Status visar det hexadecimala värde ni räknade ut på
+    varje rad.
+  \item Lägg till \code{ldi r26, '0'} och \code{ldi r27, 'A'}. Vilka värden får registren? Ett
+    tecken lagras som ett tal, dess ASCII-kod; det återkommer i del~18.
+  \item Välj för varje rad i tabellen vilket skrivsätt som passar bäst om talet är
+    \begin{itemize}
+      \item ett antal varv i en loop;
+      \item ett mönster av lysdioder som ska lysa.
+    \end{itemize}
+\end{enumerate}
+
+\task{Frågor}
+\begin{itemize}
+  \item Blir maskinkoden olika för \code{ldi r16, 200} och \code{ldi r16, 0xC8}? Titta i listfilen
+    om ni är osäkra (\secref{c7:b7}).
+\end{itemize}
+
+\redovisa{tabellen och simuleringen.}

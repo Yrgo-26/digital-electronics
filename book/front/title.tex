@@ -1,0 +1,63 @@
+% Half-title, title and copyright pages.
+%
+% \bookversion is the edition the PDF was built for: `make VERSION=v1.0.0` passes it in, and the
+% release workflow passes the tag. Without it the title page carries only the date of the build.
+\providecommand{\bookversion}{}
+\newcommand{\bookdate}{\number\day\space\ifcase\month\or januari\or februari\or mars\or april\or
+  maj\or juni\or juli\or augusti\or september\or oktober\or november\or december\fi\space
+  \number\year}
+\newcommand{\bookedition}{\ifx\bookversion\empty\else\bookversion\,·\,\fi\bookdate}
+
+\thispagestyle{empty}
+\vspace*{2.2in}
+\begin{flushright}
+  {\Large\bfseries Digitalteknik}
+\end{flushright}
+\cleardoublepage
+
+\thispagestyle{empty}
+\vspace*{1.1in}
+\begin{flushleft}
+  {\color{accent}\rule{0.9in}{2.5pt}}\par\vspace{1.4ex}
+  {\fontsize{32}{38}\selectfont\bfseries Digitalteknik\par}
+  \vspace{2.2ex}
+  {\Large\itshape Från ettor och nollor till en mikrodator\\som styr något i verkligheten\par}
+  \vspace{1.2in}
+  {\large Jonas Granath och Erik Pihl\par}
+  \vfill
+  {\small\color{muted} \bookedition\par}
+\end{flushleft}
+\newpage
+
+\thispagestyle{empty}
+\vspace*{\fill}
+{\small
+\noindent\textit{Digitalteknik}\\
+Copyright \textcopyright\ 2026 Jonas Granath och Erik Pihl.
+
+\medskip
+\noindent Bokens text och figurer, liksom kursmaterialet den är satt från, är licensierade under
+Creative Commons Erkännande 4.0 Internationell (CC BY 4.0). Du får kopiera och sprida materialet i
+vilket medium och format som helst, och bearbeta det, för vilket ändamål som helst, även
+kommersiellt, förutsatt att du anger upphovspersonen, länkar till licensen och anger om du har
+gjort ändringar. Licensen finns på \url{https://creativecommons.org/licenses/by/4.0/deed.sv}.
+
+\medskip
+\noindent Programkoden i boken, assemblerprogrammen och deras kommentarer, får också användas
+under MIT-licensen, som är licensen för all källkod i kursmaterialet: programmen, skripten som
+kontrollerar dem och verktygen som ritar figurerna och sätter boken.
+
+\medskip
+\noindent Programmen i boken är skrivna för ATmega328P med klockfrekvensen 16 MHz, och assembleras
+i Microchip Studio. ATmega328P, AVR och Microchip Studio är varumärken som tillhör Microchip
+Technology Inc.; Arduino och Arduino Uno är varumärken som tillhör Arduino S.r.l.; Windows är ett
+varumärke som tillhör Microsoft Corporation.
+
+\medskip
+\noindent Satt med TeX Gyre Pagella och DejaVu Sans Mono i Lua\LaTeX.
+
+\medskip
+\noindent\textcolor{muted}{Satt från kursens tolv pass, deras övningar och lösningsförslag, de
+tre laborationshandledningarna och övningsprovet. Den här utgåvan: \bookedition.}
+\par}
+\cleardoublepage

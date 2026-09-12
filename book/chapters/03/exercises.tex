@@ -1,0 +1,127 @@
+% Section 3.3, from lectures/L03/appendix/b_exercises.md.
+
+\section{Övningar}
+\label{c3:sec:exercises}\label{c3:app:b}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Varje uttryck du läser av ur ett nät kan kontrolleras med
+nätet självt: välj en rad i sanningstabellen, tänk dig knapparna i det läget, och följ strömvägen i
+ritningen. Finns det en sluten väg från +24~V till lampan ska tabellen säga \code{1}.
+Övning~\ref{c3:ex:3} kontrolleras på labbstationen.
+
+Lösningsförslagen finns i bilaga~\ref{app:answers}.
+
+Varje övning är märkt med sin sort. Övning~\ref{c3:ex:3} är kapitlets \textbf{kontrolluppgift}.
+\end{aside}
+
+\exercise{Läs av uttrycket}{Räkna för hand}
+\label{c3:ex:1}
+
+\bookfigure{l03_ex_networks}{Tre kontaktnät att analysera.}{c3:fig:ex_networks}
+
+\noindent För vart och ett av näten a), b) och c):
+\begin{parts}
+  \item Skriv uttrycket för lampan, med parenteser runt varje grupp, enligt \secref{c3:a1}.
+  \item Ta fram sanningstabellen.
+  \item Sammanfatta tabellen med en mening.
+\end{parts}
+
+\exercise{Det minsta nätet}{Konstruktion}
+\label{c3:ex:2}
+\begin{parts}
+  \item Förenkla vart och ett av de tre uttrycken från övning~\ref{c3:ex:1}, och ange vilken
+    räknelag du använder.
+  \item Beskriv det minsta nätet för varje uttryck: vilka kontakter, och hur de sitter.
+  \item Hur många kontakter sparar du i varje nät? Hur många kontaktelement behöver varje knapp
+    före och efter?
+\end{parts}
+
+\exercise{Kontroll: förutsäg och bygg}{Kontroll}
+\label{c3:ex:3}
+\emph{Förutsäg för hand, bygg på stationen, jämför.}
+
+\bookfigure{l03_ex_kontroll}{Kontaktnätet i kontrolluppgiften.}{c3:fig:ex_kontroll}
+
+\noindent Gör delarna i ordning, och skriv ned varje svar innan du går vidare.
+
+\task{a) För hand}
+Skriv uttrycket för H1, och förutsäg lampans läge för alla fyra kombinationerna av S1 och S2.
+
+\task{b)}
+Multiplicera ut uttrycket och förenkla. Vilken grind från kapitel~\ref{c2:ch} är det?
+
+\task{c) På stationen}
+Koppla nätet och pröva alla fyra kombinationerna. Stämmer lampan med din förutsägelse?
+
+\task{d)}
+Jämför med nätet för samma funktion i Labb~1, \hyperref[lab1:u6]{uppgift~6}. Hur många kontakter
+har de två näten? Varför kan två så olika nät göra samma sak?
+
+\exercise{Syntes}{Konstruktion}
+\label{c3:ex:4}
+\begin{parts}
+  \item Ta fram det minsta kontaktnätet med två knappar för sanningstabellen nedan:
+
+    \begin{narrowtable}{@{}ccc@{}}
+      \thead{S1} & \thead{S2} & \thead{H1} \\
+      \midrule
+      0 & 0 & 1 \\
+      0 & 1 & 1 \\
+      1 & 0 & 0 \\
+      1 & 1 & 1 \\
+    \end{narrowtable}
+  \item Ett transportband drivs av en motor som styrs av reläet K1. Motorn får gå om skyddsgrinden
+    är stängd (givaren S3 påverkad), och samtidigt antingen startknappen på plats (S1) eller
+    fjärrstarten (S2) är intryckt. Skriv uttrycket för K1 och rita strömvägen.
+\end{parts}
+
+\exercise{Felsökning}{Förståelse}
+\label{c3:ex:5}
+
+\bookfigure{l03_ex_fault}{Nätet som ska felsökas.}{c3:fig:ex_fault}
+
+\noindent Nätet ska realisera \code{H1 = (S1 + S2) · S3'}.
+\begin{parts}
+  \item Du trycker på S1 men inte på S3, och lampan förblir släckt. Du mäter 24~V mellan 0~V och
+    punkten ovanför parallellkopplingen, 24~V mellan 0~V och punkten mellan parallellkopplingen och
+    S3, och 0~V mellan 0~V och punkten mellan S3 och lampan. Var sitter felet, och vad är den
+    troligaste orsaken?
+  \item Efter en ny koppling lyser lampan när S1 eller S2 är nedtryckt, men den slocknar inte när
+    du dessutom trycker på S3. Vad är fel?
+  \item Efter ytterligare en ny koppling lyser lampan bara när S3 \textbf{och} minst en av S1 och S2
+    är nedtryckta. Vad är fel nu?
+\end{parts}
+
+\exercise{Stoppknappen}{Förståelse}
+\label{c3:ex:6}
+\begin{parts}
+  \item I en maskins stoppkrets används stoppknappens brytande kontakt. Beskriv vad som händer med
+    maskinen om ledningen till stoppknappen går av.
+  \item Beskriv vad som skulle hända om stoppknappens slutande kontakt i stället användes, och
+    kretsen var gjord så att maskinen stannar när kontakten sluts. Vad händer då om ledningen går
+    av?
+  \item Formulera en regel för hur en stoppfunktion ska kopplas, med ordet \emph{säker}.
+\end{parts}
+
+\exercise{Alla funktioner av två knappar}{Förståelse}
+\label{c3:ex:7}
+\begin{parts}
+  \item En sanningstabell med två ingångar har fyra rader. Hur många olika sanningstabeller finns
+    det, alltså hur många olika funktioner av två variabler?
+  \item Två av funktionerna behöver inte någon kontakt alls. Vilka, och hur realiseras de?
+  \item Vilka funktioner behöver både det slutande och det brytande kontaktelementet i båda
+    knapparna?
+\end{parts}
+
+\exercise{En väljare av kontakter}{Räkna för hand, Fördjupning}
+\label{c3:ex:8}
+Ett nät har kontakterna S1 och S2 slutande parallellt, i serie med S1 brytande och S3 slutande
+parallellt: \code{H1 = (S1 + S2) · (S1' + S3)}.
+\begin{parts}
+  \item Ta fram sanningstabellen.
+  \item Dela tabellen i två halvor efter S1, och beskriv med ord vad nätet gör.
+  \item Visa algebraiskt att \code{(S1 + S2)(S1' + S3) = S1' · S2 + S1 · S3}. Tänk på att
+    \code{S1 · S1' = 0}, och att en term som \code{S2 · S3} kan visa sig vara onödig: kontrollera
+    med tabellen.
+  \item Jämför med grindnätet i \secref{c2:a8}. Vad har de gemensamt?
+\end{parts}

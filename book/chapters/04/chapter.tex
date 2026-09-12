@@ -1,0 +1,36 @@
+% Chapter 4, typeset from lectures/L04: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix D, the
+% solutions, is in back/answers/c04.tex.
+
+\chapter{Karnaughdiagram och IC-kretsar}
+\label{c4:ch}
+
+{\large\itshape Hur man hittar det minsta nätet utan att gissa, och hur man kopplar upp det.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Varför ett korrekt nät inte räcker: det ska också vara litet.
+  \item Karnaughdiagram för två, tre och fyra ingångar: Graykoden, grupperna och avläsningen.
+  \item Kanter, hörn och don't care, de tre ställen där minimering oftast går fel.
+  \item Syntes av ett kombinatoriskt nät: från specifikation till minimerat grindnät.
+  \item Nät med enbart NAND eller enbart NOR, och varför de sparar kretsar.
+  \item IC-kretsar ur 74-serien: kapsel, benplacering, datablad och logiknivåer.
+  \item Kopplingsdäcket, lysdioder och ingångar som aldrig får flyta.
+\end{itemize}
+\end{chapterbox}
+
+Ett grindnät som ger rätt sanningstabell är inte färdigt förrän det också är litet. Det här
+kapitlet visar hur ett Karnaughdiagram hittar det minsta nätet utan gissningar, och hur nätet
+sedan byggs med riktiga IC-kretsar ur 74-serien på ett kopplingsdäck, inför Labb~2.
+
+Repetera först räknelagarna, De Morgans lagar och hur ett uttryck läses av ur en sanningstabell, i
+\secref{c2:app:a}. Läs sedan \secref{c4:app:a} om Karnaughdiagram, där \secref{c4:a1}--\ref{c4:a4}
+är grunden för resten, och \secref{c4:app:b} om IC-kretsar, datablad och kopplingsdäck. Övningarna
+i \secref{c4:sec:exercises} görs med papper och penna och kontrolleras i CircuitVerse, och deras
+lösningsförslag finns i bilaga~\ref{app:answers}. Gör förberedelserna till Labb~2 i
+bilaga~\ref{app:lab2}, som \secref{c4:b8} går igenom, innan labben i kapitel~\ref{c5:ch}.
+
+\input{chapters/04/karnaugh}
+\input{chapters/04/circuits}
+\input{chapters/04/summary}
+\input{chapters/04/exercises}

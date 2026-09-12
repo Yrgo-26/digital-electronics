@@ -1,0 +1,35 @@
+% Chapter 1, typeset from lectures/L01: the README is the opener and the closing summary, and
+% each appendix is a section, in the same order and with the same subsections. Appendix D, the
+% solutions, is in back/answers/c01.tex.
+
+\chapter{Talsystem och binära koder}
+\label{c1:ch}
+
+{\large\itshape Varför en dator räknar med ettor och nollor, och hur man räknar som den.\par}
+
+\begin{chapterbox}{I det här kapitlet}
+\begin{itemize}
+  \item Digitalt och analogt: varför nästan all teknik i dag räknar med ettor och nollor.
+  \item Positionssystem: det decimala, det binära och det hexadecimala talsystemet.
+  \item Omvandling mellan decimalt, binärt och hexadecimalt, för hand.
+  \item Bitar, byte och talområden: hur stora tal som ryms i 4, 8 och 16 bitar.
+  \item Binär addition, och vad som händer när summan inte ryms.
+  \item Binära koder: BCD, Graykod, ASCII, 7-segmentkod och paritetsbit.
+\end{itemize}
+\end{chapterbox}
+
+Allt i den här boken vilar på ett enda faktum: en digital signal har bara två tillstånd. Det här
+kapitlet visar varför det är en styrka och inte en begränsning, och hur många sådana signaler
+tillsammans kan bära ett tal, en bokstav eller en siffra på en display.
+
+Arbeta igenom kapitlet i ordning. \Secref{c1:app:a} om talsystemen är grunden för resten av boken:
+viktraden 1, 2, 4, 8, 16, 32, 64, 128 och omvandlingarna mellan decimalt, binärt och hexadecimalt
+används i varje kapitel som följer, och de sitter först när du har räknat många själv.
+\Secref{c1:app:b} går igenom de binära koder du kommer att möta, både i kursen och i yrkeslivet.
+Övningarna i \secref{c1:sec:exercises} räknas med papper och penna, och deras lösningsförslag
+finns i bilaga~\ref{app:answers}.
+
+\input{chapters/01/numbers}
+\input{chapters/01/codes}
+\input{chapters/01/summary}
+\input{chapters/01/exercises}

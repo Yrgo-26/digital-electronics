@@ -1,0 +1,49 @@
+% Section 4.3, from lectures/L04/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\section{Sammanfattning}
+\label{c4:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Rita ett Karnaughdiagram för en funktion med två, tre eller fyra ingångar, med rubrikerna i
+    Graykod.
+  \item Ringa in grupper av ettor efter reglerna, också över kanter och i hörn, och läsa av ett
+    minimerat uttryck på summa av produkter-form.
+  \item Använda don't care för kombinationer som aldrig förekommer.
+  \item Syntetisera ett kombinatoriskt nät från en beskrivning i ord: sanningstabell,
+    Karnaughdiagram, minimerat uttryck, grindnät, kontroll.
+  \item Göra om ett nät till enbart NAND-grindar eller enbart NOR-grindar.
+  \item Hitta ben 1, VCC, GND och varje grinds ben på en 74HC-krets, med hjälp av databladet.
+  \item Räkna ut ett förkopplingsmotstånd för en lysdiod, och förklara varför en ingång aldrig får
+    lämnas flytande.
+  \item Planera en uppkoppling med en grindtilldelning och en kopplingslista.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Varför måste rubrikerna i ett Karnaughdiagram stå i Graykod? Vad går fel med vanlig binär
+    ordning?
+  \item En grupp om fyra rutor i ett diagram med fyra ingångar: hur många ingångar blir kvar i
+    termen?
+  \item Ett diagram där ettorna bildar ett schackmönster går inte att förenkla. Vilken grind
+    beräknar en sådan funktion?
+  \item När får en X-ruta ingå i en grupp, och måste den täckas?
+  \item Ett NAND-nät har ofta fler grindar än AND-OR-nätet för samma funktion. Varför kan det ändå
+    vara billigare att bygga?
+  \item Vilket ben är VCC och vilket är GND på en 74HC08? Och på en 74HC02? Vad skiljer 74HC02 från
+    de andra?
+  \item Varför är en okopplad ingång på en HC-krets ett fel, även om kretsen verkar fungera?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c5:ch} hör ihop med Labb~2 (bilaga~\ref{app:lab2}):
+\begin{itemize}
+  \item \textbf{Labb~2-1}: grindnät med AND-, OR- och inverterarkretsar på kopplingsdäck.
+  \item \textbf{Labb~2-2}: samma nät med enbart NAND och enbart NOR.
+  \item Felsökning av ett grindnät som inte gör vad det ska, systematiskt i stället för på måfå.
+\end{itemize}

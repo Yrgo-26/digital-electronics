@@ -1,0 +1,179 @@
+% Section 8.5, from lectures/L08/appendix/d_exercises.md. The note under the lecture's intro, which
+% exercise is the Kontroll, is folded into the aside, as in Chapter 1.
+
+\section{Övningar}
+\label{c8:sec:exercises}\label{c8:app:d}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Övningarna märkta \textbf{Program} och \textbf{Kontroll}
+görs i Microchip Studio: skriv programmet, bygg och stega, och läs registren i Processor Status och
+portarna i I/O-fönstret. Skriv ned din förutsägelse innan du stegar.
+
+Övriga övningar görs med papper och penna, utan miniräknare. Lösningsförslag finns i
+bilaga~\ref{app:answers}.
+
+Varje övning är märkt med sin sort. Det finns en \textbf{Kontroll} i det här kapitlet,
+övning~\ref{c8:ex:5}.
+\end{aside}
+
+\exercise{Binär addition för hand}{Räkna för hand}
+\label{c8:ex:1}
+Addera binärt, kolumn för kolumn med minnessiffror, och ange resultatet i en byte, hexadecimalt,
+och värdet på \code{C} efteråt.
+\begin{parts}
+  \item \code{0b00101101 + 0b00010111}
+  \item \code{0x9C + 0x7A}
+  \item \code{0x0F + 0x01}. Vilken flagga, utöver \code{Z}, \code{N} och \code{C}, sätts här, och
+    varför?
+\end{parts}
+
+\exercise{Mätaren slår om}{Förståelse}
+\label{c8:ex:2}
+\code{r16} innehåller 253 och \code{C} är 0. Programmet kör \code{inc r16} fem gånger i rad.
+\begin{parts}
+  \item Vilket värde har \code{r16} efter varje \code{inc}?
+  \item Efter vilken \code{inc} är \code{Z = 1}? Vad är \code{Z} när alla fem är körda?
+  \item Vad är \code{C} efter den femte \code{inc}? Varför?
+  \item Hur skulle du ändra programmet så att \code{C} blir 1 när räknaren slår om från 255 till 0?
+\end{parts}
+
+\exercise{Negativa tal}{Räkna för hand}
+\label{c8:ex:3}
+\begin{parts}
+  \item Skriv $-1$, $-10$, $-100$ och $-128$ som byte i tvåkomplement, hexadecimalt. Visa metoden
+    \enquote{invertera och lägg till 1} för $-10$.
+  \item Vilka tal med tecken är \code{0xF0}, \code{0x81} och \code{0x7F}?
+  \item Vad blir \code{neg r16} om \code{r16} är \code{0x01}, \code{0x80} respektive \code{0x00}?
+    Ett av svaren är överraskande. Vilket, och varför?
+\end{parts}
+
+\exercise{Addera en konstant}{Program}
+\label{c8:ex:4}
+\begin{parts}
+  \item Skriv ett program som laddar 40 i \code{r16} och sedan adderar 25 till det, utan att
+    använda ett andra register.
+  \item Lägg till instruktioner som laddar 30 i \code{r17} och drar ifrån 100.
+  \item Förutsäg \code{r16}, \code{r17} och \code{C} när programmet är klart. Simulera och
+    kontrollera.
+\end{parts}
+
+\exercise{Flaggorna}{Kontroll}
+\label{c8:ex:5}
+\emph{Förutsäg för hand, kontrollera i simulatorn, förklara skillnaderna.}
+\begin{parts}
+  \item Fyll i tabellen \textbf{för hand}: resultatet hexadecimalt och flaggorna \code{C},
+    \code{Z}, \code{N}, \code{V} och \code{S} efter varje operation. Operationerna görs var för
+    sig, inte efter varandra.
+\end{parts}
+
+\begin{filltable}{@{}p{14em}C{5em}YYYYY@{}}
+  \thead{Operation} & \thead{Resultat} & \thead{C} & \thead{Z} & \thead{N} & \thead{V} &
+    \thead{S} \\
+  \midrule
+  \code{0x50 + 0x50} (\code{add}) & & & & & & \fillrule
+  \code{0xF0 + 0x20} (\code{add}) & & & & & & \fillrule
+  \code{0x30 - 0x30} (\code{sub}) & & & & & & \fillrule
+  \code{0x00 - 0x01} (\code{sub}) & & & & & & \fillrule
+  \code{0x80 - 0x01} (\code{sub}) & & & & & & \fillrule
+  \code{0xFF + 1} med \code{inc}, när \code{C} är 1 före & & & & & & \\
+\end{filltable}
+
+\begin{parts}[start=2]
+  \item Skriv ett program som gör de sex operationerna i ordning, med en etikett efter varje, som
+    i \code{flags_demo.asm} (\secref{c8:a7}). Sätt \code{C} till 1 före den sista med
+    instruktionen \code{sec} (\emph{set carry}).
+  \item Kör fram till varje etikett och jämför SREG med tabellen. Stämde allt? Förklara varje ruta
+    där du hade fel, och säg vilken regel i \secref{c8:app:a} du hade missat.
+\end{parts}
+
+\exercise{Masker}{Räkna för hand}
+\label{c8:ex:6}
+\code{r16} innehåller \code{0b11010011}. Vad blir \code{r16} efter var och en av instruktionerna
+nedan? Varje instruktion utgår från \code{0b11010011}.
+\begin{parts}
+  \item \code{andi r16, 0xF0}
+  \item \code{ori r16, 0x0C}
+  \item \code{eor r16, r24}, där \code{r24} innehåller \code{0xFF}
+  \item \code{com r16}. Jämför med \textbf{c)}.
+\end{parts}
+
+\exercise{Välj rätt mask}{Konstruktion}
+\label{c8:ex:7}
+Skriv en instruktion, eller två om det behövs, som gör följande med \code{r16} och lämnar alla
+andra bitar orörda:
+\begin{parts}
+  \item ettställer bit~0 och bit~1;
+  \item nollställer bit~7;
+  \item inverterar bit 4--7;
+  \item nollställer alla bitar utom bit~3;
+  \item nollställer bit 0--3 och ettställer bit~7.
+\end{parts}
+
+\exercise{Skift och rotation}{Räkna för hand}
+\label{c8:ex:8}
+\begin{parts}
+  \item \code{r16} innehåller \code{0b00000110}. Vad blir den efter två \code{lsl}? Vilket tal har
+    den multiplicerats med?
+  \item \code{r17} innehåller \code{0b10000001}. Vad blir \code{r17} och \code{C} efter en
+    \code{lsr}?
+  \item \code{r18} innehåller \code{0xF8}, det vill säga $-8$. Vad blir den efter en \code{asr},
+    och efter en \code{lsr}? Vilket av svaren är $-8 / 2$?
+  \item \code{r19} innehåller \code{0b11000000} och \code{C} är 0. Vad blir \code{r19} och
+    \code{C} efter var och en av tre \code{rol} i rad?
+\end{parts}
+
+\exercise{Lysdioder på port B}{Program}
+\label{c8:ex:9}
+\begin{parts}
+  \item Skriv ett program som gör port B till utport och tänder lysdioderna på PB0, PB2 och PB4
+    med en enda \code{out}.
+  \item Skriv om programmet så att samma tre lysdioder tänds med \code{sbi}, en i taget, i
+    stället.
+  \item Lägg till instruktioner som släcker PB2 med \code{cbi}, och sedan tänder PB7 med mönstret
+    läs, ändra, skriv (\secref{c8:c5}).
+  \item Förutsäg \code{PORTB} efter programmet, binärt. Kontrollera i I/O-fönstret.
+\end{parts}
+
+\exercise{Läs programmet}{Förståelse}
+\label{c8:ex:10}
+Förutsäg \code{PORTB}, binärt, efter var och en av de markerade raderna.
+
+\begin{asmcode}
+.def leds = r16
+.def temp = r17
+
+main:
+    ser temp
+    out DDRB, temp
+    ldi leds, 0b00001111
+    out PORTB, leds                 ; (1)
+    lsl leds
+    lsl leds
+    out PORTB, leds                 ; (2)
+    sbi PORTB, 0                    ; (3)
+    com leds
+    out PORTB, leds                 ; (4)
+    cbi PORTB, 7                    ; (5)
+end:
+    rjmp end
+\end{asmcode}
+
+\exercise{Multiplicera med tio}{Program, Fördjupning}
+\label{c8:ex:11}
+Processorn har ingen instruktion som multiplicerar med 10, men $10x = 8x + 2x$, och multiplikation
+med 2 och 8 är skift.
+\begin{parts}
+  \item Skriv ett program som laddar ett tal $x$ i \code{r16} och räknar ut $10x$ i \code{r16}, med
+    \code{mov}, \code{lsl} och \code{add}.
+  \item Prova med $x = 7$. Vad blir resultatet, decimalt och hexadecimalt?
+  \item Upp till vilket $x$ ger programmet rätt svar? Vad händer för större $x$?
+\end{parts}
+
+\exercise{När är det overflow?}{Förståelse, Fördjupning}
+\label{c8:ex:12}
+\begin{parts}
+  \item \code{0x40 + 0x40} ger \code{V = 1}, men \code{0xC0 + 0xC0} ger \code{V = 0}. Förklara båda
+    genom att läsa talen med tecken.
+  \item Vad blir \code{C} i de två fallen? Förklara genom att läsa talen utan tecken.
+  \item Formulera med egna ord en regel för när en addition ger \code{V = 1}.
+\end{parts}

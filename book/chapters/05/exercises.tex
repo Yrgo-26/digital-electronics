@@ -1,0 +1,158 @@
+% Section 5.3, from lectures/L05/appendix/b_exercises.md.
+%
+% Exercise 11 is marked "(fördjupning)" after its kind rather than in its title; it gets the two
+% kinds Förståelse and Fördjupning, like every other exercise so marked.
+
+\section{Övningar}
+\label{c5:sec:exercises}\label{c5:app:b}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} De flesta övningarna här är felsökningsfall: en
+beskrivning av ett nät, vad som mättes, och frågan var felet sitter. Svara alltid med \textbf{var du
+mäter härnäst och varför}, inte bara med en gissning om orsaken. En gissning som råkar vara rätt
+lär dig ingenting om nästa fel.
+
+Kontrolluppgiften, övning~\ref{c5:ex:10}, görs på labbstationen, gärna under Labb~2-1.
+
+Lösningsförslagen finns i bilaga~\ref{app:answers}.
+
+Varje övning är märkt med sin sort.
+\end{aside}
+
+\exercise{Matningen först}{Förståelse}
+\label{c5:ex:1}
+\begin{parts}
+  \item Mellan vilka ben mäter du matningen på en 74HC08, och vilket värde ska du se?
+  \item Varför ska du mäta på kretsens ben och inte på matningsskenorna?
+  \item En krets saknar matning helt, men nätet \enquote{fungerar nästan}. Hur kan en krets utan
+    matning alls ge några utsignaler?
+\end{parts}
+
+\exercise{Vad betyder mätvärdet?}{Förståelse}
+\label{c5:ex:2}
+Du mäter på ingångar och utgångar i ett nät med 74HC-kretsar på 5~V. Vilken logisk nivå motsvarar
+varje mätvärde, och vilka av dem tyder på ett fel?
+\begin{parts}
+  \item 4,7~V på en utgång.
+  \item 0,1~V på en utgång.
+  \item 2,3~V på en ingång.
+  \item 2,5~V på en utgång, som dessutom är ansluten till en annan grinds utgång.
+\end{parts}
+
+\exercise{En grind som ljuger}{Räkna för hand}
+\label{c5:ex:3}
+På en krets som ska vara en 74HC08 mäter du på grind~1: ben~1 = 4,9~V, ben~2 = 0,1~V och ben~3 =
+4,8~V.
+\begin{parts}
+  \item Vad borde ben~3 ha visat?
+  \item Grinden beter sig som en annan grind. Vilken? Ge en trolig förklaring, och vad du
+    kontrollerar för att bekräfta den.
+\end{parts}
+
+\exercise{Den varma kretsen}{Förståelse}
+\label{c5:ex:4}
+Direkt efter att du slagit på matningen känner du att en av kretsarna blir varm.
+\begin{parts}
+  \item Vad gör du först?
+  \item Nämn två troliga orsaker.
+  \item Hur kontrollerar du, utan att slå på matningen igen, vilken av dem det är?
+\end{parts}
+
+\exercise{Läs felet ur tabellen}{Räkna för hand}
+\label{c5:ex:5}
+Nätet \code{X = AB + C} ger den här tabellen:
+
+\begin{narrowtable}{@{}cccc@{}}
+  \thead{A} & \thead{B} & \thead{C} & \thead{X, mätt} \\
+  \midrule
+  0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 0 \\
+  0 & 1 & 1 & 0 \\
+  1 & 0 & 0 & 0 \\
+  1 & 0 & 1 & 0 \\
+  1 & 1 & 0 & 1 \\
+  1 & 1 & 1 & 1 \\
+\end{narrowtable}
+
+\begin{parts}
+  \item Vilka rader är fel?
+  \item Vad har de gemensamt, och vilken del av nätet pekar det ut?
+  \item Var mäter du först?
+\end{parts}
+
+\exercise{Bromsassistenten som inte bromsar}{Räkna för hand}
+\label{c5:ex:6}
+Ett par har byggt bromsassistenten i \hyperref[lab2:1:u3]{Labb~2-1 uppgift~3}. Nätet stämmer på
+tolv av sexton rader. De fyra felaktiga raderna är alla rader där \code{D = 1} och \code{F = 1}: där
+blir \code{B = 0}, men ska vara 1. Beteckningarna är desamma som i \secref{c2:a10}.
+\begin{parts}
+  \item Vilket krav i specifikationen bryter nätet mot, och varför är just det felet farligt?
+  \item Paret har kopplat förarens pedal på ett ställe i nätet där den inte hör hemma. Var sitter
+    den, och vilket uttryck har de byggt i stället för det rätta?
+  \item Var mäter du för att bekräfta det?
+\end{parts}
+
+\exercise{Halvering}{Förståelse}
+\label{c5:ex:7}
+En signal går genom sexton grindar i rad, och den är fel vid utgången. Den är rätt vid ingången.
+\begin{parts}
+  \item Var gör du den första mätningen, och varför just där?
+  \item Hur många mätningar behöver du högst för att hitta den grind där felet uppstår?
+  \item Hur många hade du behövt, i värsta fall, om du i stället börjat från ingången och mätt efter
+    varje grind?
+\end{parts}
+
+\exercise{Den flimrande lysdioden}{Förståelse}
+\label{c5:ex:8}
+En lysdiod på utgången av ett nät tänds och släcks när du för handen nära kopplingsdäcket, fast du
+inte rör strömbrytarna.
+\begin{parts}
+  \item Vad är den troliga orsaken?
+  \item Hur hittar du exakt vilket ben det gäller?
+  \item Varför händer det här med HC-kretsar, men inte på samma sätt med de äldre LS-kretsarna?
+\end{parts}
+
+\exercise{Planera fläkten}{Konstruktion}
+\label{c5:ex:9}
+Fläkten från övning~\ref{c4:ex:8} har uttrycket \code{F = TW'B' + CB'}.
+\begin{parts}
+  \item Gör en fullständig grindtilldelning med kretsbeteckningar och bennummer, med 74HC04,
+    74HC08 och 74HC32.
+  \item Skriv kopplingslistan, med matningen först och de oanvända ingångarna sist.
+  \item Nätet fungerar, utom att fläkten aldrig startar på hög temperatur. Vilka rader i tabellen
+    är fel, och vilken del av nätet mäter du först?
+\end{parts}
+
+\exercise{Kontroll: en utgång under last}{Kontroll}
+\label{c5:ex:10}
+\emph{Förutsäg, mät på labbstationen, förklara skillnaden.}
+
+En utgång på en 74HC08 driver en röd lysdiod genom ett förkopplingsmotstånd på 330~Ω till jord.
+
+\task{a) Förutsäg}
+Räkna ut strömmen genom lysdioden som i \secref{c4:b5}, med antagandet att utgången ger exakt 5~V
+och att lysdioden har 2~V över sig.
+
+\task{b) Mät}
+Med utgången hög: mät spänningen på utgången och spänningen över lysdioden. Med utgången låg: mät
+spänningen på utgången.
+
+\task{c) Räkna igen}
+Nu med de uppmätta spänningarna: spänningen över motståndet är utgångens spänning minus
+lysdiodens. Vilken ström går det?
+
+\task{d) Förklara skillnaden}
+Förklara skillnaden mellan a) och c). Vilket av de två antagandena i a) var fel, och varför?
+Stämmer den uppmätta höga och låga nivån med databladets $V_{\text{OH}}$ och $V_{\text{OL}}$?
+
+\exercise{Fel krets i sockeln}{Förståelse, Fördjupning}
+\label{c5:ex:11}
+Någon har satt en 74HC02 där det skulle sitta en 74HC00, och kopplat den enligt benplaceringen för
+74HC00: strömbrytarna A och B till ben~1 och~2, och ben~3 till lysdioden.
+\begin{parts}
+  \item Vad är ben~1 på en 74HC02?
+  \item Vad händer elektriskt när strömbrytaren på ben~1 står i läge 0 medan NOR-grinden försöker
+    ge en etta på samma ben? Varför kan kretsen bli varm?
+  \item Vad visar lysdioden på ben~3?
+\end{parts}

@@ -1,0 +1,199 @@
+% Section 1.2, from lectures/L01/appendix/b_binary_codes.md.
+
+\section{Binära koder}
+\label{c1:app:b}
+
+\subsection{Vad en kod är}
+\label{c1:b1}
+Ett binärt tal är ett sätt att tolka en rad bitar: som en summa av vikter. Men samma rad bitar kan
+tolkas på andra sätt, och vilket sätt som gäller är en överenskommelse mellan den som skriver och
+den som läser. En sådan överenskommelse kallas en \textbf{binär kod}.
+
+Bitmönstret \code{0100 0001} är talet 65 om det tolkas som ett binärt tal, bokstaven \code{A} om
+det tolkas som ASCII, och talet 41 om det tolkas som BCD. Bitarna vet inte vilket de är.
+\textbf{Det är alltid sammanhanget, och den som skrev programmet, som bestämmer vad ett bitmönster
+betyder.}
+
+Det här avsnittet går igenom de koder som förekommer i boken och som du kommer att möta i
+yrkeslivet:
+
+\begin{booktable}{@{}p{6.4em}LL@{}}
+  \thead{Kod} & \thead{Kodar} & \thead{Används till exempel i} \\
+  \midrule
+  BCD & decimala siffror & displayer, klockkretsar, äldre styrsystem \\
+  Graykod & tal, så att bara en bit ändras åt gången & lägesgivare, Karnaughdiagram
+    (kapitel~\ref{c4:ch}) \\
+  ASCII & bokstäver, siffertecken och skiljetecken & all text i datorer, seriell kommunikation \\
+  7-segmentkod & vilka segment som ska lysa i en sifferdisplay & displayer på instrument och
+    apparater \\
+  Paritetsbit & en extra bit som avslöjar ett överföringsfel & seriell kommunikation, minnen \\
+\end{booktable}
+
+\subsection{BCD}
+\label{c1:b2}
+\textbf{BCD}, \emph{binary coded decimal}, kodar varje decimal siffra för sig med fyra bitar, med
+vikterna 8, 4, 2 och 1. Koden kallas därför också \textbf{8421-kod}.
+
+\begin{narrowtable}{@{}l*{10}{c}@{}}
+  \thead{Decimal siffra} & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
+  \midrule
+  BCD & \code{0000} & \code{0001} & \code{0010} & \code{0011} & \code{0100} & \code{0101} &
+    \code{0110} & \code{0111} & \code{1000} & \code{1001} \\
+\end{narrowtable}
+
+\noindent Ett tal med flera siffror kodas siffra för siffra, fyra bitar per siffra:
+
+\begin{console}
+59 (decimalt)  ->  5 = 0101, 9 = 1001  ->  0101 1001 (BCD)
+\end{console}
+
+\noindent Jämför med det binära talet 59, som är \code{0011 1011}. \textbf{BCD och binärt är olika
+koder}, och förväxlar man dem blir det fel: \code{0101 1001} tolkat som ett binärt tal är 89.
+
+Fyra bitar har 16 kombinationer, men BCD använder bara tio av dem. Kombinationerna \code{1010}
+till \code{1111} är \textbf{ogiltiga} i BCD. Det är slöseri med bitar, men priset är värt det när
+talet ska visas: varje nibble är redan en decimal siffra, redo att skickas till sin egen display,
+utan någon omräkning. Därför används BCD i klockkretsar och sifferdisplayer. Att koden lämnar sex
+kombinationer oanvända återkommer i kapitel~\ref{c4:ch}, där de blir \emph{don't care} i ett
+Karnaughdiagram.
+
+\subsection{Graykod}
+\label{c1:b3}
+Tänk dig en givare som mäter vinkeln på en axel med tre bitar, till exempel i en robotarm. När
+axeln vrids från läge 3 till läge 4 ska givarens utsignal gå från \code{011} till \code{100}. Men
+alla tre bitarna ändras, och de ändras aldrig på exakt samma gång. Under det korta ögonblick då
+bara några av dem har hunnit ändras läser styrsystemet något helt annat, kanske \code{111}, alltså
+läge 7. Axeln har inte rört sig mer än en bråkdel av ett steg, men systemet tror att den har gått
+halvvägs runt.
+
+\textbf{Graykoden} löser det genom att ordna kombinationerna så att \textbf{exakt en bit ändras
+mellan två på varandra följande tal}, också från det sista talet tillbaka till det första:
+
+\begin{narrowtable}{@{}ccc@{}}
+  \thead{Tal} & \thead{Binärt} & \thead{Graykod} \\
+  \midrule
+  0 & \code{000} & \code{000} \\
+  1 & \code{001} & \code{001} \\
+  2 & \code{010} & \code{011} \\
+  3 & \code{011} & \code{010} \\
+  4 & \code{100} & \code{110} \\
+  5 & \code{101} & \code{111} \\
+  6 & \code{110} & \code{101} \\
+  7 & \code{111} & \code{100} \\
+\end{narrowtable}
+
+\noindent Mellan läge 3 (\code{010}) och läge 4 (\code{110}) ändras nu bara den vänstra biten.
+Under övergången kan givaren alltså bara visa 3 eller 4, aldrig något orimligt.
+
+\subsubsection{Att bygga en Graykod}
+En Graykod med en bit fler byggs genom att \textbf{spegla} den man har:
+\begin{enumerate}
+  \item Skriv koden med två bitar: \code{00}, \code{01}, \code{11}, \code{10}.
+  \item Skriv samma lista en gång till, i omvänd ordning: \code{10}, \code{11}, \code{01},
+    \code{00}.
+  \item Sätt en nolla framför den första halvan och en etta framför den andra.
+\end{enumerate}
+Resultatet är tabellen ovan. Därför kallas koden också \textbf{reflekterad binärkod}.
+
+Tvåbitarsversionen, \code{00}, \code{01}, \code{11}, \code{10}, är den du kommer att använda mest.
+Den är ordningen på rader och kolumner i ett Karnaughdiagram, där just egenskapen att grannar
+skiljer sig i en enda bit är hela poängen (kapitel~\ref{c4:ch}).
+
+\subsection{ASCII}
+\label{c1:b4}
+En dator lagrar text som tal: varje tecken har en kod. Den kod som nästan all text bygger på heter
+\textbf{ASCII}, \emph{American Standard Code for Information Interchange}. Den använder 7 bitar och
+har alltså 128 tecken: bokstäver, siffertecken, skiljetecken och några styrtecken.
+
+Ett urval:
+
+\begin{narrowtable}{@{}lcc@{\hspace{3em}}lcc@{}}
+  \thead{Tecken} & \thead{Hexadecimalt} & \thead{Decimalt} &
+  \thead{Tecken} & \thead{Hexadecimalt} & \thead{Decimalt} \\
+  \midrule
+  mellanslag & \code{0x20} & 32 & \code{A} & \code{0x41} & 65 \\
+  \code{0} & \code{0x30} & 48 & \code{B} & \code{0x42} & 66 \\
+  \code{1} & \code{0x31} & 49 & \code{Z} & \code{0x5A} & 90 \\
+  \code{9} & \code{0x39} & 57 & \code{a} & \code{0x61} & 97 \\
+  \code{:} & \code{0x3A} & 58 & \code{b} & \code{0x62} & 98 \\
+  \code{?} & \code{0x3F} & 63 & \code{z} & \code{0x7A} & 122 \\
+\end{narrowtable}
+
+\noindent Styrtecknen ligger på \code{0x00}--\code{0x1F} och skrivs inte ut. De två du oftast möter
+är radmatning (\code{0x0A}) och vagnretur (\code{0x0D}), som avslutar en rad text.
+
+Tre saker i tabellen är värda att lägga på minnet:
+\begin{itemize}
+  \item \textbf{Siffertecknen \code{0}--\code{9} ligger på \code{0x30}--\code{0x39}.} Siffertecknet
+    \code{7} är alltså inte talet 7 utan talet \code{0x37} = 55. För att få talet ur tecknet drar
+    man bort \code{0x30}, och för att få tecknet ur talet lägger man till \code{0x30}. Det är precis
+    vad ett program gör när det ska visa ett tal som text, och det gör du själv i
+    kapitel~\ref{c10:ch}.
+  \item \textbf{Bokstäverna ligger i ordning}, så \code{B} är ett mer än \code{A}. Det gör att ett
+    program kan räkna fram bokstäver.
+  \item \textbf{Stora och små bokstäver skiljer sig med \code{0x20}}, alltså bara i bit~5: \code{A}
+    är \code{0100 0001} och \code{a} är \code{0110 0001}.
+\end{itemize}
+
+ASCII har inga svenska bokstäver. Å, ä och ö kom med senare koder som utökar ASCII, i dag nästan
+alltid Unicode i formatet UTF-8, där de första 128 tecknen är exakt ASCII.
+
+\subsection{7-segmentkod}
+\label{c1:b5}
+En sifferdisplay på en mikrovågsugn, en multimeter eller en klocka består ofta av sju avlånga
+lysdioder, \textbf{segment}, som kallas a till g. Varje siffra visas genom att rätt segment tänds.
+
+\bookfigure{l01_seven_segment}{En 7-segmentsdisplay med segmenten a till g, och samma display när
+segmenten a, c, d, f och g lyser och bildar siffran 5.}{c1:fig:seven_segment}
+
+\textbf{7-segmentkoden} för en siffra är en bit per segment: \code{1} för tänt och \code{0} för
+släckt. Skrivs bitarna i ordningen g, f, e, d, c, b, a, med a som bit~0, blir koderna för siffrorna
+0--9:
+
+\begin{narrowtable}{@{}clcc@{}}
+  \thead{Siffra} & \thead{Tända segment} & \thead{\code{g f e d c b a}} & \thead{Hexadecimalt} \\
+  \midrule
+  0 & a b c d e f & \code{0 1 1 1 1 1 1} & \code{0x3F} \\
+  1 & b c & \code{0 0 0 0 1 1 0} & \code{0x06} \\
+  2 & a b d e g & \code{1 0 1 1 0 1 1} & \code{0x5B} \\
+  3 & a b c d g & \code{1 0 0 1 1 1 1} & \code{0x4F} \\
+  4 & b c f g & \code{1 1 0 0 1 1 0} & \code{0x66} \\
+  5 & a c d f g & \code{1 1 0 1 1 0 1} & \code{0x6D} \\
+  6 & a c d e f g & \code{1 1 1 1 1 0 1} & \code{0x7D} \\
+  7 & a b c & \code{0 0 0 0 1 1 1} & \code{0x07} \\
+  8 & a b c d e f g & \code{1 1 1 1 1 1 1} & \code{0x7F} \\
+  9 & a b c d f g & \code{1 1 0 1 1 1 1} & \code{0x6F} \\
+\end{narrowtable}
+
+\noindent En krets som tar emot en BCD-siffra och tänder rätt segment kallas en \textbf{avkodare},
+och den är ett kombinatoriskt nät: sju utgångar, en per segment, som var och en är en funktion av
+de fyra ingångsbitarna. Sådana nät är ämnet för kapitel~\ref{c2:ch} och kapitel~\ref{c4:ch}.
+
+Tabellen gäller en display där en etta tänder segmentet (gemensam katod). Det finns också
+displayer där en nolla tänder segmentet (gemensam anod), och då är varje bit inverterad. Vilken sort
+man har står i databladet.
+
+\subsection{Paritetsbit}
+\label{c1:b6}
+När bitar skickas över en kabel kan en störning ibland vända en etta till en nolla eller tvärtom.
+Det enklaste sättet att upptäcka det är en \textbf{paritetsbit}: en extra bit som läggs till så att
+det totala antalet ettor alltid är jämnt.
+
+\textbf{Exempel:} tecknet \code{A} är \code{100 0001} i ASCII. Det har två ettor, ett jämnt antal,
+så paritetsbiten blir \code{0}, och det som skickas är \code{0100 0001}. Tecknet \code{C} är
+\code{100 0011} med tre ettor, så paritetsbiten blir \code{1}, och det som skickas är
+\code{1100 0011}, med fyra ettor.
+
+Mottagaren räknar ettorna. Är antalet udda har något gått fel, och tecknet kan begäras på nytt.
+
+Paritetsbiten har en tydlig begränsning: \textbf{den upptäcker en felaktig bit, men inte två.}
+Vänds två bitar är antalet ettor jämnt igen, och felet passerar obemärkt. Den säger inte heller
+vilken bit som är fel. Den är ändå vanlig, eftersom den kostar en enda bit och fångar det
+vanligaste felet.
+
+Att räkna ut en paritetsbit är samma sak som att använda XOR-grinden från kapitel~\ref{c2:ch} på
+alla bitar: XOR av ett jämnt antal ettor är \code{0}, och av ett udda antal \code{1}.
+
+Det finns också \textbf{udda paritet}, där paritetsbiten väljs så att antalet ettor blir udda.
+Sändare och mottagare måste vara överens om vilken som gäller; det är ännu en överenskommelse av det
+slag som \secref{c1:b1} handlade om.

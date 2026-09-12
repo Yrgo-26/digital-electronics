@@ -1,0 +1,151 @@
+% Section 11.4, from lectures/L11/appendix/c_exercises.md. The intro's "görs lämpligen på passet"
+% (exercise 9 needs the board) reads "görs lämpligen i samband med Labb 3".
+
+\section{Övningar}
+\label{c11:sec:exercises}\label{c11:app:c}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Övningarna märkta \textbf{Program} skrivs i Microchip
+Studio och testas först i simulatorn och sedan, om ni har kortet, på ett Arduino Uno.
+Övning~\ref{c11:ex:9}, kontrollen, kräver kortet och en multimeter, och görs lämpligen i samband
+med Labb~3.
+
+Övningarna märkta \textbf{Räkna för hand}, \textbf{Förståelse} och \textbf{Konstruktion} görs på
+papper, utan miniräknare, och kontrolleras mot bilaga~\ref{app:answers}. Gör varje övning innan du
+läser lösningen.
+
+Varje övning är märkt med sin sort. Exakt en övning är en \textbf{Kontroll}, och i det här kapitlet
+är det övning~\ref{c11:ex:9}.
+\end{aside}
+
+\exercise{Ingångar, beslut och utgångar}{Förståelse}
+\label{c11:ex:1}
+Beskriv för vart och ett av styrsystemen nedan vilka \textbf{ingångar} det har, vilka
+\textbf{utgångar}, och vilket \textbf{beslut} det fattar, som i \secref{c11:a1}.
+\begin{parts}
+  \item En garageport med en knapp, en motor som kan köra upp och ned, och två
+    gränslägesbrytare, en som känner att porten är helt öppen och en att den är helt stängd.
+  \item En handtork som blåser när en IR-givare ser en hand, och slutar tio sekunder efter att
+    handen försvunnit.
+  \item Övergångsstället i slutuppgiften, \hyperref[lab3:b]{del~B} i Labb~3.
+\end{parts}
+
+\exercise{Förkopplingsmotståndet}{Räkna för hand}
+\label{c11:ex:2}
+Stiftet ger 5~V. Räkna med 2~V över en röd lysdiod och 3~V över en grön.
+\begin{parts}
+  \item Hur stor blir strömmen genom en röd lysdiod med 220~Ω, 330~Ω och 1~kΩ?
+  \item Hur stor blir strömmen genom en grön lysdiod med 220~Ω? Varför lyser den kanske svagare än
+    den röda med samma motstånd?
+  \item Vilket motstånd behövs för 10~mA genom en röd lysdiod?
+  \item Någon tar ett motstånd på 47~Ω. Hur stor blir strömmen, och vad säger databladets gräns om
+    det?
+\end{parts}
+
+\exercise{Hela porten}{Räkna för hand}
+\label{c11:ex:3}
+Sex röda lysdioder sitter på PB0--PB5, var och en med 220~Ω, och alla lyser samtidigt.
+\begin{parts}
+  \item Hur stor är den sammanlagda strömmen ut ur porten?
+  \item Jämför med gränsen på ungefär 100~mA för en grupp av stift, från \secref{c11:a2}. Hur mycket
+    marginal finns det?
+  \item Varför är 330~Ω ett säkrare val än 220~Ω om många lysdioder kan lysa samtidigt?
+\end{parts}
+
+\exercise{Reläet}{Förståelse}
+\label{c11:ex:4}
+Titta på kopplingen i \secref{c11:a3}.
+\begin{parts}
+  \item Varför kopplas reläspolen inte direkt till stiftet?
+  \item Vad gör dioden, och vad händer om den saknas?
+  \item Mikrodatorn och 24~V-kretsen har ingen gemensam ledning. Varför är det en fördel?
+  \item Någon kopplar lampan på 24~V direkt mellan stiftet och jord, utan relä. Vad händer, med
+    lampan och med kortet?
+\end{parts}
+
+\exercise{Knappar som studsar}{Förståelse}
+\label{c11:ex:5}
+\begin{parts}
+  \item Förklara med egna ord varför programmet i \secref{c11:a4} räknar 6 i stället för 2 när
+    väntan tas bort.
+  \item Varför väntar programmet 20~ms, och inte 1~ms eller 500~ms? Vad går fel med var och en av
+    de två andra?
+  \item Lysdioden i \code{led_follows_button.asm} i kapitel~\ref{c10:ch} (\secref{c10:b4}) tänds så
+    länge knappen hålls ned, och har ingen avstudsning alls. Varför behövs den inte där?
+\end{parts}
+
+\exercise{Hur lång tid tar ett varv?}{Räkna för hand}
+\label{c11:ex:6}
+Använd formeln för \code{delay_s} i \secref{c11:b4}.
+\begin{parts}
+  \item Hur många cykler tar ett anrop av \code{delay_s} med \code{r24} = 4?
+  \item Vägarbetsljusets loop har, utöver de två anropen, tre instruktioner per tillstånd
+    (\code{ldi}, \code{out}, \code{ldi}) och ett \code{rjmp}. Hur många cykler tar ett helt varv?
+    Jämför med de 128\,000\,716 cykler som kursens kontroll mätte.
+  \item Hur mycket för långt blir ett varv, i mikrosekunder? Hur mycket blir det på en timme?
+  \item Jämför med resonatorns noggrannhet i \secref{c11:a7}. Vilken av de två felkällorna är värd
+    att bry sig om?
+\end{parts}
+
+\exercise{Nattläge}{Konstruktion}
+\label{c11:ex:7}
+På natten stängs trafikljus ofta av, och bara den gula lampan blinkar: en halv sekund tänd, en
+halv sekund släckt.
+\begin{parts}
+  \item Skriv tillståndstabellen, som i \secref{c11:b2}.
+  \item Rita flödesplanen.
+  \item Skriv programmet, med den gula lysdioden på PB1 och subrutinen \code{delay_ms}. Kan
+    \code{r24} laddas en enda gång, före loopen? Varför, eller varför inte?
+  \item Hur lång blir en hel blinkperiod, räknat i cykler?
+\end{parts}
+
+\exercise{En knapp som växlar}{Program}
+\label{c11:ex:8}
+Skriv ett program där varje tryck på knappen på PD2 \textbf{växlar} lysdioden på PB5: ett tryck
+tänder, nästa släcker, och så vidare. Använd avstudsning som i \secref{c11:a4}.
+\begin{parts}
+  \item Rita flödesplanen.
+  \item Skriv programmet och testa det i simulatorn.
+  \item Vad händer på kortet om väntan efter trycket tas bort? Prova, om ni har kortet.
+\end{parts}
+
+\exercise{Kontroll: strömmen genom lysdioden}{Kontroll}
+\label{c11:ex:9}
+\emph{Räkna för hand, mät på kortet, förklara skillnaden.}
+
+En röd lysdiod med 220~Ω sitter på stift 8 (PB0), och ett program tänder den.
+
+\task{a) För hand}
+Räkna ut strömmen genom lysdioden, med 2~V över den.
+
+\task{b)}
+\textbf{Mät spänningen över motståndet} med en multimeter, när lysdioden lyser. Räkna ut strömmen
+med Ohms lag. Mät också spänningen mellan stiftet och jord.
+
+\task{c) Jämför}
+Stämmer strömmarna i a) och b)? Förklara skillnaden med det du mätte: är spänningen på stiftet
+verkligen 5~V, och är spänningen över lysdioden verkligen 2~V?
+
+\task{d)}
+Byt till en grön lysdiod och gör om b). Vad ändras, och varför?
+
+\exercise{Felsökning på kortet}{Förståelse}
+\label{c11:ex:10}
+Programmet för trafikljuset fungerar i simulatorn. Förklara för vart och ett av symptomen nedan
+vad det troligaste felet är, och hur du kontrollerar det.
+\begin{parts}
+  \item Den gröna lampan lyser aldrig. De andra två fungerar.
+  \item Alla tre lamporna ser ut att lysa svagt, hela tiden.
+  \item Ingenting händer alls, och utskriften efter överföringen slutar med
+    \code{ser_open(): can't open device}.
+  \item Den röda och den gula lampan har bytt plats: gul lyser när röd ska lysa.
+\end{parts}
+
+\exercise{En dag på ett trafikljus}{Räkna för hand, Fördjupning}
+\label{c11:ex:11}
+\begin{parts}
+  \item Kortets resonator går 0,5~\% för fort. Hur mycket fel har en klocka byggd på programmets
+    fördröjningar efter ett dygn?
+  \item Hur många hela ljuscykler, om 8~s var, hinner trafikljuset i slutuppgiften med på ett
+    dygn? Räkna med exakt 8~s.
+\end{parts}

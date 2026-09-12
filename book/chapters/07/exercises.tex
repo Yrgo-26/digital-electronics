@@ -1,0 +1,193 @@
+% Section 7.5, from lectures/L07/appendix/d_exercises.md.
+%
+% One correction to the source: exercise 10 a) asks for the cycles of exercise 4's program from
+% start, and its solution counts the rjmp main at address 0, which the listing in exercise 4 does
+% not show. The exercise now says that the program sits in the template, here and in the source.
+
+\section{Övningar}
+\label{c7:sec:exercises}\label{c7:app:d}
+
+\begin{aside}
+\textbf{Så kontrollerar du ditt arbete.} Övningarna märkta \textbf{Program} och \textbf{Kontroll}
+görs i Microchip Studio: skapa ett projekt enligt bilaga~\ref{app:studio}, skriv programmet, bygg
+med \textbf{F7} och stega med \textbf{F11}. Förutsäg alltid resultatet innan du stegar
+(\secref{c7:c3}).
+
+Övriga övningar görs med papper och penna. Lösningsförslag finns i bilaga~\ref{app:answers}. Gör
+övningen innan du läser lösningen: det du nästan svarade lär dig mer än det rätta svaret gör.
+\end{aside}
+
+Varje övning är märkt med sin sort. Det finns en \textbf{Kontroll} i det här kapitlet,
+övning~\ref{c7:ex:7}.
+
+\exercise{Arbetsbänken}{Förståelse}
+\label{c7:ex:1}
+\begin{parts}
+  \item Hur många register har ATmega328P, och hur många bitar rymmer vart och ett?
+  \item Vilka register kan laddas med \code{ldi}?
+  \item Förklara, med hjälp av hur instruktionen \code{ldi} är kodad, varför de övriga registren
+    inte kan laddas med \code{ldi}. Svaret ska innehålla ett antal bitar.
+  \item Du vill ha talet 7 i \code{r5}. Skriv två instruktioner som gör det.
+\end{parts}
+
+\exercise{Tre minnen}{Förståelse}
+\label{c7:ex:2}
+\begin{parts}
+  \item I vilket minne ligger programmet?
+  \item I vilket minne ligger värden som ändras medan programmet kör?
+  \item Vilket av de två minnena behåller sitt innehåll när strömmen bryts? Varför är det viktigt
+    för ett Arduino-kort?
+  \item Vad heter adressen \code{0x08FF} i programmen, och vad ligger där?
+\end{parts}
+
+\exercise{Samma tal, olika skrivsätt}{Räkna för hand}
+\label{c7:ex:3}
+\begin{parts}
+  \item Skriv tre \code{ldi}-instruktioner som var och en laddar talet 45 i \code{r16}: decimalt,
+    binärt och hexadecimalt.
+  \item Gör samma sak för talen 255, 16 och 100.
+  \item Vilket decimalt värde laddas av \code{ldi r16, 0b01010101}, \code{ldi r17, 0x3F},
+    \code{ldi r18, $80} och \code{ldi r19, 'a'}? Tecknet \code{a} har ASCII-koden \code{0x61}.
+  \item En lysdiod ska lysa för varje etta i ett register. Vilket skrivsätt väljer du när du
+    laddar mönstret, och varför?
+\end{parts}
+
+\exercise{Förutsäg registren}{Räkna för hand}
+\label{c7:ex:4}
+Fyll i tabellen med värdet i varje register \textbf{efter} varje instruktion, hexadecimalt. Alla
+register är 0 när programmet startar.
+
+\begin{asmcode}
+main:
+    ldi r16, 0x10
+    ldi r17, 7
+    mov r18, r17
+    inc r18
+    inc r18
+    dec r16
+    mov r19, r16
+    clr r17
+    ser r20
+    dec r20
+end:
+    rjmp end
+\end{asmcode}
+
+\begin{filltable}{@{}p{7.6em}YYYYY@{}}
+  \thead{Efter} & \thead{\code{r16}} & \thead{\code{r17}} & \thead{\code{r18}} &
+    \thead{\code{r19}} & \thead{\code{r20}} \\
+  \midrule
+  \code{ldi r16, 0x10} & & & & & \fillrule
+  \code{ldi r17, 7} & & & & & \fillrule
+  \code{mov r18, r17} & & & & & \fillrule
+  \code{inc r18} & & & & & \fillrule
+  \code{inc r18} & & & & & \fillrule
+  \code{dec r16} & & & & & \fillrule
+  \code{mov r19, r16} & & & & & \fillrule
+  \code{clr r17} & & & & & \fillrule
+  \code{ser r20} & & & & & \fillrule
+  \code{dec r20} & & & & & \\
+\end{filltable}
+
+Kontrollera sedan ditt svar genom att stega programmet i simulatorn.
+
+\exercise{Hitta felen}{Förståelse}
+\label{c7:ex:5}
+Programmet nedan går inte att assemblera. Hitta alla fel, förklara vart och ett, och skriv det
+rättade programmet.
+
+\begin{asmcode}
+.include "m328Pdef.inc"
+
+.org 0x0000
+    rjmp main
+
+main
+    ldi r16 5
+    ldi r10, 3
+    mov r17 r16
+    inc r20, 1
+    rjmp mian
+\end{asmcode}
+
+\exercise{Ditt första egna program}{Program}
+\label{c7:ex:6}
+Skriv ett program, utifrån mallen (sidan~\pageref{lab3:template}), som:
+\begin{enumerate}
+  \item laddar talet 12 i \code{r16};
+  \item kopierar \code{r16} till \code{r17};
+  \item ökar \code{r17} med 3, med \code{inc};
+  \item laddar bitmönstret \code{1010 1010} i \code{r18}, skrivet binärt;
+  \item kopierar \code{r18} till \code{r19};
+  \item nollställer \code{r18}.
+\end{enumerate}
+\begin{parts}
+  \item Skriv ned vilka värden \code{r16}--\code{r19} ska ha när programmet når \code{end}, både
+    decimalt och hexadecimalt.
+  \item Bygg och stega programmet. Stämmer värdena?
+  \item Hur många klockcykler har programmet kört när det når \code{end}? Räkna först, kontrollera
+    sedan med Cycle Counter.
+\end{parts}
+
+\exercise{Maskinkod för hand}{Kontroll}
+\label{c7:ex:7}
+\emph{Räkna ut för hand, kontrollera i listfilen, förklara.}
+
+Använd kodningen av \code{ldi} i \secref{c7:a6}: \code{1110 KKKK dddd KKKK}, där \code{dddd} är
+registrets nummer minus 16.
+\begin{parts}
+  \item Räkna ut maskinkoden, hexadecimalt, för:
+    \begin{itemize}
+      \item \code{ldi r16, 0x2A}
+      \item \code{ldi r24, 0x2A}
+      \item \code{ldi r31, 0xFF}
+      \item \code{ldi r20, 0x03}
+    \end{itemize}
+    Visa de fyra fälten för åtminstone den första.
+  \item Skriv de fyra instruktionerna i ett program, bygg det, och öppna listfilen (\code{.lss}) i
+    projektets katalog \code{Debug}. Jämför maskinkoden där med dina svar.
+  \item Stämde alla fyra? Om inte: vilket fält hade du fel på? Det vanligaste felet är att skriva
+    konstanten i ett stycke i stället för att dela den i två halvor.
+  \item Varför finns det ingen maskinkod för \code{ldi r15, 0x2A}?
+\end{parts}
+
+\exercise{Programmet som inte tog slut}{Förståelse}
+\label{c7:ex:8}
+\begin{parts}
+  \item Varför slutar varje program i boken med raderna \code{end:} och \code{rjmp end}?
+  \item Ta bort de två raderna ur programmet i övning~\ref{c7:ex:4}. Programmet går fortfarande att
+    assemblera. Vad händer när processorn har kört den sista instruktionen?
+  \item Varför börjar varje program med \code{rjmp main}, trots att \code{main} kommer direkt
+    efter?
+\end{parts}
+
+\exercise{Tillåtet eller inte?}{Förståelse}
+\label{c7:ex:9}
+Vilka av raderna är tillåtna? Förklara varför de otillåtna inte är det, och skriv en rad som gör
+det som troligen var meningen.
+\begin{parts}
+  \item \code{mov r5, r16}
+  \item \code{ldi r5, 16}
+  \item \code{mov r16, 5}
+  \item \code{ldi r16, r5}
+  \item \code{inc r3}
+\end{parts}
+
+\exercise{Hur lång tid tar programmet?}{Räkna för hand}
+\label{c7:ex:10}
+\begin{parts}
+  \item Hur många klockcykler tar programmet i övning~\ref{c7:ex:4}, från start tills det når
+    \code{end}? Programmet står i mallen, så det börjar med \code{rjmp main} på adress 0.
+  \item Hur lång tid är det vid 16~MHz?
+  \item Ungefär hur många gånger per sekund skulle processorn hinna köra programmet, om det startade
+    om efter varje varv?
+\end{parts}
+
+\exercise{Maskinkod baklänges}{Räkna för hand, Fördjupning}
+\label{c7:ex:11}
+Tre instruktioner i en listfil har maskinkoden nedan. Alla tre är \code{ldi}-instruktioner. Vilka?
+\begin{parts}
+  \item \code{0xE3F5}
+  \item \code{0xE0A0}
+  \item \code{0xEF0F}. Vilken annan instruktion ur \secref{c7:b5} gör exakt samma sak?
+\end{parts}

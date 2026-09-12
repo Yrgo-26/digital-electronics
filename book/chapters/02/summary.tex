@@ -1,0 +1,55 @@
+% Section 2.3, from lectures/L02/README.md: what you should be able to do, the questions to test
+% yourself with, and the next lecture.
+
+\needspace{12\baselineskip}
+\section{Sammanfattning}
+\label{c2:sec:summary}
+
+\needspace{6\baselineskip}
+\subsection*{Det här ska du kunna nu}
+Efter det här kapitlet ska du kunna:
+\begin{itemize}
+  \item Rita symbolen för varje grundgrind, i ANSI- och i IEC-form, och ange dess sanningstabell och
+    uttryck.
+  \item Skriva ett booleskt uttryck med bokens notation, och förenkla det med räknelagarna och De
+    Morgans lagar.
+  \item Ta fram ett uttryck i SP-form ur en sanningstabell, och realisera det som ett grindnät.
+  \item Analysera ett grindnät: ta fram dess uttryck och sanningstabell med hjälp av
+    mellansignaler.
+  \item Bygga och simulera ett grindnät i CircuitVerse, och kontrollera det mot en sanningstabell.
+  \item Översätta mellan ett uttryck och ett kontaktnät: serie är AND, parallell är OR, brytande
+    kontakt är NOT.
+  \item Förklara hur ett relä med självhållning kan minnas att det har startats.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Frågor att testa dig själv med}
+\begin{enumerate}
+  \item Vilken grind ger \code{1} bara när alla ingångar är \code{1}? Vilken ger \code{0} bara när
+    alla ingångar är \code{0}?
+  \item Varför är \mbox{\code{A + A'B}} lika med \mbox{\code{A + B}}? Visa det både med en
+    sanningstabell och med ord.
+  \item Hur flyttar De Morgan en inversion genom en grind, och varför betyder det att en NAND-grind
+    kan bygga vilken funktion som helst?
+  \item I bromsassistenten läggs förarens pedal in med OR sist, i stället för att gå genom
+    felhanteringslogiken. Vad går sönder om du kopplar den tvärtom?
+  \item Varför behöver en XOR-funktion med tryckknappar både den slutande och den brytande
+    kontakten i varje knapp?
+  \item Vad händer i självhållningskretsen om stoppknappen av misstag kopplas med sin slutande
+    kontakt i stället för sin brytande?
+\end{enumerate}
+
+CircuitVerse, \url{https://circuitverse.org/simulator}, är simulatorn som grindnäten byggs och
+testas i, i det här kapitlet och fram till och med kapitel~\ref{c6:ch}. Innan Labb~1: läs
+\secref{c2:app:b} om kontaktnät, och gör förberedelseuppgifterna i bilaga~\ref{app:lab1}.
+
+\needspace{6\baselineskip}
+\subsection*{Nästa kapitel}
+Kapitel~\ref{c3:ch} hör ihop med Labb~1, kopplingsnät:
+\begin{itemize}
+  \item \textbf{Labb~1 -- Kopplingsnät}: logiska funktioner byggda med två tryckknappar och en lampa
+    på 24~V.
+  \item Att analysera ett kontaktnät man inte har ritat själv, och att hitta felet när lampan inte
+    gör som den ska.
+  \item Förberedelseuppgifterna i labbhandledningen ska vara klara när du börjar labben.
+\end{itemize}

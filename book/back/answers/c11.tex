@@ -1,0 +1,178 @@
+% Solutions to Chapter 11's exercises, from lectures/L11/appendix/d_solutions.md.
+%
+% The programs are left out: exercise 7 c) keeps its answer to the question whether r24 can be
+% loaded once, and 7 d) says in words how the program it counts is built; exercise 8 keeps the flow
+% chart in words, what the simulator showed, and c). Exercise 9 c) said the difference was "ett
+% tiotal procent"; with the solution's own figures, 12,7 mA against 13,6 mA, it is about 7 %, and it
+% now says so, here and in the lecture. Exercise 3 b) called an 18 mA margin "knappt en lysdiod
+% till", less than one more LED; one LED takes 13,6 mA, so it is "drygt en lysdiod till", here
+% and in the lecture.
+
+\answerchapter{c11:ch}
+
+De cykeltal som anges här är uppmätta i simulatorn.
+
+\answer{c11:ex:1}{Ingångar, beslut och utgångar}
+\pt{a}Ingångar: knappen och de två gränslägesbrytarna. Utgångar: motor upp och motor ned. Beslut:
+ett tryck startar porten mot det läge den inte står i, och motorn stannar när gränslägesbrytaren i
+det läget slår till. Ett bra program ser också till att upp och ned aldrig är på samtidigt.
+
+\pt{b}Ingång: IR-givaren. Utgång: fläkten. Beslut: fläkten går så länge givaren ser en hand, och
+tio sekunder till efter att den försvunnit. Beslutet innehåller alltså en tid, precis som
+trafikljuset.
+
+\pt{c}Ingång: knappen. Utgångar: den röda, den gula och den gröna lampan. Beslut: grönt tills
+knappen trycks, sedan en fast följd av tillstånd med bestämda tider, och grönt igen.
+
+\answer{c11:ex:2}{Förkopplingsmotståndet}
+\pt{a}Spänningen över motståndet är \code{5 - 2 = 3 V}.
+\begin{itemize}
+  \item 220~Ω: \code{3 / 220 ≈ 0,0136 A = 13,6 mA}
+  \item 330~Ω: \code{3 / 330 ≈ 9,1 mA}
+  \item 1~kΩ: \code{3 / 1000 = 3 mA}
+\end{itemize}
+
+\pt{b}\code{(5 - 3) / 220 ≈ 9,1 mA}. Den gröna lysdioden tar mer av spänningen själv, så det blir
+mindre kvar över motståndet och därmed mindre ström. Dessutom ger olika färger olika mycket ljus
+för samma ström, så gröna lysdioder upplevs ofta som svagare.
+
+\pt{c}\code{R = 3 V / 0,010 A = 300 Ω}. Närmaste vanliga värde är 330~Ω, som ger 9,1~mA, eller
+270~Ω, som ger 11~mA. Båda duger.
+
+\pt{d}\code{3 / 47 ≈ 64 mA}, långt över 40~mA, som är stiftets absoluta maximum. Både lysdioden
+och stiftet riskerar att förstöras. I praktiken sjunker spänningen på stiftet vid så stor ström, så
+det blir något mindre, men det är ändå långt utanför vad kretsen är specificerad för.
+
+\answer{c11:ex:3}{Hela porten}
+\pt{a}\code{6 · 13,6 mA ≈ 82 mA}.
+
+\pt{b}Marginalen är ungefär 18~mA, drygt en lysdiod till. Det fungerar, men det är inte mycket att
+ha om någon senare lägger till fler utgångar på samma grupp.
+
+\pt{c}Med 330~Ω blir det \code{6 · 9,1 ≈ 55 mA}, med god marginal, och lysdioderna lyser nästan
+lika starkt. Att välja det lite större motståndet kostar nästan ingenting och tar bort risken.
+
+\answer{c11:ex:4}{Reläet}
+\pt{a}En reläspole behöver typiskt mer ström än ett stift kan ge, ofta 70~mA eller mer för ett relä
+på 5~V. Transistorn låter några milliampere från stiftet styra den större strömmen.
+
+\pt{b}När transistorn slår av vill spolen hålla sin ström igång, och spänningen över den slår upp
+till många tiotals volt. Dioden leder då och låter strömmen klinga av genom spolen. Utan dioden går
+spänningstoppen över transistorn, som kan förstöras redan första gången.
+
+\pt{c}Störningar och fel på 24~V-sidan, en kortslutning, en spänningstopp från en motor, kan inte
+nå mikrodatorn. De två kretsarna kan dessutom ha olika jord.
+
+\pt{d}Stiftet ger bara 5~V, så lampan kommer knappt att glöda. Men en kall glödtråd har lågt
+motstånd, och strömmen kan bli långt över vad stiftet tål. Stiftet, och i värsta fall kretsen,
+riskerar att förstöras. Rätt sätt är ett relä, som i \secref{c11:a3}.
+
+\answer{c11:ex:5}{Knappar som studsar}
+\pt{a}Programmet räknar varje gång stiftet går från 1 till 0. I testet slöts knappen två gånger vid
+varje tryck, sluts, studs, sluts igen, och en gång till när den släpptes. Varje sådan nolla ser för
+programmet ut som ett nytt tryck: tre per tryck, sex för två tryck.
+
+\pt{b}Väntan ska vara längre än studsarna varar och kortare än den tid en människa behöver mellan
+två tryck.
+\begin{itemize}
+  \item \textbf{1~ms} är kortare än studsarna, som kan hålla på i flera millisekunder. Programmet
+    tittar på knappen igen medan den fortfarande studsar, och räknar för mycket.
+  \item \textbf{500~ms} tar bort studsarna, men programmet blir trögt: ett andra tryck inom en halv
+    sekund missas, och det märks för den som trycker snabbt.
+\end{itemize}
+
+\pt{c}Programmet räknar ingenting. Under några millisekunder av studs flimrar lysdioden, vilket
+ingen människa ser, och därefter följer den knappen.
+
+\answer{c11:ex:6}{Hur lång tid tar ett varv?}
+\pt{a}\mbox{\code{16 000 084 · 4 + 18 = 64 000 354}} cykler.
+
+\pt{b}Ett tillstånd tar \mbox{\code{1 + 1 + 1 + 64 000 354 = 64 000 357}} cykler. Två tillstånd
+och ett \code{rjmp}: \mbox{\code{2 · 64 000 357 + 2 = 128 000 716}} cykler. Precis vad kontrollen
+mätte.
+
+\pt{c}8~s är 128\,000\,000 cykler, så varvet är 716 cykler för långt. En cykel är 62,5~ns, så
+\mbox{\code{716 · 62,5 ns ≈ 44,8 µs}}. En timme är \mbox{\code{3600 / 8 = 450}} varv, och
+\mbox{\code{450 · 44,8 µs ≈ 20 ms}}.
+
+\pt{d}Resonatorn kan ge 0,5~\%, alltså 18 sekunder på en timme. Det är nästan tusen gånger mer än
+programmets 20~ms. Det är resonatorn som är värd att bry sig om, om noggrannheten alls spelar roll,
+och för ett trafikljus gör den inte det.
+
+\answer{c11:ex:7}{Nattläge}
+\pt{a}\leavevmode
+
+\begin{narrowtable}{@{}lccl@{}}
+  \thead{Tillstånd} & \thead{Gul (PB1)} & \thead{Tid} & \thead{Därefter} \\
+  \midrule
+  Tänd & tänd & 0,5~s & Släckt \\
+  Släckt & släckt & 0,5~s & Tänd \\
+\end{narrowtable}
+
+\pt{b}Start, initiering av \code{SP} och PB1, och sedan en loop utan villkor: tänd gul, vänta
+0,5~s, släck gul, vänta 0,5~s, tillbaka till \enquote{tänd gul}. Samma form som vägarbetsljusets
+flödesplan.
+
+\pt{c}Ja, \code{r24} kan laddas en enda gång, eftersom \code{delay_ms} följer kursens regel och
+lämnar \code{r24} oförändrat. Med en subrutin som inte gjorde det hade \code{r24} behövt laddas om
+före varje anrop.
+
+\pt{d}Räkna med ett program där \code{r24} = 250 laddas före loopen, och loopen är \code{sbi},
+två anrop av \code{delay_ms}, \code{cbi}, två anrop till och ett \code{rjmp} tillbaka. Den tända
+halvan är \code{sbi} (2 cykler) och två anrop om \mbox{\code{4 000 018}} cykler:
+\mbox{\code{8 000 038}}. Den släckta är \code{cbi} (2), två anrop och \code{rjmp} (2):
+\mbox{\code{8 000 040}}. En hel period är \textbf{16\,000\,078} cykler, en sekund och knappt
+5~µs. Simulatorn mäter samma sak.
+
+\answer{c11:ex:8}{En knapp som växlar}
+\pt{a}Start och initiering, sedan en loop: vänta tills knappen är nedtryckt, växla lysdioden, vänta
+20~ms, vänta tills knappen är släppt, vänta 20~ms, och tillbaka.
+
+\pt{b}I simulatorn, med samma studsande tryck som \code{press_counter.asm}, ska lysdioden lysa
+efter det första trycket och vara släckt efter det andra.
+
+\pt{c}Utan väntan växlar lysdioden en gång för varje studs. Är antalet studsar jämnt ser det ut som
+att trycket inte gjorde någonting, och är det udda fungerar det. Resultatet blir slumpmässigt, och
+det är just det som gör felet så förvirrande att hitta.
+
+\answer{c11:ex:9}{Kontroll: strömmen genom lysdioden}
+\pt{a}\code{(5 - 2) / 220 ≈ 13,6 mA}.
+
+\pt{b}Ett typiskt resultat är ungefär 2,8~V över motståndet, alltså \code{2,8 / 220 ≈ 12,7 mA}, och
+ungefär 4,8~V mellan stiftet och jord. Era värden beror på lysdioden och på USB-porten.
+
+\pt{c}Strömmen blir något mindre än uträknat, av två skäl som mätningen visar:
+\begin{itemize}
+  \item \textbf{Stiftet ger inte riktigt 5~V under last.} Utgången har ett litet inre motstånd, så
+    spänningen sjunker när en ström går ut ur den. Dessutom är matningen från USB inte alltid
+    exakt 5~V.
+  \item \textbf{Lysdiodens spänning är inte exakt 2~V.} Den beror på typ och färg, och varierar
+    något med strömmen.
+\end{itemize}
+Skillnaden är några procent, i exemplet ovan ungefär 7~\%, och den visar hur mycket en förenklad
+modell räcker till: tillräckligt för att välja motstånd, inte för att förutsäga strömmen på
+milliampere när.
+
+\pt{d}Den gröna lysdioden har högre spänning över sig, kanske 2,2--3~V beroende på typ. Då blir det
+mindre kvar över motståndet, och strömmen blir mindre. Mät spänningen över lysdioden, så ser ni hur
+stor skillnaden är.
+
+\answer{c11:ex:10}{Felsökning på kortet}
+\pt{a}Troligast är den gröna lysdioden vänd fel, eller kopplad till fel stift. Kontrollera att det
+långa benet sitter mot motståndet, och att sladden går till stift 10. Byt plats på den gröna och
+den röda lysdioden: följer felet med lysdioden, är det den eller dess koppling.
+
+\pt{b}\code{QUARTER_MS} står kvar på 1. Hela ljuscykeln går då runt ungefär 30 gånger i sekunden,
+och ögat ser alla lamporna lysa svagt. Sätt den till 250, bygg om och för över programmet igen.
+
+\pt{c}Programmet har aldrig kommit fram till kortet: fel COM-port, eller kortet är inte anslutet.
+Kontrollera porten i Arduino IDE och i verktygets argument, se \secref{studio:5-6} i
+bilaga~\ref{app:studio}.
+
+\pt{d}Sladdarna till stift 8 och 9 har bytt plats, eller så har bitnumren i \code{.equ RED} och
+\code{.equ YELLOW} bytt plats i programmet. Jämför kopplingen med tabellen i slutuppgiften.
+
+\answer{c11:ex:11}{En dag på ett trafikljus}
+\pt{a}\mbox{\code{0,005 · 86 400 s = 432 s}}, alltså 7 minuter och 12 sekunder på ett dygn.
+
+\pt{b}\mbox{\code{86 400 / 8 = 10 800}} ljuscykler.

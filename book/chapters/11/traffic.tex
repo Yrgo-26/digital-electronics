@@ -1,0 +1,216 @@
+% Section 11.2, from lectures/L11/appendix/b_traffic_light.md.
+
+\section{Genomarbetat exempel: från flödesplan till program}
+\label{c11:app:b}
+
+\subsection{Uppgiften: vägarbetsljuset}
+\label{c11:b1}
+Vid ett vägarbete är vägen smal nog för ett körfält, och trafiken från de två hållen turas om. Vid
+varje ände står ett ljus med en röd och en grön lampa. Det här exemplet programmerar det ena ljuset:
+\textbf{rött i 4 sekunder, grönt i 4 sekunder, och om igen, för alltid.}
+
+Exemplet är medvetet enklare än trafikljuset i slutuppgiften: två lampor och två tillstånd i
+stället för tre lampor och fyra. Metoden är densamma, och det är metoden avsnittet handlar om:
+\begin{enumerate}
+  \item Skriv upp \textbf{tillstånden}, vilka lampor som lyser i vart och ett, och hur länge.
+  \item Rita \textbf{flödesplanen}.
+  \item Välj \textbf{stift och bitmönster}.
+  \item Skriv \textbf{programmet}, ett tillstånd i taget, med subrutiner för det som upprepas.
+  \item \textbf{Testa} i simulatorn, och sedan på kortet.
+\end{enumerate}
+
+Lamporna är lysdioder på kortet: röd på stift 8 (PB0) och grön på stift 10 (PB2), kopplade som i
+slutuppgiften.
+
+\subsection{Tillstånden}
+\label{c11:b2}
+Ett styrobjekt som går igenom samma steg om och om igen beskrivs bäst som en följd av
+\textbf{tillstånd}. Ett tillstånd säger vilka utgångar som är på, och hur länge systemet stannar
+där:
+
+\begin{narrowtable}{@{}lcccl@{}}
+  \thead{Tillstånd} & \thead{Röd (PB0)} & \thead{Grön (PB2)} & \thead{Tid} & \thead{Därefter} \\
+  \midrule
+  Stopp & tänd & släckt & 4~s & Kör \\
+  Kör & släckt & tänd & 4~s & Stopp \\
+\end{narrowtable}
+
+\noindent Det är samma idé som tillståndsföljden för en räknare i kapitel~\ref{c6:ch}: systemet är
+i ett tillstånd i taget, och går till nästa vid en bestämd händelse. För en räknare var händelsen
+en klockflank. Här är det att en viss tid har gått.
+
+Tabellen är värd att skriva även när uppgiften är så här liten. Den är specifikationen, och det
+färdiga programmet ska kunna kontrolleras mot den rad för rad.
+
+\subsection{Flödesplanen}
+\label{c11:b3}
+
+\bookfigure{l11_roadwork_flowchart}{Flödesplanen för vägarbetsljuset.}{c11:fig:roadwork_flowchart}
+
+\noindent Varje tillstånd blir två symboler: en utmatning som tänder rätt lampor, och ett
+subrutinanrop som väntar. Loopen tillbaka har inget villkor, eftersom ljuset aldrig slutar. Det
+enda som händer före loopen är initieringen: stackpekaren, eftersom programmet anropar subrutiner,
+och de två stiften som utgångar.
+
+\subsection{Subrutinen \code{delay_s}}
+\label{c11:b4}
+Programmet behöver vänta hela sekunder, men \code{delay_ms} från \secref{c10:c4} räcker bara till
+255~ms. En ny subrutin, \code{delay_s}, tar antalet sekunder i \code{r24} och anropar
+\code{delay_ms} med 250~ms fyra gånger per sekund:
+
+\needspace{21\baselineskip}
+\begin{asmcode}
+;--------------------------------------------------------------------------------
+; delay_s: Waits r24 seconds (1-63), as 4 x r24 calls of delay_ms with 250 ms each.
+; A call takes 16 000 084 x r24 + 18 cycles: about 5 microseconds too long per second.
+;--------------------------------------------------------------------------------
+delay_s:
+    push r24                        ; Save the registers this subroutine changes.
+    push r25
+    mov r25, r24
+    lsl r25                         ; r25 = 2 x r24 ...
+    lsl r25                         ; ... = 4 x r24: the number of quarter seconds.
+    ldi r24, QUARTER_MS             ; A quarter of a second is 250 ms.
+delay_s_loop:
+    rcall delay_ms
+    dec r25
+    brne delay_s_loop
+    pop r25                         ; Restore them, in the opposite order.
+    pop r24
+    ret
+\end{asmcode}
+
+\noindent Tre saker i den är värda att lägga märke till:
+\begin{itemize}
+  \item \textbf{\code{lsl} två gånger multiplicerar med fyra}, som i kapitel~\ref{c8:ch}: varje
+    skift åt vänster dubblar talet. Tre sekunder blir tolv kvartar.
+  \item \textbf{Den följer kursens regel.} Den ändrar \code{r24} och \code{r25}, och sparar båda.
+    Efter \code{ldi r24, 4} och \code{rcall delay_s} är \code{r24} fortfarande 4, och kan användas
+    igen.
+  \item \textbf{Den fungerar upp till 63 sekunder.} Fyra gånger 64 är 256, som inte får plats i
+    \code{r25}.
+\end{itemize}
+
+Konstanten \code{QUARTER_MS} står överst i programmet och är normalt 250:
+
+\needspace{5\baselineskip}
+\begin{asmcode}
+.equ QUARTER_MS = 250               ; 250 ms. Set it to 1 to run about 250 times
+                                    ; faster in the simulator; set it back before
+                                    ; flashing.
+\end{asmcode}
+
+\noindent Den finns för simulatorns skull, se \secref{c11:b6}.
+
+\textbf{Hur exakt är den?} Varje kvart är ett anrop av \code{delay_ms} med 250, alltså
+\mbox{\code{16 000 · 250 + 18}} cykler, plus 3 cykler för \code{dec} och \code{brne} i loopen. Fyra
+kvartar blir 16\,000\,084 cykler, och hela anropet \mbox{\code{16 000 084 · r24 + 18}} cykler. En
+sekund blir alltså ungefär 5~µs för lång. Det är långt mindre än felet i kortets klocka
+(\secref{c11:a7}).
+
+\subsection{Programmet, rad för rad}
+\label{c11:b5}
+Hela programmet finns i \code{roadwork_light.asm}. Konstanter och initiering först:
+
+\needspace{14\baselineskip}
+\begin{asmcode}
+.equ RED = 0                        ; PB0, Arduino pin 8.
+.equ GREEN = 2                      ; PB2, Arduino pin 10.
+
+main:
+    ldi r16, high(RAMEND)           ; SP = RAMEND = 0x08FF.
+    out SPH, r16
+    ldi r16, low(RAMEND)
+    out SPL, r16
+
+    ldi r16, (1 << RED) | (1 << GREEN)
+    out DDRB, r16                   ; The two lights are outputs.
+\end{asmcode}
+
+\noindent\code{(1 << RED)} är ett uttryck som assemblern räknar ut: en etta skiftad \code{RED} steg
+åt vänster, alltså \code{0b00000001}, och \code{(1 << GREEN)} blir \code{0b00000100}. \code{|} är
+OR, bit för bit, så båda tillsammans blir \code{0b00000101}. Skrivsättet gör att raden säger
+\emph{vilka} lampor det gäller, i stället för bara ett tal, och om grön flyttas till ett annat
+stift behöver bara \code{.equ}-raden ändras.
+
+Sedan de två tillstånden, i en loop:
+
+\needspace{14\baselineskip}
+\begin{asmcode}
+loop:
+    ldi r16, (1 << RED)             ; Red, 4 s.
+    out PORTB, r16
+    ldi r24, 4
+    rcall delay_s
+
+    ldi r16, (1 << GREEN)           ; Green, 4 s.
+    out PORTB, r16
+    ldi r24, 4
+    rcall delay_s
+
+    rjmp loop                       ; And round again.
+\end{asmcode}
+
+\noindent Varje tillstånd är fyra rader: bitmönstret, ut på porten, tiden, vänta. Programmet läses
+som tabellen i \secref{c11:b2}, rad för rad, och det är ingen slump: tabellen skrevs först.
+
+Lägg märke till att \code{out PORTB, r16} skriver \textbf{hela} porten. Den tänder en lampa och
+släcker den andra i samma instruktion, och det är därför bitmönstret för \enquote{Kör} är
+\code{0b00000100} och inte bara \enquote{tänd grön}. Med \code{sbi} och \code{cbi} hade samma sak
+krävt två instruktioner per tillstånd.
+
+\subsection{Testa i simulatorn}
+\label{c11:b6}
+Ett tillstånd på 4 sekunder är 64 miljoner cykler, och simulatorn behöver en lång stund för att
+köra dem. Därför finns \code{QUARTER_MS}: sätt den till \textbf{1} medan programmet testas i
+simulatorn. Då tar varje \enquote{sekund} ungefär 4~ms, och hela cykeln syns på ett ögonblick, i
+samma ordning och med samma förhållande mellan tiderna.
+
+Så testar du:
+\begin{enumerate}
+  \item Sätt \code{QUARTER_MS} till 1 och bygg.
+  \item Sätt en brytpunkt på varje \code{out PORTB, r16}.
+  \item Kör med \textbf{Continue} (\textbf{F5}). Vid varje stopp: stega ett steg med \textbf{F11}
+    och kontrollera i I/O-fönstret att rätt bitar i \code{PORTB} är ettor.
+  \item Nollställ stoppuret vid ett stopp och kör till nästa. Med \code{QUARTER_MS} = 1 ska två
+    stopp i rad ligga ungefär 16~ms isär, 4 \enquote{sekunder} gånger 4~ms.
+\end{enumerate}
+
+I kursens kontroll av programmet, med \code{QUARTER_MS} = 250, tar en hel cykel
+\textbf{128\,000\,716} cykler, 8,0000448~s. Med \code{QUARTER_MS} = 1 tar den 512\,716 cykler,
+32~ms: ungefär 250 gånger fortare.
+
+\subsection{Till kortet}
+\label{c11:b7}
+\begin{enumerate}
+  \item \textbf{Sätt tillbaka \code{QUARTER_MS} till 250.} Det är det vanligaste felet i det här
+    steget. Med 1 går hela cykeln runt ungefär 30 gånger i sekunden, och båda lamporna ser ut att
+    lysa svagt på en gång.
+  \item Koppla lysdioderna enligt \secref{c11:a5}, med USB-kabeln urkopplad.
+  \item Bygg, anslut kortet och för över programmet enligt \secref{studio:5} i
+    bilaga~\ref{app:studio}.
+  \item Ta tid på några cykler och jämför med tabellen.
+\end{enumerate}
+
+Om lamporna gör något annat än i simulatorn, följ felsökningsordningen i \secref{c11:a6}.
+
+\subsection{Från vägarbetsljus till trafikljus}
+\label{c11:b8}
+Slutuppgiftens \hyperref[lab3:a]{del~A}, trafikljuset i bilaga~\ref{app:lab3}, använder precis
+samma metod med fler tillstånd:
+\begin{itemize}
+  \item \textbf{Tabellen} får fyra rader i stället för två, och en tredje lampa, gul på PB1.
+  \item \textbf{Flödesplanen} får fyra par av symboler, ett per tillstånd.
+  \item \textbf{Bitmönstren} blir fyra, och ett av dem har två lampor tända samtidigt.
+  \item \textbf{Subrutinerna} är desamma, oförändrade.
+\end{itemize}
+
+\needspace{16\baselineskip}
+Ljuscykeln som del~A ska ge, ritad som ett tidsdiagram:
+
+\bookfigure{l11_traffic_timing}{Tidsdiagram för trafikljuset i slutuppgiftens del~A: en cykel på
+8~s.}{c11:fig:traffic_timing}
+
+\hyperref[lab3:b]{Del~B}, övergångsstället, lägger till något nytt: ett \textbf{villkor}. Ljuset
+står still i ett tillstånd tills knappen trycks, och det blir en beslutssymbol i flödesplanen och
+en väntan med \code{sbic} i programmet (\secref{c10:b5}).

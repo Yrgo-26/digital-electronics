@@ -1,0 +1,292 @@
+% Section 4.2, from lectures/L04/appendix/b_integrated_circuits.md.
+%
+% B.3 once called the noise margin "brusimmuniteten från L02"; the noise tolerance is L01 A.1, and
+% the source now says so too. B.8's "nästa pass, L05" is chapter 5, where Labb 2 belongs.
+
+\section{IC-kretsar}
+\label{c4:app:b}
+
+\subsection{Från grind till krets}
+\label{c4:b1}
+En logisk grind är ett begrepp. För att kunna koppla upp den behöver du en \textbf{IC-krets}
+(\emph{integrated circuit}): en liten kiselbit med transistorer, ingjuten i en plastkapsel med
+metallben. Den mest spridda familjen av enkla logikkretsar är \textbf{74-serien}, som funnits sedan
+1960-talet och fortfarande tillverkas. Varje krets i serien har ett nummer som säger vad den
+innehåller:
+
+\begin{booktable}{@{}p{5.2em}Lp{6em}@{}}
+  \thead{Krets} & \thead{Innehåll} & \thead{Används i} \\
+  \midrule
+  74HC00 & fyra NAND-grindar med två ingångar & Labb~2-2 \\
+  74HC02 & fyra NOR-grindar med två ingångar & Labb~2-2 \\
+  74HC04 & sex inverterare (NOT) & Labb~2-1 \\
+  74HC08 & fyra AND-grindar med två ingångar & Labb~2-1 \\
+  74HC32 & fyra OR-grindar med två ingångar & Labb~2-1 \\
+  74HC86 & fyra XOR-grindar med två ingångar & -- \\
+\end{booktable}
+
+Namnet har tre delar. \textbf{74} betyder standardserien, för normala temperaturer. \textbf{HC} är
+kretsfamiljen, alltså hur transistorerna inuti är byggda: \emph{High-speed CMOS}. \textbf{00} är
+funktionen. En 74HC00 och en 74LS00 innehåller samma fyra NAND-grindar, men i olika teknik.
+
+Tillverkarna lägger ofta till egna bokstäver före och efter. \code{SN74HC00N} från Texas
+Instruments och \code{74HC00N} från Nexperia är samma krets; \code{N} på slutet betyder här kapseln
+DIP, den som passar i ett kopplingsdäck. Leta efter \code{74}, familjen och numret, och bry dig inte
+om resten.
+
+\textbf{Två familjer du kommer att möta:}
+\begin{itemize}
+  \item \textbf{HC} (CMOS) arbetar på 2--6~V, drar nästan ingen ström i vila, och är den boken
+    använder.
+  \item \textbf{LS} (TTL) är äldre, kräver 5~V, och drar mer ström. En LS-ingång som lämnas
+    okopplad läses som 1, vilket har lärt generationer av elektroniker den dåliga vanan att lämna
+    ingångar okopplade. På en HC-krets är det ett fel (\secref{c4:b4}).
+\end{itemize}
+
+\subsection{Kapsel och benplacering}
+\label{c4:b2}
+Kretsarna i boken sitter i en \textbf{DIP-14}-kapsel: 14 ben i två rader, 2,54~mm mellan benen, så
+att de passar i kopplingsdäckets hål.
+
+\textbf{Ben 1 hittar du med hjälp av markeringen.} I ena kortsidan finns ett halvrunt
+\textbf{hack}, och ofta också en liten prick vid ben 1. Håll kretsen med hacket åt vänster och
+texten rättvänd: då sitter ben 1 längst ned till vänster. Benen räknas sedan \textbf{moturs, sett
+ovanifrån}: 1 till 7 längs nederkanten från vänster till höger, och 8 till 14 längs överkanten från
+höger till vänster.
+
+Alla kretsar i tabellen ovan har matningen på samma ben:
+\begin{itemize}
+  \item \textbf{ben 14: VCC}, plus 5~V;
+  \item \textbf{ben 7: GND}, jord (0~V).
+\end{itemize}
+
+Utan matning fungerar ingenting. Och en krets som sitter felvänd får plus på ben 7 och jord på ben
+14: den blir varm, fungerar inte, och kan förstöras. Känn efter med ett finger om en krets blir
+varm, och bryt matningen direkt om den blir det.
+
+Benplaceringen finns i databladet. Här är de kretsar boken använder, ritade ovanifrån med grindarna
+inuti:
+
+\bookfigure{l04_dip_74hc00}{Benplacering för 74HC00, fyra NAND-grindar.}{c4:fig:dip_74hc00}
+
+\bookfigure{l04_dip_74hc08}{Benplacering för 74HC08, fyra AND-grindar: samma benplacering som
+74HC00.}{c4:fig:dip_74hc08}
+
+\bookfigure{l04_dip_74hc32}{Benplacering för 74HC32, fyra OR-grindar: samma benplacering som
+74HC00.}{c4:fig:dip_74hc32}
+
+\bookfigure{l04_dip_74hc86}{Benplacering för 74HC86, fyra XOR-grindar: samma benplacering som
+74HC00.}{c4:fig:dip_74hc86}
+
+\bookfigure{l04_dip_74hc04}{Benplacering för 74HC04, sex inverterare.}{c4:fig:dip_74hc04}
+
+\bookfigure{l04_dip_74hc02}{Benplacering för 74HC02, fyra NOR-grindar: utgången kommer först i
+varje grupp.}{c4:fig:dip_74hc02}
+
+\textbf{74HC00, 08, 32 och 86 har samma benplacering.} Grind 1 har ingångarna på ben 1 och 2 och
+utgången på ben 3, grind 2 på ben 4, 5 och 6, och så vidare. Byt en 74HC08 mot en 74HC32 så byts
+alla fyra AND-grindarna mot OR-grindar, utan att en enda sladd flyttas.
+
+\textbf{74HC02 är undantaget}, och det är den krets flest kopplar fel. I varje grupp om tre ben
+kommer \textbf{utgången först}: ben 1 är utgång och ben 2 och 3 ingångar. Den som kopplar en 74HC02
+ur minnet av en 74HC00 kopplar sina insignaler till en utgång. Titta på benplaceringen varje gång.
+
+\subsection{Databladet}
+\label{c4:b3}
+Varje krets har ett \textbf{datablad}, ett dokument från tillverkaren som beskriver den i detalj.
+Sök på kretsens namn och \enquote{datasheet}, och välj en stor tillverkare som Texas Instruments,
+Nexperia eller onsemi. Ett datablad är ofta 15--20 sidor, men för att koppla upp en krets behöver
+du bara tre saker ur det:
+\begin{enumerate}
+  \item \textbf{Benplaceringen} (\emph{pin configuration} eller \emph{pinout}): vilket ben som är
+    vad, som i figurerna ovan.
+  \item \textbf{Funktionstabellen} (\emph{function table}): kretsens sanningstabell, skriven med
+    \code{H} för hög och \code{L} för låg, och ibland \code{X} för \enquote{spelar ingen roll}.
+  \item \textbf{De elektriska nivåerna}: vilka spänningar som räknas som 0 och 1.
+\end{enumerate}
+
+\subsubsection{Logiknivåer}
+En digital krets delar in spänningen i tre områden: låg, hög, och ett förbjudet område däremellan.
+För en 74HC-krets matad med 4,5~V anger databladet:
+
+\begin{booktable}{@{}p{4.2em}Lp{10.2em}@{}}
+  \thead{Storhet} & \thead{Betydelse} & \thead{Värde vid VCC = 4,5~V} \\
+  \midrule
+  $V_{\text{IH}}$ & lägsta spänning på en ingång som garanterat läses som 1 & 3,15~V \\
+  $V_{\text{IL}}$ & högsta spänning på en ingång som garanterat läses som 0 & 1,35~V \\
+  $V_{\text{OH}}$ & lägsta spänning en hög utgång ger, vid 4~mA last & 3,84~V \\
+  $V_{\text{OL}}$ & högsta spänning en låg utgång ger, vid 4~mA last & 0,33~V \\
+\end{booktable}
+
+En tumregel för HC-kretsar: under \textbf{30~\%} av matningen är 0, över \textbf{70~\%} är 1. Vid
+5~V betyder det under 1,5~V och över 3,5~V. En ingång mellan de två gränserna kan läsas som vad som
+helst, och får kretsen att dra onödigt mycket ström.
+
+Lägg märke till marginalen: en utgång ger minst 3,84~V när den är hög, och en ingång behöver bara
+3,15~V. Skillnaden, ungefär 0,7~V, är \textbf{brusmarginalen}. Den gör att en störning på upp till
+0,7~V på en ledning inte ändrar något. Det är brusimmuniteten från \secref{c1:a1}, uttryckt i volt.
+
+\subsubsection{Gränsvärden}
+Databladet har också en tabell med \textbf{absoluta maxvärden} (\emph{absolute maximum ratings}). De
+är inte arbetsvärden, utan gränser som förstör kretsen om de överskrids. För 74HC:
+\begin{itemize}
+  \item matningen får vara högst 7~V (och kretsen är specificerad för 2--6~V);
+  \item en utgång får leverera högst 25~mA;
+  \item hela kretsen, alla utgångar tillsammans, högst 50~mA genom VCC eller GND.
+\end{itemize}
+
+\textbf{Koppla aldrig 24~V från Labb~1 till en 74HC-krets.} Den överlever det inte.
+
+\subsection{Ingångar: aldrig flytande}
+\label{c4:b4}
+En CMOS-ingång drar nästan ingen ström, under en mikroampere. Det låter bra, men det betyder att en
+ingång som inte är ansluten till något, en \textbf{flytande ingång}, inte har någon bestämd
+spänning alls. Den plockar upp laddning från omgivningen och kan läsas som 0 i ena sekunden och 1 i
+nästa, beroende på om din hand är nära. Kretsen verkar fungera ibland, och det är den värsta sortens
+fel.
+
+\textbf{Regeln: varje ingång ska vara ansluten till något.} Det gäller också ingångarna på grindar
+du inte använder: koppla dem till GND (eller VCC).
+
+En strömbrytare eller tryckknapp ger bara en förbindelse när den är sluten. När den är öppen är
+ingången flytande, om inte ett motstånd bestämmer nivån:
+
+\bookfigure{l04_io_circuit}{Tryckknapp med pull-down-motstånd på en grindingång, och lysdiod med
+förkopplingsmotstånd på utgången.}{c4:fig:io_circuit}
+
+\begin{itemize}
+  \item Knappen sitter mellan \textbf{5~V} och ingången.
+  \item Ett motstånd på \textbf{10~kΩ} sitter mellan ingången och \textbf{jord}. Det kallas ett
+    \textbf{pull-down-motstånd}: det drar ned ingången till 0 när knappen är öppen.
+  \item När knappen trycks ned kopplar den ingången direkt till 5~V. Motståndet ligger då mellan
+    5~V och jord och leder 0,5~mA, men det spelar ingen roll; ingången ser 5~V och läser 1.
+\end{itemize}
+
+Det omvända, knappen mot jord och motståndet mot 5~V, kallas ett \textbf{pull-up-motstånd} och ger
+omvänd logik: nedtryckt knapp läses som 0. Det är den kopplingen mikrokontrollern använder i
+kapitel~\ref{c10:ch}, där motståndet dessutom sitter inbyggt i kretsen.
+
+Kopplingsdäckets stationer i Labb~2 har strömbrytare som redan ger 0 eller 5~V. Då behövs inga egna
+motstånd, men regeln om ingångar du inte använder gäller fortfarande.
+
+\subsection{Utgångar: lysdiod med förkopplingsmotstånd}
+\label{c4:b5}
+För att se vad en utgång gör kopplar du en \textbf{lysdiod} till den. En lysdiod är en diod som
+lyser när ström går igenom den i rätt riktning: från det långa benet (\textbf{anoden}) till det
+korta (\textbf{katoden}, som också är märkt med en platt kant på kapseln).
+
+En lysdiod måste alltid ha ett \textbf{förkopplingsmotstånd} i serie. Över en röd lysdiod ligger
+ungefär 2~V när den lyser, nästan oberoende av strömmen, så utan motstånd skulle strömmen bara
+begränsas av hur mycket utgången orkar leverera, och det är mer än lysdioden tål.
+
+Motståndet räknas ut med Ohms lag. Resten av spänningen, det som inte ligger över lysdioden, ska
+ligga över motståndet:
+\[
+  R = \frac{U_{\text{matning}} - U_{\text{lysdiod}}}{I}
+\]
+Med 5~V matning, en röd lysdiod på 2~V och en önskad ström på 10~mA:
+\[
+  R = \frac{5 - 2}{0,010} = 300\ \Omega
+\]
+Välj närmaste standardvärde uppåt, \textbf{330~Ω}, som ger 9~mA. En lysdiod lyser tydligt redan vid
+några milliampere, så 330--470~Ω är ett bra val till en 74HC-utgång. Håll strömmen under 10~mA: då
+ligger utgången väl inom sina gränser, och en hög utgång håller sin spänning.
+
+Lysdioden kopplas från utgången, genom motståndet, till jord. Då lyser den när utgången är
+\textbf{1}. Vänd den, eller koppla den mot 5~V i stället för mot jord, så lyser den när utgången är
+0: det fungerar också, men gör varje avläsning baklänges.
+
+\subsection{Kopplingsdäcket}
+\label{c4:b6}
+Ett \textbf{kopplingsdäck} (\emph{breadboard}) låter dig koppla upp en krets utan att löda. Under
+hålen finns metallfjädrar som förbinder hålen i ett bestämt mönster:
+
+\bookfigure{l04_breadboard}{Kopplingsdäck med matningsskenor, femhålskolumner och en IC-krets över
+mittspåret.}{c4:fig:breadboard}
+
+\begin{itemize}
+  \item \textbf{Matningsskenorna} längs kanterna, märkta \code{+} (röd linje) och \code{-} (blå
+    linje), är förbundna längs hela kanten. Anslut 5~V och jord till dem en gång, så har du
+    matning överallt.
+  \item \textbf{Hålen i mitten} är förbundna \textbf{fem och fem i kolumner}, a--e på ena sidan av
+    mittspåret och f--j på den andra. Allt som sitter i samma kolumn på samma sida är kopplat
+    ihop.
+  \item \textbf{Mittspåret} skiljer de två halvorna åt. En IC-krets sätts \textbf{över} mittspåret,
+    så att varje ben hamnar i en egen kolumn, och du får fyra lediga hål bredvid varje ben att
+    koppla till.
+\end{itemize}
+
+Tre vanliga fel, som alla ger en krets som \enquote{nästan} fungerar:
+\begin{itemize}
+  \item Två ledningar i \textbf{samma kolumn} som inte skulle vara ihopkopplade. De är det nu.
+  \item En krets som \textbf{inte} sitter över mittspåret: då kortsluts benen parvis.
+  \item Matningsskenor som är \textbf{delade på mitten}. På en del kopplingsdäck går skenan inte
+    hela vägen, vilket syns som ett avbrott i den röda eller blå linjen. Koppla i så fall ihop
+    halvorna.
+\end{itemize}
+
+Använd gärna \textbf{röd tråd för 5~V och svart eller blå för jord}, och korta trådar som ligger
+platt mot däcket. En uppkoppling som går att följa med blicken går också att felsöka.
+
+Sätt en \textbf{avkopplingskondensator} på 100~nF mellan VCC och GND, så nära varje krets som
+möjligt. När en grind slår om drar den en kort strömpuls, och kondensatorn levererar den lokalt, i
+stället för att pulsen ska störa matningen till resten av kretsarna. I små uppkopplingar som i
+Labb~2 fungerar det ofta utan, men det är god vana, och i en verklig konstruktion är den inte
+valfri.
+
+\subsection{Att planera en uppkoppling}
+\label{c4:b7}
+Den som börjar koppla direkt från ett grindnät tappar bort sig efter tredje sladden. Planera i
+stället i tre steg, med papper och penna.
+
+\textbf{1. Räkna grindarna, välj kretsar.} Räkna hur många grindar av varje sort nätet behöver, och
+hur många kretsar det blir. Varje 74HC08, 32, 00, 02 och 86 har fyra grindar, 74HC04 har sex.
+
+\textbf{2. Gör en grindtilldelning.} Bestäm vilken grind i vilken krets som gör vad, och skriv ut
+benens nummer. Kretsarna får beteckningarna U1, U2 och så vidare. För \code{X = AB + C}:
+
+\begin{booktable}{@{}>{\raggedright\arraybackslash}p{6.4em}p{6.6em}%
+    >{\raggedright\arraybackslash}p{4.6em}L>{\raggedright\arraybackslash}p{4.4em}@{}}
+  \thead{Grind i nätet} & \thead{Krets} & \thead{Grind i kretsen} & \thead{Ingångar (ben)} &
+    \thead{Utgång (ben)} \\
+  \midrule
+  AND: \code{AB} & U1 = 74HC08 & grind 1 & A $\rightarrow$ 1, B $\rightarrow$ 2 & 3 \\
+  OR: \code{AB + C} & U2 = 74HC32 & grind 1 & U1 ben 3 $\rightarrow$ 1, C $\rightarrow$ 2 &
+    3 $\rightarrow$ X \\
+\end{booktable}
+
+\textbf{3. Gör en kopplingslista.} En rad per ledning, i den ordning du kopplar. Börja alltid med
+matningen:
+
+\begin{booktable}{@{}p{2em}Lp{8em}@{}}
+  \thead{Nr} & \thead{Från} & \thead{Till} \\
+  \midrule
+  1 & U1 ben 14 & +5~V \\
+  2 & U1 ben 7 & GND \\
+  3 & U2 ben 14 & +5~V \\
+  4 & U2 ben 7 & GND \\
+  5 & strömbrytare A & U1 ben 1 \\
+  6 & strömbrytare B & U1 ben 2 \\
+  7 & U1 ben 3 & U2 ben 1 \\
+  8 & strömbrytare C & U2 ben 2 \\
+  9 & U2 ben 3 & lysdiod X \\
+  10 & oanvända ingångar (U1 ben 4, 5, 9, 10, 12, 13; U2 ben 4, 5, 9, 10, 12, 13) & GND \\
+\end{booktable}
+
+Bocka av varje rad när ledningen sitter. Om något inte fungerar har du nu en lista att kontrollera
+rad för rad, och det är precis vad felsökningen i \secref{c5:app:a} bygger på.
+
+\subsection{Förbered Labb~2}
+\label{c4:b8}
+Labb~2 (bilaga~\ref{app:lab2}) hör till kapitel~\ref{c5:ch}, och du hinner inte klart om
+förberedelserna görs vid labbplatsen. Före labben ska du ha:
+\begin{itemize}
+  \item läst hela labbhandledningen, och tagit fram sanningstabeller, Karnaughdiagram och
+    minimerade uttryck för varje uppgift;
+  \item ritat grindnätet för varje uppgift, och byggt och testat det i CircuitVerse;
+  \item gjort en grindtilldelning och en kopplingslista (\secref{c4:b7}) för varje uppgift;
+  \item för Labb~2-2: gjort om näten till enbart NAND (\secref{c4:a9}), och gjort
+    grindtilldelningen för 74HC00.
+\end{itemize}
+
+Ta med allt på papper eller i datorn. Förberedelserna är en del av redovisningen.
