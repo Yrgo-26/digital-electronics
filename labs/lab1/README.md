@@ -282,7 +282,20 @@ räknelagar, varför den aldrig påverkar lampan fast den påverkar strömmen.
 
 ---
 
-## Uppgift 9 - Extra: fler funktioner
+## Uppgift 9 - Trappomkopplare
+Bygg en trappomkopplare, där lampan kan tändas och släckas med vilken som helst av de två knapparna.
+
+Varje gång en knapp ändrar läge ska lampan ändra läge. Om lampan lyser när båda knapparna är
+släppta, ska den alltså slockna när S1 eller S2 trycks ned. När båda knapparna är nedtryckta ska
+lampan vara i samma läge som när båda är släppta.
+
+Rita kontaktnätet och koppla det.
+
+**Redovisa** kontaktnätet och kopplingen.
+
+---
+
+## Uppgift 10 - Extra: fler funktioner
 *Frivillig uppgift, för den som blir klar i tid.*
 
 Med två knappar finns det 16 olika funktioner, eftersom varje rad i en tabell med fyra rader kan
@@ -300,8 +313,8 @@ knapparna? Vilka klarar sig med ett element per knapp?
 ---
 
 ## Redovisning
-Läraren prickar av varje uppgift när den är redovisad. För godkänd laboration krävs uppgift 1-8;
-uppgift 9 är frivillig. Båda i paret ska kunna förklara varje koppling.
+Läraren prickar av varje uppgift när den är redovisad. För godkänd laboration krävs uppgift 1-9;
+uppgift 10 är frivillig. Båda i paret ska kunna förklara varje koppling.
 
 | Uppgift | Innehåll | Redovisad |
 |---------|----------|-----------|
@@ -314,7 +327,8 @@ uppgift 9 är frivillig. Båda i paret ska kunna förklara varje koppling.
 | 6 | XOR och XNOR | |
 | 7 | Syntes från sanningstabell | |
 | 8 | Analys av ett kontaktnät | |
-| 9 | Extra (frivillig) | |
+| 9 | Trappomkopplare | |
+| 10 | Extra (frivillig) | |
 
 Återställ stationen när ni är klara: aggregatet av, sladdarna tillbaka på sin plats.
 
