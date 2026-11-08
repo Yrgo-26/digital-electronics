@@ -139,6 +139,22 @@ Du kan kontrollera det själv i listfilen som Microchip Studio skriver när prog
 [Appendix B.7](./b_assembly_language.md#b7-listfilen). Nästan alla instruktioner i kursen är ett
 ord, 16 bitar, långa.
 
+Alla instruktioner har inte en operationskod på fyra bitar. Operationskoden får de bitar som blir
+över när operanderna har fått sina. `ldi` behöver tolv bitar till konstanten och registret, så det
+blir fyra kvar. `mov` behöver tio bitar till sina två register, `d` och `r`, så dess operationskod
+blir sex bitar:
+
+```text
+mov  0010 11rd dddd rrrr
+eor  0010 01rd dddd rrrr
+```
+
+`mov` och `eor` börjar alltså med samma fyra bitar, och det är de två nästa som skiljer dem åt.
+Därför räcker 16 bitar till många fler än 16 instruktioner.
+
+I Microchips manual kallas hela det 16 bitar långa ordet för *opcode*. I kursen menar vi med
+operationskoden bara de bitar som väljer instruktionen.
+
 ---
 
 ## A.7 En instruktion per klockcykel

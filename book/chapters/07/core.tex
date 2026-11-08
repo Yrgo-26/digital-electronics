@@ -150,6 +150,22 @@ Så \code{ldi r16, 0x2A} blir maskinkoden:
 Du kan kontrollera det själv i listfilen som Microchip Studio skriver när programmet byggs, se
 \secref{c7:b7}. Nästan alla instruktioner i boken är ett ord, 16 bitar, långa.
 
+Alla instruktioner har inte en operationskod på fyra bitar. Operationskoden får de bitar som blir
+över när operanderna har fått sina. \code{ldi} behöver tolv bitar till konstanten och registret,
+så det blir fyra kvar. \code{mov} behöver tio bitar till sina två register, \code{d} och \code{r},
+så dess operationskod blir sex bitar:
+
+\begin{textdrawing}
+mov  0010 11rd dddd rrrr
+eor  0010 01rd dddd rrrr
+\end{textdrawing}
+
+\code{mov} och \code{eor} börjar alltså med samma fyra bitar, och det är de två nästa som skiljer
+dem åt. Därför räcker 16 bitar till många fler än 16 instruktioner.
+
+I Microchips manual kallas hela det 16 bitar långa ordet för \emph{opcode}. I den här boken menar
+vi med operationskoden bara de bitar som väljer instruktionen.
+
 \subsection{En instruktion per klockcykel}
 \label{c7:a7}
 Klockan på ett Arduino Uno-kort går med \textbf{16~MHz}. Det betyder 16 miljoner klockcykler per

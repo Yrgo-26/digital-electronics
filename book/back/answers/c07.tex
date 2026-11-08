@@ -13,10 +13,10 @@
 
 \pt{b}\code{r16}--\code{r31}.
 
-\pt{c}\code{ldi} är 16 bitar lång. Fyra av bitarna är operationskoden och åtta är konstanten, så
-det blir bara \textbf{fyra bitar} kvar till registret. Fyra bitar kan räkna från 0 till 15, alltså
-skilja på sexton register, och processorn lägger till 16: \code{0000} betyder \code{r16} och
-\code{1111} betyder \code{r31}. Det finns inget bitmönster som betyder \code{r5}.
+\pt{c}\code{ldi} är 16 bitar lång. Fyra av bitarna är operationskoden för \code{ldi} och åtta är
+konstanten, så det blir bara \textbf{fyra bitar} kvar till registret. Fyra bitar kan räkna från 0
+till 15, alltså skilja på sexton register, och processorn lägger till 16: \code{0000} betyder
+\code{r16} och \code{1111} betyder \code{r31}. Det finns inget bitmönster som betyder \code{r5}.
 
 \pt{d}Ladda konstanten i ett övre register och kopiera den:
 
